@@ -1,4 +1,7 @@
 node_modules/
-dist/
+.nuxt/
+.output/
+.data/
+dist
 *.local
 .DS_Store

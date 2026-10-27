@@ -6,33 +6,38 @@
 
 기존 `?register=shootkit` 쿼리를 붙여도 같은 키트가 열립니다.
 
-## 원본
+## Nuxt 변환(2026-10-27)
 
-- 저장소: https://github.com/bobaekimboae/bobaedream
-- 원본 커밋: [`563c3a11efb62be739d22efdcff6dd92876ee4c9`](https://github.com/bobaekimboae/bobaedream/commit/563c3a11efb62be739d22efdcff6dd92876ee4c9)
-- 원본 화면: https://bobaekimboae.github.io/bobaedream/?register=shootkit&v=563c3a1
-- 핵심 원본: `src/prototype/register/shoot-kit/`
+React 19 + Vite로 만들었던 키트를 **Nuxt 4.6.3(Vue 3.5)** 으로 옮겼습니다. 화면 동작·문구·스타일(클래스 이름)은 원본과 같게 유지했고, 카메라·캔버스·WebCodecs만 쓰는 브라우저 앱이라 SSR 없이(`ssr: false`) 정적 SPA로 만듭니다.
 
-슈트킷 소스와 필요한 공유 숏폼 코드, 데이터, 아이콘, 촬영 가이드, 로컬 글꼴을 복사했습니다. 독립 진입점과 빌드 설정을 추가했으며 공유 SNS 컴포넌트의 타입 참조만 별도 파일로 옮겼습니다. 원본 앱의 다른 화면과 서버는 포함하지 않습니다. 복사한 파일과 원본 Git blob SHA는 `docs/source-manifest.json`, 원본 에이전트 가이드는 `docs/UPSTREAM-AGENTS.md`에 기록되어 있습니다.
+- `app/components/shoot/` : 촬영 키트 화면 조각(.vue). 원본 `ShootRegister.tsx` 안의 내부 컴포넌트를 파일 하나에 하나씩 나눴습니다.
+- `app/components/shortform/` : 공유 SNS 게시 조각(`SnsPublish.vue`).
+- `app/composables/` : 카메라 스트림(`useCamera`), 창 포커스·Esc(`useDialogStack`), 사진 맞춤 크기(`useFit`), 끌어서 칸 바꾸기(`useDragSwap`), React `useEffect` 모양의 도우미(`useEffect`).
+- `app/lib/shoot/`, `app/lib/shortform/` : 프레임워크와 무관한 순수 TypeScript(촬영 항목·이미지 처리·쇼츠 컷 계획·mp4 만들기·자동 선별·숏폼 그리기). 원본 파일을 그대로 가져왔고, 공용 상수·형은 `app/lib/shoot/shared.ts`에 모았습니다.
+- `app/data/` : 촬영 항목·지역 JSON. `app/assets/css/` : 원본 CSS 그대로(전역으로 불러옴).
+- `public/` : 아이콘 · 촬영 예시 사진 · Pretendard 글꼴 · 자동 선별 자료(원본과 같음).
+
+원본 React 소스와 Git blob SHA는 `docs/source-manifest.json`, 원본 에이전트 가이드는 `docs/UPSTREAM-AGENTS.md`에 남아 있습니다(경로는 변환 전 기준).
 
 ## 실행 및 빌드
 
-Node.js 24 이상을 사용합니다.
+Node.js 22.22 이상(24 권장)을 사용합니다.
 
 ```sh
 npm ci --no-audit --no-fund
-npm run dev
-npm run build
+npm run dev        # http://127.0.0.1:3000/shootkit/
+npm run generate   # 정적 파일 → .output/public
 npm run preview
+npm run typecheck  # vue-tsc
 ```
 
-개발·미리보기 주소의 `/shootkit/` 경로로 접속합니다. 배포 파일은 `dist/`에 생성됩니다. Vite의 `base`를 `/shootkit/`으로 설정해 GitHub Pages의 프로젝트 경로와 지연 로딩 경로를 함께 처리합니다.
+개발·미리보기 주소의 `/shootkit/` 경로로 접속합니다. `nuxt.config.ts`의 `app.baseURL`을 `/shootkit/`으로 설정해 GitHub Pages의 프로젝트 경로와 지연 로딩 경로를 함께 처리합니다.
 
 ## GitHub Pages 배포
 
-`main`에는 소스를 저장하고 `gh-pages` 브랜치 루트에는 `dist/`의 파일을 저장합니다. GitHub 저장소의 **Settings → Pages → Build and deployment**에서 **Deploy from a branch**, **gh-pages**, **/(root)**를 선택합니다.
+`main`에는 소스를 저장하고 `gh-pages` 브랜치 루트에는 `npm run generate`로 만든 `.output/public/`의 파일을 저장합니다. GitHub 저장소의 **Settings → Pages → Build and deployment**에서 **Deploy from a branch**, **gh-pages**, **/(root)**를 선택합니다.
 
-새 버전은 `npm ci && npm run build` 후 생성된 `dist/`를 `gh-pages` 브랜치에 반영하면 배포됩니다. `.nojekyll`도 함께 배포합니다.
+새 버전은 `npm ci && npm run generate` 후 생성된 `.output/public/`을 `gh-pages` 브랜치에 반영하면 배포됩니다. `.nojekyll`은 `public/`에 들어 있어 함께 복사됩니다(`_nuxt/` 폴더가 Jekyll에 걸러지지 않게).
 
 ## 동작
 
