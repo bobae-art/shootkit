@@ -1,0 +1,488 @@
+{
+  "version": 1,
+  "updated": "2026-10-25",
+  "source": "노션 「등록 촬영 사진·영상 컨설팅 (58동성 비교)」 2026-10-25 · 58同城 二手车发布 촬영 레일 · 컨설팅 2건 통합 반영 2026-10-25 · 컨설팅 6건 통합(필수 4장 = 대각 2장 + 계기판 · 대시보드) 2026-10-25",
+  "rulesTitle": "이 4장을 먼저 찍어 주세요",
+  "rulesNotice": "좌측 전면 45° · 우측 후면 45° · 계기판 · 대시보드 4장을 먼저 찍으면 좋아요. 대각선 2장이면 차의 네 면이 다 보이고, 계기판으로 주행거리를 확인할 수 있어요. 사진은 1장부터 등록할 수 있어요.",
+  "levelLabels": {
+    "required": "우선",
+    "recommended": "권장",
+    "optional": "선택"
+  },
+  "photo": {
+    "min": 4,
+    "max": 30,
+    "hint": "사진 1장만 있어도 등록할 수 있어요 · 먼저 4장을 찍어 보세요",
+    "otherItemId": "other",
+    "hintDone": "나머지 각도와 엔진룸·트렁크도 찍으면 더 잘 보여요",
+    "autoSortNote": "앨범 사진 부위 자동 선별(2026-10-25): 항목 auto = 인식 부류. 같은 부류가 여러 칸이면 레일 순서대로 채운다(좌우 방향은 구분하지 않음).",
+    "enforceRequired": false,
+    "publishMin": 1,
+    "keyTitle": "먼저 찍으면 좋은",
+    "enforceNote": "2026-10-25 「필수 사진 강제를 일단은 빼자」: enforceRequired=false면 4장은 「우선」 안내만 하고 사진 publishMin장 + 소재지로 등록. 「권장」과 헷갈리지 않게 「추천」 대신 「우선」. 58 재현(&vstage=58)은 enforcedText 문구로 늘 강제."
+  },
+  "video": {
+    "perStageSec": {
+      "min": 8,
+      "max": 15
+    },
+    "extraStages": [
+      {
+        "key": "seat",
+        "label": "시트",
+        "min": 10,
+        "max": 25,
+        "hint": "운전석부터 뒷좌석까지 시트만 따로 찍어요. 가죽 상태와 시트 기능을 손으로 눌러 보여 주세요.",
+        "steps": [
+          {
+            "label": "운전석",
+            "hand": "운전석 시트 전체와 옆 볼스터를 천천히 비춰 주세요"
+          },
+          {
+            "label": "조수석",
+            "hand": "조수석 시트를 같은 높이에서 비춰 주세요"
+          },
+          {
+            "label": "뒷좌석",
+            "hand": "뒷문을 열고 뒷좌석 쿠션과 등받이를 비춰 주세요"
+          },
+          {
+            "label": "시트 기능",
+            "hand": "통풍·열선·마사지·메모리 버튼을 눌러 작동을 보여 주세요"
+          },
+          {
+            "label": "가죽 상태",
+            "hand": "가죽 주름·마모가 있는 곳을 가까이 비춰 주세요"
+          }
+        ]
+      },
+      {
+        "key": "cluster",
+        "label": "계기판",
+        "min": 3,
+        "max": 10
+      },
+      {
+        "key": "start",
+        "label": "시동 소리",
+        "min": 5,
+        "max": 15
+      },
+      {
+        "key": "tyre",
+        "label": "타이어",
+        "min": 5,
+        "max": 15
+      },
+      {
+        "key": "wheel",
+        "label": "휠·브레이크",
+        "min": 3,
+        "max": 15
+      },
+      {
+        "key": "damage",
+        "label": "흠집 표시",
+        "min": 3,
+        "max": 15
+      },
+      {
+        "key": "feature",
+        "label": "옵션 작동",
+        "min": 5,
+        "max": 15
+      },
+      {
+        "key": "comfort",
+        "label": "편의 장비",
+        "min": 5,
+        "max": 15
+      },
+      {
+        "key": "door",
+        "label": "문·트렁크",
+        "min": 3,
+        "max": 15
+      },
+      {
+        "key": "under",
+        "label": "하부",
+        "min": 3,
+        "max": 10
+      },
+      {
+        "key": "charge",
+        "label": "충전구·프렁크",
+        "min": 3,
+        "max": 15
+      }
+    ],
+    "optional": true,
+    "customTimes": [
+      {
+        "label": "3~10초",
+        "min": 3,
+        "max": 10
+      },
+      {
+        "label": "5~15초",
+        "min": 5,
+        "max": 15
+      },
+      {
+        "label": "10~30초",
+        "min": 10,
+        "max": 30
+      },
+      {
+        "label": "15~40초",
+        "min": 15,
+        "max": 40
+      }
+    ],
+    "targets": [
+      {
+        "label": "제한 없음",
+        "sec": 0
+      },
+      {
+        "label": "30초",
+        "sec": 30
+      },
+      {
+        "label": "60초",
+        "sec": 60
+      }
+    ],
+    "recommend": [
+      {
+        "id": "super",
+        "label": "슈퍼카",
+        "stages": [
+          "start",
+          "wheel",
+          "feature"
+        ]
+      },
+      {
+        "id": "luxury",
+        "label": "고급 세단",
+        "stages": [
+          "seat",
+          "comfort",
+          "feature"
+        ]
+      },
+      {
+        "id": "suv",
+        "label": "SUV·미니밴",
+        "stages": [
+          "seat",
+          "door",
+          "feature"
+        ]
+      },
+      {
+        "id": "ev",
+        "label": "전기차",
+        "replace": {
+          "engine": "charge"
+        },
+        "hide": [
+          "start",
+          "under"
+        ],
+        "stages": [
+          "cluster",
+          "feature",
+          "tyre"
+        ]
+      },
+      {
+        "id": "old",
+        "label": "10년 넘은 차",
+        "stages": [
+          "under",
+          "tyre",
+          "start"
+        ]
+      }
+    ],
+    "shorts": {
+      "lengths": [
+        15,
+        30,
+        60
+      ],
+      "skip": [
+        "damage"
+      ],
+      "keepSound": [
+        "start"
+      ],
+      "hookDefault": "실매물 영상 그대로",
+      "cutMin": 1.5,
+      "cutMax": 6,
+      "highlightCut": 2.5
+    }
+  },
+  "groups": [
+    {
+      "id": "exterior",
+      "label": "외관",
+      "level": "recommended",
+      "videoStage": true,
+      "videoKey": "exterior",
+      "items": [
+        {
+          "id": "front-left-45",
+          "label": "좌측 전면 45°",
+          "note": "대표",
+          "rule": "frontLeft",
+          "guide": {
+            "kind": "q34",
+            "hint": "차 앞모서리를 윤곽 모서리에 맞춰 주세요"
+          },
+          "level": "required",
+          "auto": [
+            "front34"
+          ]
+        },
+        {
+          "id": "front",
+          "label": "정면",
+          "rule": "front",
+          "guide": {
+            "kind": "front",
+            "hint": "차 정면이 윤곽 안에 꽉 차게 맞춰 주세요"
+          },
+          "auto": [
+            "front"
+          ]
+        },
+        {
+          "id": "front-right-45",
+          "label": "우측 전면 45°",
+          "rule": "frontRight",
+          "guide": {
+            "kind": "q34",
+            "flip": true,
+            "hint": "차 앞모서리를 윤곽 모서리에 맞춰 주세요"
+          },
+          "auto": [
+            "front34"
+          ]
+        },
+        {
+          "id": "side-right",
+          "label": "우측면",
+          "rule": "sideRight",
+          "guide": {
+            "kind": "side",
+            "flip": true,
+            "hint": "바퀴 두 개를 동그라미에 맞춰 주세요"
+          },
+          "auto": [
+            "side"
+          ]
+        },
+        {
+          "id": "rear-right-45",
+          "label": "우측 후면 45°",
+          "rule": "rearRight",
+          "level": "required",
+          "guide": {
+            "kind": "q34",
+            "flip": true,
+            "hint": "차 뒷모서리를 윤곽 모서리에 맞춰 주세요"
+          },
+          "auto": [
+            "rear34"
+          ]
+        },
+        {
+          "id": "rear",
+          "label": "후면",
+          "rule": "rear",
+          "guide": {
+            "kind": "rear",
+            "hint": "차 뒷면이 윤곽 안에 꽉 차게 맞춰 주세요"
+          },
+          "auto": [
+            "rear"
+          ]
+        },
+        {
+          "id": "side-left",
+          "label": "좌측면",
+          "rule": "side",
+          "guide": {
+            "kind": "side",
+            "hint": "바퀴 두 개를 동그라미에 맞춰 주세요"
+          },
+          "auto": [
+            "side"
+          ]
+        }
+      ],
+      "videoSec": {
+        "min": 15,
+        "max": 30
+      }
+    },
+    {
+      "id": "interior",
+      "label": "실내",
+      "level": "recommended",
+      "videoStage": true,
+      "videoKey": "interior",
+      "videoSteps": [
+        {
+          "item": "cluster",
+          "label": "계기판",
+          "hand": "시동을 켜고 주행거리 숫자를 잠깐 멈춰 보여 주세요"
+        },
+        {
+          "item": "dashboard",
+          "label": "대시보드",
+          "hand": "핸들을 잡고 버튼, 가운데 화면까지 천천히 훑어 주세요"
+        },
+        {
+          "item": "front-seat",
+          "label": "앞좌석",
+          "hand": "시트를 손으로 눌러 보고 천장·선루프도 같이 보여 주세요"
+        },
+        {
+          "item": "rear-seat",
+          "label": "뒷좌석",
+          "hand": "뒷문을 열고 뒷좌석 쿠션을 손으로 눌러 주세요"
+        }
+      ],
+      "items": [
+        {
+          "id": "cluster",
+          "label": "계기판",
+          "rule": "cluster",
+          "guide": {
+            "kind": "cluster",
+            "hint": "시동을 켜고 주행거리 숫자가 보이게 찍어 주세요"
+          },
+          "level": "required",
+          "auto": [
+            "cluster"
+          ]
+        },
+        {
+          "id": "dashboard",
+          "label": "대시보드",
+          "rule": "dash",
+          "guide": {
+            "kind": "dash",
+            "hint": "핸들과 가운데 화면이 함께 보이게 찍어 주세요"
+          },
+          "level": "required",
+          "auto": [
+            "dashboard",
+            "center"
+          ]
+        },
+        {
+          "id": "front-seat",
+          "label": "앞좌석",
+          "rule": "frontSeat",
+          "guide": {
+            "kind": "free",
+            "hint": "운전석·조수석 시트가 함께 보이게 찍어 주세요"
+          },
+          "auto": [
+            "frontseat"
+          ]
+        },
+        {
+          "id": "rear-seat",
+          "label": "뒷좌석",
+          "rule": "rearSeat",
+          "guide": {
+            "kind": "free",
+            "hint": "뒷문을 열고 뒷좌석 전체가 보이게 찍어 주세요"
+          },
+          "auto": [
+            "rearseat"
+          ]
+        }
+      ],
+      "videoSec": {
+        "min": 10,
+        "max": 20
+      }
+    },
+    {
+      "id": "engine",
+      "label": "엔진룸",
+      "level": "recommended",
+      "videoStage": true,
+      "videoKey": "engine",
+      "items": [
+        {
+          "id": "engine-bay",
+          "label": "엔진룸",
+          "rule": "engine",
+          "guide": {
+            "kind": "engine",
+            "hint": "보닛을 끝까지 열고 엔진룸 전체가 보이게 찍어 주세요"
+          },
+          "auto": [
+            "engine"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "trunk",
+      "label": "트렁크",
+      "level": "recommended",
+      "videoStage": true,
+      "videoKey": "trunk",
+      "items": [
+        {
+          "id": "trunk-open",
+          "label": "트렁크",
+          "rule": "trunk",
+          "guide": {
+            "kind": "trunk",
+            "hint": "트렁크를 열고 바닥까지 보이게 찍어 주세요"
+          },
+          "auto": [
+            "trunk"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "other",
+      "label": "기타",
+      "level": "optional",
+      "videoStage": false,
+      "items": [
+        {
+          "id": "other",
+          "label": "기타",
+          "repeatable": true,
+          "guide": {
+            "kind": "free",
+            "hint": "찍을 부분이 네 모서리 안에 들어오게 맞춰 주세요"
+          }
+        }
+      ]
+    }
+  ],
+  "vehicleType": "car",
+  "vehicleNote": "중고차(승용) 기준 목록이에요.",
+  "enforcedText": {
+    "note": "강제할 때(enforceRequired true 또는 58 재현 &vstage=58) 쓰는 문구",
+    "levelLabel": "필수",
+    "rulesTitle": "필수 4장은 꼭 찍어 주세요",
+    "rulesNotice": "좌측 전면 45° · 우측 후면 45° · 계기판 · 대시보드 4장을 찍어야 등록할 수 있어요. 대각선 2장이면 차의 네 면이 다 보이고, 계기판으로 주행거리를 확인할 수 있어요.",
+    "hint": "필수 4장을 찍으면 등록할 수 있어요"
+  }
+}

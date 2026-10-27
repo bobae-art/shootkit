@@ -1,0 +1,1151 @@
+{
+  "repository": "https://github.com/bobaekimboae/bobaedream",
+  "commit": "563c3a11efb62be739d22efdcff6dd92876ee4c9",
+  "files": [
+    {
+      "path": "src/prototype/preload-guard.ts",
+      "upstreamBlobSha": "247eae1a00c6c27fb5de184c902aad8c6f517ce8",
+      "localBlobSha": "247eae1a00c6c27fb5de184c902aad8c6f517ce8",
+      "adapted": false
+    },
+    {
+      "path": "src/prototype/data/regions-kr.json",
+      "upstreamBlobSha": "bebc42c863a05d308eadf686d7c357ad66b6e831",
+      "localBlobSha": "bebc42c863a05d308eadf686d7c357ad66b6e831",
+      "adapted": false
+    },
+    {
+      "path": "src/prototype/data/shoot-items-kit.json",
+      "upstreamBlobSha": "483234a77f202135e9e04370b8bd39f5fc94a247",
+      "localBlobSha": "483234a77f202135e9e04370b8bd39f5fc94a247",
+      "adapted": false
+    },
+    {
+      "path": "src/prototype/dealer-page/shortform/render.ts",
+      "upstreamBlobSha": "2b0e287e2af66135f6796e0fe0cd56278cd68433",
+      "localBlobSha": "2b0e287e2af66135f6796e0fe0cd56278cd68433",
+      "adapted": false
+    },
+    {
+      "path": "src/prototype/dealer-page/shortform/shortform-studio.css",
+      "upstreamBlobSha": "410a24d6276513de50cd2b6fa3ee009d111dad12",
+      "localBlobSha": "410a24d6276513de50cd2b6fa3ee009d111dad12",
+      "adapted": false
+    },
+    {
+      "path": "src/prototype/dealer-page/shortform/SnsPublish.tsx",
+      "upstreamBlobSha": "05c30f59bd257de721846df5e2ce5af746dfe289",
+      "localBlobSha": "9ab181b827bac42b4df8357fbbaaef44726b004c",
+      "adapted": true
+    },
+    {
+      "path": "src/prototype/fonts/pretendard.ts",
+      "upstreamBlobSha": "7d1f98bddd4c5e4850f116c944f453ce98dd3465",
+      "localBlobSha": "7d1f98bddd4c5e4850f116c944f453ce98dd3465",
+      "adapted": false
+    },
+    {
+      "path": "src/prototype/register/shoot-kit/autosort.ts",
+      "upstreamBlobSha": "a8458a3a4ae9bf17a1b85a3a0eeb5e2eeb652db4",
+      "localBlobSha": "a8458a3a4ae9bf17a1b85a3a0eeb5e2eeb652db4",
+      "adapted": false
+    },
+    {
+      "path": "src/prototype/register/shoot-kit/camera.ts",
+      "upstreamBlobSha": "6e155866374fc1e5d582f225d80d4bf656da141d",
+      "localBlobSha": "6e155866374fc1e5d582f225d80d4bf656da141d",
+      "adapted": false
+    },
+    {
+      "path": "src/prototype/register/shoot-kit/guides.tsx",
+      "upstreamBlobSha": "ec7ee60765b063b9cf13dd062f221f92f02f0259",
+      "localBlobSha": "ec7ee60765b063b9cf13dd062f221f92f02f0259",
+      "adapted": false
+    },
+    {
+      "path": "src/prototype/register/shoot-kit/image-ops.ts",
+      "upstreamBlobSha": "b35d2bcfae7dc2b51f8eedb702a0a6e724e6a980",
+      "localBlobSha": "b35d2bcfae7dc2b51f8eedb702a0a6e724e6a980",
+      "adapted": false
+    },
+    {
+      "path": "src/prototype/register/shoot-kit/items.ts",
+      "upstreamBlobSha": "9b1b60c8f6e2592d10003067b54beb2f7dff6e80",
+      "localBlobSha": "9b1b60c8f6e2592d10003067b54beb2f7dff6e80",
+      "adapted": false
+    },
+    {
+      "path": "src/prototype/register/shoot-kit/layer-esc.ts",
+      "upstreamBlobSha": "87d80233ebca565ed457e26f99448ef5b0628b30",
+      "localBlobSha": "87d80233ebca565ed457e26f99448ef5b0628b30",
+      "adapted": false
+    },
+    {
+      "path": "src/prototype/register/shoot-kit/photo-sort.tsx",
+      "upstreamBlobSha": "da5bc979dee77211c78fd69d7be0f26dd54102ad",
+      "localBlobSha": "da5bc979dee77211c78fd69d7be0f26dd54102ad",
+      "adapted": false
+    },
+    {
+      "path": "src/prototype/register/shoot-kit/save-mp4.ts",
+      "upstreamBlobSha": "4e0436fb7df8ce6f4784f98b9c3cd55bf75fe61d",
+      "localBlobSha": "4e0436fb7df8ce6f4784f98b9c3cd55bf75fe61d",
+      "adapted": false
+    },
+    {
+      "path": "src/prototype/register/shoot-kit/shoot.css",
+      "upstreamBlobSha": "48379801cfd5aad8ea18d72007f5fc4727b4e4e4",
+      "localBlobSha": "48379801cfd5aad8ea18d72007f5fc4727b4e4e4",
+      "adapted": false
+    },
+    {
+      "path": "src/prototype/register/shoot-kit/ShootRegister.tsx",
+      "upstreamBlobSha": "c415ea0aa999076899d0049b15479a3276497979",
+      "localBlobSha": "c415ea0aa999076899d0049b15479a3276497979",
+      "adapted": false
+    },
+    {
+      "path": "src/prototype/register/shoot-kit/shorts.css",
+      "upstreamBlobSha": "14b60f1170383449f575e4c953d38d934051262b",
+      "localBlobSha": "14b60f1170383449f575e4c953d38d934051262b",
+      "adapted": false
+    },
+    {
+      "path": "src/prototype/register/shoot-kit/shorts.ts",
+      "upstreamBlobSha": "ab2bc423fa484f3f2ad0692c61bf1f92d3f181e3",
+      "localBlobSha": "ab2bc423fa484f3f2ad0692c61bf1f92d3f181e3",
+      "adapted": false
+    },
+    {
+      "path": "src/prototype/register/shoot-kit/ShortsMaker.tsx",
+      "upstreamBlobSha": "241c3976b5a3fc03230576d51850d472d294c58c",
+      "localBlobSha": "241c3976b5a3fc03230576d51850d472d294c58c",
+      "adapted": false
+    },
+    {
+      "path": "src/prototype/register/shoot-kit/sound.ts",
+      "upstreamBlobSha": "2e05c06627965445ebe24671e622e912fe0c98ef",
+      "localBlobSha": "2e05c06627965445ebe24671e622e912fe0c98ef",
+      "adapted": false
+    },
+    {
+      "path": "src/prototype/register/shoot-kit/stage-prefs.ts",
+      "upstreamBlobSha": "964e47128315b60e48bf67b8bea94c566fc8b1c9",
+      "localBlobSha": "964e47128315b60e48bf67b8bea94c566fc8b1c9",
+      "adapted": false
+    },
+    {
+      "path": "src/prototype/register/shoot-kit/templates.tsx",
+      "upstreamBlobSha": "c1276a7704a15480e81287d978f9693d3563d3f8",
+      "localBlobSha": "c1276a7704a15480e81287d978f9693d3563d3f8",
+      "adapted": false
+    },
+    {
+      "path": "src/prototype/register/shoot-kit/use-inline-css.ts",
+      "upstreamBlobSha": "cf7b8fc444343d173cc6fa307047c610aa1e325e",
+      "localBlobSha": "cf7b8fc444343d173cc6fa307047c610aa1e325e",
+      "adapted": false
+    },
+    {
+      "path": "public/assets/fonts/pretendard/OFL.txt",
+      "upstreamBlobSha": "497b88f9fa7623ba9f8fdac86b43dec5621984ed",
+      "localBlobSha": "497b88f9fa7623ba9f8fdac86b43dec5621984ed",
+      "adapted": false
+    },
+    {
+      "path": "public/assets/fonts/pretendard/pretendard-guazi.css",
+      "upstreamBlobSha": "5f3ca12bcc9b9a233d6a2ae7d3ba3355e8b2f200",
+      "localBlobSha": "5f3ca12bcc9b9a233d6a2ae7d3ba3355e8b2f200",
+      "adapted": false
+    },
+    {
+      "path": "public/assets/fonts/pretendard/woff2-dynamic-subset/PretendardVariable.subset.0.woff2",
+      "upstreamBlobSha": "eec84682c9e1118f5d64bac7b60a0d5c8cc277db",
+      "localBlobSha": "eec84682c9e1118f5d64bac7b60a0d5c8cc277db",
+      "adapted": false
+    },
+    {
+      "path": "public/assets/fonts/pretendard/woff2-dynamic-subset/PretendardVariable.subset.1.woff2",
+      "upstreamBlobSha": "a0fa937345eb0d7c341ac4a4b63496a2b7d2d078",
+      "localBlobSha": "a0fa937345eb0d7c341ac4a4b63496a2b7d2d078",
+      "adapted": false
+    },
+    {
+      "path": "public/assets/fonts/pretendard/woff2-dynamic-subset/PretendardVariable.subset.10.woff2",
+      "upstreamBlobSha": "5ac44404ac52db01d5318a3ce41db7025256125f",
+      "localBlobSha": "5ac44404ac52db01d5318a3ce41db7025256125f",
+      "adapted": false
+    },
+    {
+      "path": "public/assets/fonts/pretendard/woff2-dynamic-subset/PretendardVariable.subset.11.woff2",
+      "upstreamBlobSha": "aec023b90b564d1c50b4501bd138c592d6592463",
+      "localBlobSha": "aec023b90b564d1c50b4501bd138c592d6592463",
+      "adapted": false
+    },
+    {
+      "path": "public/assets/fonts/pretendard/woff2-dynamic-subset/PretendardVariable.subset.12.woff2",
+      "upstreamBlobSha": "27f0ba1cf08d4d68da4cb2b3abbc2ea915fe14f7",
+      "localBlobSha": "27f0ba1cf08d4d68da4cb2b3abbc2ea915fe14f7",
+      "adapted": false
+    },
+    {
+      "path": "public/assets/fonts/pretendard/woff2-dynamic-subset/PretendardVariable.subset.13.woff2",
+      "upstreamBlobSha": "c78d1b7654985830400adc0ea90c5fe6b4da324f",
+      "localBlobSha": "c78d1b7654985830400adc0ea90c5fe6b4da324f",
+      "adapted": false
+    },
+    {
+      "path": "public/assets/fonts/pretendard/woff2-dynamic-subset/PretendardVariable.subset.14.woff2",
+      "upstreamBlobSha": "4ee047882bfd16a67e504e5902244076ae62c62e",
+      "localBlobSha": "4ee047882bfd16a67e504e5902244076ae62c62e",
+      "adapted": false
+    },
+    {
+      "path": "public/assets/fonts/pretendard/woff2-dynamic-subset/PretendardVariable.subset.15.woff2",
+      "upstreamBlobSha": "e311b83e8c8bb5874e8dded8790b52a062cb0530",
+      "localBlobSha": "e311b83e8c8bb5874e8dded8790b52a062cb0530",
+      "adapted": false
+    },
+    {
+      "path": "public/assets/fonts/pretendard/woff2-dynamic-subset/PretendardVariable.subset.16.woff2",
+      "upstreamBlobSha": "1118dad2a2cf7868c75668f48f06908bc229a468",
+      "localBlobSha": "1118dad2a2cf7868c75668f48f06908bc229a468",
+      "adapted": false
+    },
+    {
+      "path": "public/assets/fonts/pretendard/woff2-dynamic-subset/PretendardVariable.subset.17.woff2",
+      "upstreamBlobSha": "28d9f1b02899b1892cdc357d6a8c75ed984e13ab",
+      "localBlobSha": "28d9f1b02899b1892cdc357d6a8c75ed984e13ab",
+      "adapted": false
+    },
+    {
+      "path": "public/assets/fonts/pretendard/woff2-dynamic-subset/PretendardVariable.subset.18.woff2",
+      "upstreamBlobSha": "0aa785d80dc1e3937b2911aba15ab3180acdfc4b",
+      "localBlobSha": "0aa785d80dc1e3937b2911aba15ab3180acdfc4b",
+      "adapted": false
+    },
+    {
+      "path": "public/assets/fonts/pretendard/woff2-dynamic-subset/PretendardVariable.subset.19.woff2",
+      "upstreamBlobSha": "cffd0457cdbda5437f8c5054f2a4a5adc24a37f5",
+      "localBlobSha": "cffd0457cdbda5437f8c5054f2a4a5adc24a37f5",
+      "adapted": false
+    },
+    {
+      "path": "public/assets/fonts/pretendard/woff2-dynamic-subset/PretendardVariable.subset.2.woff2",
+      "upstreamBlobSha": "11188574ceeab8a1513413cf453a48474ec2473a",
+      "localBlobSha": "11188574ceeab8a1513413cf453a48474ec2473a",
+      "adapted": false
+    },
+    {
+      "path": "public/assets/fonts/pretendard/woff2-dynamic-subset/PretendardVariable.subset.20.woff2",
+      "upstreamBlobSha": "446057e3f19607efdaa982a321a56f7ca6a603d2",
+      "localBlobSha": "446057e3f19607efdaa982a321a56f7ca6a603d2",
+      "adapted": false
+    },
+    {
+      "path": "public/assets/fonts/pretendard/woff2-dynamic-subset/PretendardVariable.subset.21.woff2",
+      "upstreamBlobSha": "a1f22ace7a6f19c629f9e729288cb95ead1e7f23",
+      "localBlobSha": "a1f22ace7a6f19c629f9e729288cb95ead1e7f23",
+      "adapted": false
+    },
+    {
+      "path": "public/assets/fonts/pretendard/woff2-dynamic-subset/PretendardVariable.subset.22.woff2",
+      "upstreamBlobSha": "544bce298fec01f73157f19e8d427d121ff7452c",
+      "localBlobSha": "544bce298fec01f73157f19e8d427d121ff7452c",
+      "adapted": false
+    },
+    {
+      "path": "public/assets/fonts/pretendard/woff2-dynamic-subset/PretendardVariable.subset.23.woff2",
+      "upstreamBlobSha": "7184f01fbed048b7afdd217e0aa9cc299ad5db07",
+      "localBlobSha": "7184f01fbed048b7afdd217e0aa9cc299ad5db07",
+      "adapted": false
+    },
+    {
+      "path": "public/assets/fonts/pretendard/woff2-dynamic-subset/PretendardVariable.subset.24.woff2",
+      "upstreamBlobSha": "030323fe9810ffafe354ff7ba9f90d5d029e39f2",
+      "localBlobSha": "030323fe9810ffafe354ff7ba9f90d5d029e39f2",
+      "adapted": false
+    },
+    {
+      "path": "public/assets/fonts/pretendard/woff2-dynamic-subset/PretendardVariable.subset.25.woff2",
+      "upstreamBlobSha": "cbbeb7c4698db1096acb70f0246dc2953b466a1f",
+      "localBlobSha": "cbbeb7c4698db1096acb70f0246dc2953b466a1f",
+      "adapted": false
+    },
+    {
+      "path": "public/assets/fonts/pretendard/woff2-dynamic-subset/PretendardVariable.subset.26.woff2",
+      "upstreamBlobSha": "6cd7515ff60dde70440031a0c68b09fc29545431",
+      "localBlobSha": "6cd7515ff60dde70440031a0c68b09fc29545431",
+      "adapted": false
+    },
+    {
+      "path": "public/assets/fonts/pretendard/woff2-dynamic-subset/PretendardVariable.subset.27.woff2",
+      "upstreamBlobSha": "2af9f95922ca6ec4d16ccd72fb8b68a46fb9e37f",
+      "localBlobSha": "2af9f95922ca6ec4d16ccd72fb8b68a46fb9e37f",
+      "adapted": false
+    },
+    {
+      "path": "public/assets/fonts/pretendard/woff2-dynamic-subset/PretendardVariable.subset.28.woff2",
+      "upstreamBlobSha": "25c9459f7268570d82f2917764342750fbdbe5e3",
+      "localBlobSha": "25c9459f7268570d82f2917764342750fbdbe5e3",
+      "adapted": false
+    },
+    {
+      "path": "public/assets/fonts/pretendard/woff2-dynamic-subset/PretendardVariable.subset.29.woff2",
+      "upstreamBlobSha": "2226447dda0867684ae415b9db068b9fa575840b",
+      "localBlobSha": "2226447dda0867684ae415b9db068b9fa575840b",
+      "adapted": false
+    },
+    {
+      "path": "public/assets/fonts/pretendard/woff2-dynamic-subset/PretendardVariable.subset.3.woff2",
+      "upstreamBlobSha": "8ccaf48f6f2ce3c7eaed15da7f3ba09ca2fce67e",
+      "localBlobSha": "8ccaf48f6f2ce3c7eaed15da7f3ba09ca2fce67e",
+      "adapted": false
+    },
+    {
+      "path": "public/assets/fonts/pretendard/woff2-dynamic-subset/PretendardVariable.subset.30.woff2",
+      "upstreamBlobSha": "c5a3f9def547eb4c1c1412d619ef8ff8e28bc98c",
+      "localBlobSha": "c5a3f9def547eb4c1c1412d619ef8ff8e28bc98c",
+      "adapted": false
+    },
+    {
+      "path": "public/assets/fonts/pretendard/woff2-dynamic-subset/PretendardVariable.subset.31.woff2",
+      "upstreamBlobSha": "b5a465b4e27e77de0be1f4189f66617d29399b9c",
+      "localBlobSha": "b5a465b4e27e77de0be1f4189f66617d29399b9c",
+      "adapted": false
+    },
+    {
+      "path": "public/assets/fonts/pretendard/woff2-dynamic-subset/PretendardVariable.subset.32.woff2",
+      "upstreamBlobSha": "0d02dc928b572252c24a378b2f8da0e6a10764d7",
+      "localBlobSha": "0d02dc928b572252c24a378b2f8da0e6a10764d7",
+      "adapted": false
+    },
+    {
+      "path": "public/assets/fonts/pretendard/woff2-dynamic-subset/PretendardVariable.subset.33.woff2",
+      "upstreamBlobSha": "1912f3bb9babae90573a055ee4040851e3a4758f",
+      "localBlobSha": "1912f3bb9babae90573a055ee4040851e3a4758f",
+      "adapted": false
+    },
+    {
+      "path": "public/assets/fonts/pretendard/woff2-dynamic-subset/PretendardVariable.subset.34.woff2",
+      "upstreamBlobSha": "3cc0b4e2ec537afb75b3d5ab1202bb8f132256ca",
+      "localBlobSha": "3cc0b4e2ec537afb75b3d5ab1202bb8f132256ca",
+      "adapted": false
+    },
+    {
+      "path": "public/assets/fonts/pretendard/woff2-dynamic-subset/PretendardVariable.subset.35.woff2",
+      "upstreamBlobSha": "c6d452f3be058895bcfb4fe408049a501baa96c7",
+      "localBlobSha": "c6d452f3be058895bcfb4fe408049a501baa96c7",
+      "adapted": false
+    },
+    {
+      "path": "public/assets/fonts/pretendard/woff2-dynamic-subset/PretendardVariable.subset.36.woff2",
+      "upstreamBlobSha": "d549819a831532c7bc6cc4173f5e336738a2401a",
+      "localBlobSha": "d549819a831532c7bc6cc4173f5e336738a2401a",
+      "adapted": false
+    },
+    {
+      "path": "public/assets/fonts/pretendard/woff2-dynamic-subset/PretendardVariable.subset.37.woff2",
+      "upstreamBlobSha": "31b1a22ee6103bd53029d9de792f06a7873acc4c",
+      "localBlobSha": "31b1a22ee6103bd53029d9de792f06a7873acc4c",
+      "adapted": false
+    },
+    {
+      "path": "public/assets/fonts/pretendard/woff2-dynamic-subset/PretendardVariable.subset.38.woff2",
+      "upstreamBlobSha": "8866b03ee4cc77a9560781f96916d607e654ed4b",
+      "localBlobSha": "8866b03ee4cc77a9560781f96916d607e654ed4b",
+      "adapted": false
+    },
+    {
+      "path": "public/assets/fonts/pretendard/woff2-dynamic-subset/PretendardVariable.subset.39.woff2",
+      "upstreamBlobSha": "f165e2c8f2a72bf5b1ef8d5635b81a0a5b8cb29c",
+      "localBlobSha": "f165e2c8f2a72bf5b1ef8d5635b81a0a5b8cb29c",
+      "adapted": false
+    },
+    {
+      "path": "public/assets/fonts/pretendard/woff2-dynamic-subset/PretendardVariable.subset.4.woff2",
+      "upstreamBlobSha": "33f9cf65dec5dac180424154b3476f910a9ba720",
+      "localBlobSha": "33f9cf65dec5dac180424154b3476f910a9ba720",
+      "adapted": false
+    },
+    {
+      "path": "public/assets/fonts/pretendard/woff2-dynamic-subset/PretendardVariable.subset.40.woff2",
+      "upstreamBlobSha": "521ec28d9ece022ef1bb773505d8b23cf353abbf",
+      "localBlobSha": "521ec28d9ece022ef1bb773505d8b23cf353abbf",
+      "adapted": false
+    },
+    {
+      "path": "public/assets/fonts/pretendard/woff2-dynamic-subset/PretendardVariable.subset.41.woff2",
+      "upstreamBlobSha": "96b01ce0d9905e38d5ba70d7a9cbb09795e82da9",
+      "localBlobSha": "96b01ce0d9905e38d5ba70d7a9cbb09795e82da9",
+      "adapted": false
+    },
+    {
+      "path": "public/assets/fonts/pretendard/woff2-dynamic-subset/PretendardVariable.subset.42.woff2",
+      "upstreamBlobSha": "0f0b66d2edda5af368da826a960683776525f69d",
+      "localBlobSha": "0f0b66d2edda5af368da826a960683776525f69d",
+      "adapted": false
+    },
+    {
+      "path": "public/assets/fonts/pretendard/woff2-dynamic-subset/PretendardVariable.subset.43.woff2",
+      "upstreamBlobSha": "b470a9094717de710cb960c2beba18b533e7a3f5",
+      "localBlobSha": "b470a9094717de710cb960c2beba18b533e7a3f5",
+      "adapted": false
+    },
+    {
+      "path": "public/assets/fonts/pretendard/woff2-dynamic-subset/PretendardVariable.subset.44.woff2",
+      "upstreamBlobSha": "96a3e1d493c4ae5cb28fa0b2c714f25846fc0822",
+      "localBlobSha": "96a3e1d493c4ae5cb28fa0b2c714f25846fc0822",
+      "adapted": false
+    },
+    {
+      "path": "public/assets/fonts/pretendard/woff2-dynamic-subset/PretendardVariable.subset.45.woff2",
+      "upstreamBlobSha": "31e4cecaff982991b438fb813d63ece3d7477da2",
+      "localBlobSha": "31e4cecaff982991b438fb813d63ece3d7477da2",
+      "adapted": false
+    },
+    {
+      "path": "public/assets/fonts/pretendard/woff2-dynamic-subset/PretendardVariable.subset.46.woff2",
+      "upstreamBlobSha": "d0ae0923ac171cd2413bd6070cbc4aa287eaace9",
+      "localBlobSha": "d0ae0923ac171cd2413bd6070cbc4aa287eaace9",
+      "adapted": false
+    },
+    {
+      "path": "public/assets/fonts/pretendard/woff2-dynamic-subset/PretendardVariable.subset.47.woff2",
+      "upstreamBlobSha": "3b41251d081a1b14fa533acb73aa011cb2e5f642",
+      "localBlobSha": "3b41251d081a1b14fa533acb73aa011cb2e5f642",
+      "adapted": false
+    },
+    {
+      "path": "public/assets/fonts/pretendard/woff2-dynamic-subset/PretendardVariable.subset.48.woff2",
+      "upstreamBlobSha": "ce02f5bd830fb86b2fd154d3a56849c9e5fd9040",
+      "localBlobSha": "ce02f5bd830fb86b2fd154d3a56849c9e5fd9040",
+      "adapted": false
+    },
+    {
+      "path": "public/assets/fonts/pretendard/woff2-dynamic-subset/PretendardVariable.subset.49.woff2",
+      "upstreamBlobSha": "0e7d1fe826dc98e6476d706d033bb3dc20ee8f7b",
+      "localBlobSha": "0e7d1fe826dc98e6476d706d033bb3dc20ee8f7b",
+      "adapted": false
+    },
+    {
+      "path": "public/assets/fonts/pretendard/woff2-dynamic-subset/PretendardVariable.subset.5.woff2",
+      "upstreamBlobSha": "0eaa11cd5de117a57c4b6b6e4b4c5bb4ed9be67a",
+      "localBlobSha": "0eaa11cd5de117a57c4b6b6e4b4c5bb4ed9be67a",
+      "adapted": false
+    },
+    {
+      "path": "public/assets/fonts/pretendard/woff2-dynamic-subset/PretendardVariable.subset.50.woff2",
+      "upstreamBlobSha": "9c91849ef2e84662be86195a260cc2426b6832ea",
+      "localBlobSha": "9c91849ef2e84662be86195a260cc2426b6832ea",
+      "adapted": false
+    },
+    {
+      "path": "public/assets/fonts/pretendard/woff2-dynamic-subset/PretendardVariable.subset.51.woff2",
+      "upstreamBlobSha": "e8e3b4e4043b2baddc7a5fad00e1d408d9df8889",
+      "localBlobSha": "e8e3b4e4043b2baddc7a5fad00e1d408d9df8889",
+      "adapted": false
+    },
+    {
+      "path": "public/assets/fonts/pretendard/woff2-dynamic-subset/PretendardVariable.subset.52.woff2",
+      "upstreamBlobSha": "62291a7a6fbb8c5439c2fbae1272ffd5b537c271",
+      "localBlobSha": "62291a7a6fbb8c5439c2fbae1272ffd5b537c271",
+      "adapted": false
+    },
+    {
+      "path": "public/assets/fonts/pretendard/woff2-dynamic-subset/PretendardVariable.subset.53.woff2",
+      "upstreamBlobSha": "74c0d7c4ba8dd16634e39a5fc04e55741f322e71",
+      "localBlobSha": "74c0d7c4ba8dd16634e39a5fc04e55741f322e71",
+      "adapted": false
+    },
+    {
+      "path": "public/assets/fonts/pretendard/woff2-dynamic-subset/PretendardVariable.subset.54.woff2",
+      "upstreamBlobSha": "37685e26cea2866b07f5a976d772172150dd2b7b",
+      "localBlobSha": "37685e26cea2866b07f5a976d772172150dd2b7b",
+      "adapted": false
+    },
+    {
+      "path": "public/assets/fonts/pretendard/woff2-dynamic-subset/PretendardVariable.subset.55.woff2",
+      "upstreamBlobSha": "c99ef873cfc47dd358aaed3bb2832a3ad7bfa3a4",
+      "localBlobSha": "c99ef873cfc47dd358aaed3bb2832a3ad7bfa3a4",
+      "adapted": false
+    },
+    {
+      "path": "public/assets/fonts/pretendard/woff2-dynamic-subset/PretendardVariable.subset.56.woff2",
+      "upstreamBlobSha": "bd18b2e8b0d14b3f8bee003b1b4552d071bb0a52",
+      "localBlobSha": "bd18b2e8b0d14b3f8bee003b1b4552d071bb0a52",
+      "adapted": false
+    },
+    {
+      "path": "public/assets/fonts/pretendard/woff2-dynamic-subset/PretendardVariable.subset.57.woff2",
+      "upstreamBlobSha": "ebdd968852367455886e004bffc4995f7bf06d85",
+      "localBlobSha": "ebdd968852367455886e004bffc4995f7bf06d85",
+      "adapted": false
+    },
+    {
+      "path": "public/assets/fonts/pretendard/woff2-dynamic-subset/PretendardVariable.subset.58.woff2",
+      "upstreamBlobSha": "d8daf95e4013b8e96dbdf44f9369ebf80b98b8b0",
+      "localBlobSha": "d8daf95e4013b8e96dbdf44f9369ebf80b98b8b0",
+      "adapted": false
+    },
+    {
+      "path": "public/assets/fonts/pretendard/woff2-dynamic-subset/PretendardVariable.subset.59.woff2",
+      "upstreamBlobSha": "b6783fe3cad28c152eb7af13d010812325e999c8",
+      "localBlobSha": "b6783fe3cad28c152eb7af13d010812325e999c8",
+      "adapted": false
+    },
+    {
+      "path": "public/assets/fonts/pretendard/woff2-dynamic-subset/PretendardVariable.subset.6.woff2",
+      "upstreamBlobSha": "4ecbbbcf3a5305e195627e6d6c5cb8f811f2f24d",
+      "localBlobSha": "4ecbbbcf3a5305e195627e6d6c5cb8f811f2f24d",
+      "adapted": false
+    },
+    {
+      "path": "public/assets/fonts/pretendard/woff2-dynamic-subset/PretendardVariable.subset.60.woff2",
+      "upstreamBlobSha": "ec52a94d55a28d09185f14b413c200b96928c50d",
+      "localBlobSha": "ec52a94d55a28d09185f14b413c200b96928c50d",
+      "adapted": false
+    },
+    {
+      "path": "public/assets/fonts/pretendard/woff2-dynamic-subset/PretendardVariable.subset.61.woff2",
+      "upstreamBlobSha": "02215b6b11eb2e0f8147e22f385fe13da1a72229",
+      "localBlobSha": "02215b6b11eb2e0f8147e22f385fe13da1a72229",
+      "adapted": false
+    },
+    {
+      "path": "public/assets/fonts/pretendard/woff2-dynamic-subset/PretendardVariable.subset.62.woff2",
+      "upstreamBlobSha": "0acb5f676fadf81e4dcd38057efc735fa30f9257",
+      "localBlobSha": "0acb5f676fadf81e4dcd38057efc735fa30f9257",
+      "adapted": false
+    },
+    {
+      "path": "public/assets/fonts/pretendard/woff2-dynamic-subset/PretendardVariable.subset.63.woff2",
+      "upstreamBlobSha": "9bd774ea6020ea517dc0eae5fe91ca22d79ed073",
+      "localBlobSha": "9bd774ea6020ea517dc0eae5fe91ca22d79ed073",
+      "adapted": false
+    },
+    {
+      "path": "public/assets/fonts/pretendard/woff2-dynamic-subset/PretendardVariable.subset.64.woff2",
+      "upstreamBlobSha": "5dd145f4746307cd5e680cb0341c159be771d4cc",
+      "localBlobSha": "5dd145f4746307cd5e680cb0341c159be771d4cc",
+      "adapted": false
+    },
+    {
+      "path": "public/assets/fonts/pretendard/woff2-dynamic-subset/PretendardVariable.subset.65.woff2",
+      "upstreamBlobSha": "de7c978234d068f83da5f4b017da3b0e798323a6",
+      "localBlobSha": "de7c978234d068f83da5f4b017da3b0e798323a6",
+      "adapted": false
+    },
+    {
+      "path": "public/assets/fonts/pretendard/woff2-dynamic-subset/PretendardVariable.subset.66.woff2",
+      "upstreamBlobSha": "ac74c4f2f091a625a1e1f68efbcc320529ebdde9",
+      "localBlobSha": "ac74c4f2f091a625a1e1f68efbcc320529ebdde9",
+      "adapted": false
+    },
+    {
+      "path": "public/assets/fonts/pretendard/woff2-dynamic-subset/PretendardVariable.subset.67.woff2",
+      "upstreamBlobSha": "f029a1facaa3a7d16c6d932d2b0754a9d3d74c93",
+      "localBlobSha": "f029a1facaa3a7d16c6d932d2b0754a9d3d74c93",
+      "adapted": false
+    },
+    {
+      "path": "public/assets/fonts/pretendard/woff2-dynamic-subset/PretendardVariable.subset.68.woff2",
+      "upstreamBlobSha": "df664c5890bfdb85860e6a7acf43013772d08ee0",
+      "localBlobSha": "df664c5890bfdb85860e6a7acf43013772d08ee0",
+      "adapted": false
+    },
+    {
+      "path": "public/assets/fonts/pretendard/woff2-dynamic-subset/PretendardVariable.subset.69.woff2",
+      "upstreamBlobSha": "37d6d6f6a9140ac95394b292fb5e75b0b45a2ae2",
+      "localBlobSha": "37d6d6f6a9140ac95394b292fb5e75b0b45a2ae2",
+      "adapted": false
+    },
+    {
+      "path": "public/assets/fonts/pretendard/woff2-dynamic-subset/PretendardVariable.subset.7.woff2",
+      "upstreamBlobSha": "9f08418e3bafbaaa07d06551805327dd503552ce",
+      "localBlobSha": "9f08418e3bafbaaa07d06551805327dd503552ce",
+      "adapted": false
+    },
+    {
+      "path": "public/assets/fonts/pretendard/woff2-dynamic-subset/PretendardVariable.subset.70.woff2",
+      "upstreamBlobSha": "056b0f5257a7d5099221585f5afe7ddb27bfc4bc",
+      "localBlobSha": "056b0f5257a7d5099221585f5afe7ddb27bfc4bc",
+      "adapted": false
+    },
+    {
+      "path": "public/assets/fonts/pretendard/woff2-dynamic-subset/PretendardVariable.subset.71.woff2",
+      "upstreamBlobSha": "73688e4c67179a7d6ebd3690e68e5757222a6816",
+      "localBlobSha": "73688e4c67179a7d6ebd3690e68e5757222a6816",
+      "adapted": false
+    },
+    {
+      "path": "public/assets/fonts/pretendard/woff2-dynamic-subset/PretendardVariable.subset.72.woff2",
+      "upstreamBlobSha": "d298292db8a3ad8211197fc31352c9a335054a0e",
+      "localBlobSha": "d298292db8a3ad8211197fc31352c9a335054a0e",
+      "adapted": false
+    },
+    {
+      "path": "public/assets/fonts/pretendard/woff2-dynamic-subset/PretendardVariable.subset.73.woff2",
+      "upstreamBlobSha": "18b8b22ba0724632a10bc903e6eae8e3a2f0ac88",
+      "localBlobSha": "18b8b22ba0724632a10bc903e6eae8e3a2f0ac88",
+      "adapted": false
+    },
+    {
+      "path": "public/assets/fonts/pretendard/woff2-dynamic-subset/PretendardVariable.subset.74.woff2",
+      "upstreamBlobSha": "da514f498c39ce5737a30e69cac31daeae21c078",
+      "localBlobSha": "da514f498c39ce5737a30e69cac31daeae21c078",
+      "adapted": false
+    },
+    {
+      "path": "public/assets/fonts/pretendard/woff2-dynamic-subset/PretendardVariable.subset.75.woff2",
+      "upstreamBlobSha": "be2d1b180f4c4a1dcb132dd316a50853870754bf",
+      "localBlobSha": "be2d1b180f4c4a1dcb132dd316a50853870754bf",
+      "adapted": false
+    },
+    {
+      "path": "public/assets/fonts/pretendard/woff2-dynamic-subset/PretendardVariable.subset.76.woff2",
+      "upstreamBlobSha": "202befb97a029dfddb06c0aca11cf697c03b400e",
+      "localBlobSha": "202befb97a029dfddb06c0aca11cf697c03b400e",
+      "adapted": false
+    },
+    {
+      "path": "public/assets/fonts/pretendard/woff2-dynamic-subset/PretendardVariable.subset.77.woff2",
+      "upstreamBlobSha": "b945efbb49c8039e327a9d8844fc52010ba097b3",
+      "localBlobSha": "b945efbb49c8039e327a9d8844fc52010ba097b3",
+      "adapted": false
+    },
+    {
+      "path": "public/assets/fonts/pretendard/woff2-dynamic-subset/PretendardVariable.subset.78.woff2",
+      "upstreamBlobSha": "55e04b633df7813734b6c11223dd2851e7502bfe",
+      "localBlobSha": "55e04b633df7813734b6c11223dd2851e7502bfe",
+      "adapted": false
+    },
+    {
+      "path": "public/assets/fonts/pretendard/woff2-dynamic-subset/PretendardVariable.subset.79.woff2",
+      "upstreamBlobSha": "cd1a71ca5e69053f436c080ae1dc1617e6f29cea",
+      "localBlobSha": "cd1a71ca5e69053f436c080ae1dc1617e6f29cea",
+      "adapted": false
+    },
+    {
+      "path": "public/assets/fonts/pretendard/woff2-dynamic-subset/PretendardVariable.subset.8.woff2",
+      "upstreamBlobSha": "1b84ede3e1d63c0a0cb2dbf02fe9c6f135407590",
+      "localBlobSha": "1b84ede3e1d63c0a0cb2dbf02fe9c6f135407590",
+      "adapted": false
+    },
+    {
+      "path": "public/assets/fonts/pretendard/woff2-dynamic-subset/PretendardVariable.subset.80.woff2",
+      "upstreamBlobSha": "fe0831c9428e33b077164e81645f5371d0f948f1",
+      "localBlobSha": "fe0831c9428e33b077164e81645f5371d0f948f1",
+      "adapted": false
+    },
+    {
+      "path": "public/assets/fonts/pretendard/woff2-dynamic-subset/PretendardVariable.subset.81.woff2",
+      "upstreamBlobSha": "3f6583e2b0900c1c2ba2fae269bc3d25d240042d",
+      "localBlobSha": "3f6583e2b0900c1c2ba2fae269bc3d25d240042d",
+      "adapted": false
+    },
+    {
+      "path": "public/assets/fonts/pretendard/woff2-dynamic-subset/PretendardVariable.subset.82.woff2",
+      "upstreamBlobSha": "e8880fea2b7c145330dc4e90e276c56b5ebf4675",
+      "localBlobSha": "e8880fea2b7c145330dc4e90e276c56b5ebf4675",
+      "adapted": false
+    },
+    {
+      "path": "public/assets/fonts/pretendard/woff2-dynamic-subset/PretendardVariable.subset.83.woff2",
+      "upstreamBlobSha": "275966175accb7adda138da9a4b57ddf73c585c0",
+      "localBlobSha": "275966175accb7adda138da9a4b57ddf73c585c0",
+      "adapted": false
+    },
+    {
+      "path": "public/assets/fonts/pretendard/woff2-dynamic-subset/PretendardVariable.subset.84.woff2",
+      "upstreamBlobSha": "a923ff4071dd86c3a75cdc5e9d613776c70f4ea6",
+      "localBlobSha": "a923ff4071dd86c3a75cdc5e9d613776c70f4ea6",
+      "adapted": false
+    },
+    {
+      "path": "public/assets/fonts/pretendard/woff2-dynamic-subset/PretendardVariable.subset.85.woff2",
+      "upstreamBlobSha": "98625bbc74927f8a83075547da6a092a32745571",
+      "localBlobSha": "98625bbc74927f8a83075547da6a092a32745571",
+      "adapted": false
+    },
+    {
+      "path": "public/assets/fonts/pretendard/woff2-dynamic-subset/PretendardVariable.subset.86.woff2",
+      "upstreamBlobSha": "6c33d5547b50ea9c6208d12c68e127b3b11e7b75",
+      "localBlobSha": "6c33d5547b50ea9c6208d12c68e127b3b11e7b75",
+      "adapted": false
+    },
+    {
+      "path": "public/assets/fonts/pretendard/woff2-dynamic-subset/PretendardVariable.subset.87.woff2",
+      "upstreamBlobSha": "17e44938bd72e9cd9c78abc119825e8cfb1876fa",
+      "localBlobSha": "17e44938bd72e9cd9c78abc119825e8cfb1876fa",
+      "adapted": false
+    },
+    {
+      "path": "public/assets/fonts/pretendard/woff2-dynamic-subset/PretendardVariable.subset.88.woff2",
+      "upstreamBlobSha": "13f3d635187099b8e053d618013250aa93462124",
+      "localBlobSha": "13f3d635187099b8e053d618013250aa93462124",
+      "adapted": false
+    },
+    {
+      "path": "public/assets/fonts/pretendard/woff2-dynamic-subset/PretendardVariable.subset.89.woff2",
+      "upstreamBlobSha": "0e0c9902f009d7eed763b1bea237e27a2b3fcdaa",
+      "localBlobSha": "0e0c9902f009d7eed763b1bea237e27a2b3fcdaa",
+      "adapted": false
+    },
+    {
+      "path": "public/assets/fonts/pretendard/woff2-dynamic-subset/PretendardVariable.subset.9.woff2",
+      "upstreamBlobSha": "3cb1bb9b3cc8d469e431634a3bd5eccef8f017fb",
+      "localBlobSha": "3cb1bb9b3cc8d469e431634a3bd5eccef8f017fb",
+      "adapted": false
+    },
+    {
+      "path": "public/assets/fonts/pretendard/woff2-dynamic-subset/PretendardVariable.subset.90.woff2",
+      "upstreamBlobSha": "a9f66ece45bc214f4f8986f3c55a82af86c5d364",
+      "localBlobSha": "a9f66ece45bc214f4f8986f3c55a82af86c5d364",
+      "adapted": false
+    },
+    {
+      "path": "public/assets/fonts/pretendard/woff2-dynamic-subset/PretendardVariable.subset.91.woff2",
+      "upstreamBlobSha": "8b897e0e8ce16d73d6bf92000b86cea992e7b6dd",
+      "localBlobSha": "8b897e0e8ce16d73d6bf92000b86cea992e7b6dd",
+      "adapted": false
+    },
+    {
+      "path": "public/assets/shoot-templates/eng-1.webp",
+      "upstreamBlobSha": "aa171c391e664b45d90bda85a8347c432badc4bd",
+      "localBlobSha": "aa171c391e664b45d90bda85a8347c432badc4bd",
+      "adapted": false
+    },
+    {
+      "path": "public/assets/shoot-templates/ext-1.webp",
+      "upstreamBlobSha": "d1cf8b455c3e374da5b63f211871944667474bbc",
+      "localBlobSha": "d1cf8b455c3e374da5b63f211871944667474bbc",
+      "adapted": false
+    },
+    {
+      "path": "public/assets/shoot-templates/ext-2.webp",
+      "upstreamBlobSha": "847dcd4a65bb4aa905c20650e1da6ad21b3cfd00",
+      "localBlobSha": "847dcd4a65bb4aa905c20650e1da6ad21b3cfd00",
+      "adapted": false
+    },
+    {
+      "path": "public/assets/shoot-templates/ext-3.webp",
+      "upstreamBlobSha": "aa9b16f69952372c394b51c5ce81dc3f459cbe32",
+      "localBlobSha": "aa9b16f69952372c394b51c5ce81dc3f459cbe32",
+      "adapted": false
+    },
+    {
+      "path": "public/assets/shoot-templates/ext-4.webp",
+      "upstreamBlobSha": "7cb022fbbab1686d595d2bfb924eb676399906f7",
+      "localBlobSha": "7cb022fbbab1686d595d2bfb924eb676399906f7",
+      "adapted": false
+    },
+    {
+      "path": "public/assets/shoot-templates/in-ceiling.webp",
+      "upstreamBlobSha": "0c9c24b777ea0d6e2b1f9e3da980779b3a777ac2",
+      "localBlobSha": "0c9c24b777ea0d6e2b1f9e3da980779b3a777ac2",
+      "adapted": false
+    },
+    {
+      "path": "public/assets/shoot-templates/in-comfort.webp",
+      "upstreamBlobSha": "4fbc47b1023ef2a8ed9f6cd22ebc960d1a0e07d5",
+      "localBlobSha": "4fbc47b1023ef2a8ed9f6cd22ebc960d1a0e07d5",
+      "adapted": false
+    },
+    {
+      "path": "public/assets/shoot-templates/in-dash.webp",
+      "upstreamBlobSha": "69f364780289454f79a0b5b2811d7aac8a975dd4",
+      "localBlobSha": "69f364780289454f79a0b5b2811d7aac8a975dd4",
+      "adapted": false
+    },
+    {
+      "path": "public/assets/shoot-templates/in-rear.webp",
+      "upstreamBlobSha": "539b0d8c6834d25336230ec2ac95fb332b33652e",
+      "localBlobSha": "539b0d8c6834d25336230ec2ac95fb332b33652e",
+      "adapted": false
+    },
+    {
+      "path": "public/assets/shoot-templates/in-seat.webp",
+      "upstreamBlobSha": "6a8a5e3ed947adab6b90528455b5e96bb903c041",
+      "localBlobSha": "6a8a5e3ed947adab6b90528455b5e96bb903c041",
+      "adapted": false
+    },
+    {
+      "path": "public/assets/shoot-templates/in-wheel.webp",
+      "upstreamBlobSha": "194a5d321eb5ac65fa692bcfa32eebbfdf4775f3",
+      "localBlobSha": "194a5d321eb5ac65fa692bcfa32eebbfdf4775f3",
+      "adapted": false
+    },
+    {
+      "path": "public/assets/shoot-templates/int-1.webp",
+      "upstreamBlobSha": "f2b8c35e814624e537659b0c4cd7fb75a09098af",
+      "localBlobSha": "f2b8c35e814624e537659b0c4cd7fb75a09098af",
+      "adapted": false
+    },
+    {
+      "path": "public/assets/shoot-templates/int-2.webp",
+      "upstreamBlobSha": "69f364780289454f79a0b5b2811d7aac8a975dd4",
+      "localBlobSha": "69f364780289454f79a0b5b2811d7aac8a975dd4",
+      "adapted": false
+    },
+    {
+      "path": "public/assets/shoot-templates/int-3.webp",
+      "upstreamBlobSha": "075c6ddeebea183b5a9e04955b61b22b54d5c704",
+      "localBlobSha": "075c6ddeebea183b5a9e04955b61b22b54d5c704",
+      "adapted": false
+    },
+    {
+      "path": "public/assets/shoot-templates/int-4.webp",
+      "upstreamBlobSha": "539b0d8c6834d25336230ec2ac95fb332b33652e",
+      "localBlobSha": "539b0d8c6834d25336230ec2ac95fb332b33652e",
+      "adapted": false
+    },
+    {
+      "path": "public/assets/shoot-templates/opt-cluster.webp",
+      "upstreamBlobSha": "9440c5c3b78098ee4d824a5247641dc00565fc75",
+      "localBlobSha": "9440c5c3b78098ee4d824a5247641dc00565fc75",
+      "adapted": false
+    },
+    {
+      "path": "public/assets/shoot-templates/opt-comfort.webp",
+      "upstreamBlobSha": "12d4ad6bf79e2660fb6f52d51b78d30c65b6797f",
+      "localBlobSha": "12d4ad6bf79e2660fb6f52d51b78d30c65b6797f",
+      "adapted": false
+    },
+    {
+      "path": "public/assets/shoot-templates/opt-damage-1.webp",
+      "upstreamBlobSha": "d747ea1cf25693ccb9ccfa209df9957675d172ac",
+      "localBlobSha": "d747ea1cf25693ccb9ccfa209df9957675d172ac",
+      "adapted": false
+    },
+    {
+      "path": "public/assets/shoot-templates/opt-damage-2.webp",
+      "upstreamBlobSha": "65b16bbb56630822561d37172109a8de2a518eff",
+      "localBlobSha": "65b16bbb56630822561d37172109a8de2a518eff",
+      "adapted": false
+    },
+    {
+      "path": "public/assets/shoot-templates/opt-door-1.webp",
+      "upstreamBlobSha": "f2b8c35e814624e537659b0c4cd7fb75a09098af",
+      "localBlobSha": "f2b8c35e814624e537659b0c4cd7fb75a09098af",
+      "adapted": false
+    },
+    {
+      "path": "public/assets/shoot-templates/opt-door-2.webp",
+      "upstreamBlobSha": "bac99092b3e49aa3662c1be989817f799f759d87",
+      "localBlobSha": "bac99092b3e49aa3662c1be989817f799f759d87",
+      "adapted": false
+    },
+    {
+      "path": "public/assets/shoot-templates/opt-feature-1.webp",
+      "upstreamBlobSha": "e134f726e17addfaac86d95de48fdf56bcafa7d7",
+      "localBlobSha": "e134f726e17addfaac86d95de48fdf56bcafa7d7",
+      "adapted": false
+    },
+    {
+      "path": "public/assets/shoot-templates/opt-feature-2.webp",
+      "upstreamBlobSha": "2c5630eb1ab51702abf929321a31d61ee968f1d0",
+      "localBlobSha": "2c5630eb1ab51702abf929321a31d61ee968f1d0",
+      "adapted": false
+    },
+    {
+      "path": "public/assets/shoot-templates/opt-feature-3.webp",
+      "upstreamBlobSha": "060c060bec78f1caa2c53881f80c24b599318623",
+      "localBlobSha": "060c060bec78f1caa2c53881f80c24b599318623",
+      "adapted": false
+    },
+    {
+      "path": "public/assets/shoot-templates/opt-start-1.webp",
+      "upstreamBlobSha": "338b7867c8c9b8029dd6065d0ebdb20ee42d46ec",
+      "localBlobSha": "338b7867c8c9b8029dd6065d0ebdb20ee42d46ec",
+      "adapted": false
+    },
+    {
+      "path": "public/assets/shoot-templates/opt-tyre.webp",
+      "upstreamBlobSha": "5aad9dbabeadc719413070e0f978fc42c7b52c92",
+      "localBlobSha": "5aad9dbabeadc719413070e0f978fc42c7b52c92",
+      "adapted": false
+    },
+    {
+      "path": "public/assets/shoot-templates/opt-under.webp",
+      "upstreamBlobSha": "b7f05948d188b236cc07a735fa12d14e1bb73d8c",
+      "localBlobSha": "b7f05948d188b236cc07a735fa12d14e1bb73d8c",
+      "adapted": false
+    },
+    {
+      "path": "public/assets/shoot-templates/opt-wheel.webp",
+      "upstreamBlobSha": "fa4ff8abae3efb23e20a24377347a1b398614a53",
+      "localBlobSha": "fa4ff8abae3efb23e20a24377347a1b398614a53",
+      "adapted": false
+    },
+    {
+      "path": "public/assets/shoot-templates/rule-cluster.webp",
+      "upstreamBlobSha": "45e5060952bf818810da8b25297662bab295c72c",
+      "localBlobSha": "45e5060952bf818810da8b25297662bab295c72c",
+      "adapted": false
+    },
+    {
+      "path": "public/assets/shoot-templates/rule-dash.webp",
+      "upstreamBlobSha": "d1da20adf48d4e23af2e2d9c7a35dffd158c8e47",
+      "localBlobSha": "d1da20adf48d4e23af2e2d9c7a35dffd158c8e47",
+      "adapted": false
+    },
+    {
+      "path": "public/assets/shoot-templates/rule-engine.webp",
+      "upstreamBlobSha": "d5143eee9c949623bca634437a85a4160e0a8ccd",
+      "localBlobSha": "d5143eee9c949623bca634437a85a4160e0a8ccd",
+      "adapted": false
+    },
+    {
+      "path": "public/assets/shoot-templates/rule-front.webp",
+      "upstreamBlobSha": "c2a25df059a6550fb82526b22076b81421b5506f",
+      "localBlobSha": "c2a25df059a6550fb82526b22076b81421b5506f",
+      "adapted": false
+    },
+    {
+      "path": "public/assets/shoot-templates/rule-frontLeft.webp",
+      "upstreamBlobSha": "b98e3550638a08d01db4cf4f6a0b049df64d73b0",
+      "localBlobSha": "b98e3550638a08d01db4cf4f6a0b049df64d73b0",
+      "adapted": false
+    },
+    {
+      "path": "public/assets/shoot-templates/rule-frontRight.webp",
+      "upstreamBlobSha": "9919b24b2dd498a79b59155d39ffd46c4d03304b",
+      "localBlobSha": "9919b24b2dd498a79b59155d39ffd46c4d03304b",
+      "adapted": false
+    },
+    {
+      "path": "public/assets/shoot-templates/rule-frontSeat.webp",
+      "upstreamBlobSha": "be6f8812ba20ec589641f3b9c4b93504ab907d6a",
+      "localBlobSha": "be6f8812ba20ec589641f3b9c4b93504ab907d6a",
+      "adapted": false
+    },
+    {
+      "path": "public/assets/shoot-templates/rule-rear.webp",
+      "upstreamBlobSha": "cac3d185321f1122574e377104363272e1f666c2",
+      "localBlobSha": "cac3d185321f1122574e377104363272e1f666c2",
+      "adapted": false
+    },
+    {
+      "path": "public/assets/shoot-templates/rule-rearRight.webp",
+      "upstreamBlobSha": "06c826ed732709ebb781cf93a1c36635cb7d1705",
+      "localBlobSha": "06c826ed732709ebb781cf93a1c36635cb7d1705",
+      "adapted": false
+    },
+    {
+      "path": "public/assets/shoot-templates/rule-rearSeat.webp",
+      "upstreamBlobSha": "2f17e6425e3391df77fbaad57f8114d63bf3566a",
+      "localBlobSha": "2f17e6425e3391df77fbaad57f8114d63bf3566a",
+      "adapted": false
+    },
+    {
+      "path": "public/assets/shoot-templates/rule-side.webp",
+      "upstreamBlobSha": "52690c2271b47b48eef260338543ff3b72be44e7",
+      "localBlobSha": "52690c2271b47b48eef260338543ff3b72be44e7",
+      "adapted": false
+    },
+    {
+      "path": "public/assets/shoot-templates/rule-sideRight.webp",
+      "upstreamBlobSha": "9f40db37b9c0681fdfb651be4863ec3ad5c08f20",
+      "localBlobSha": "9f40db37b9c0681fdfb651be4863ec3ad5c08f20",
+      "adapted": false
+    },
+    {
+      "path": "public/assets/shoot-templates/trk-1.webp",
+      "upstreamBlobSha": "1219c786a971cc8ddfdbf30ad4a8ce252d85562c",
+      "localBlobSha": "1219c786a971cc8ddfdbf30ad4a8ce252d85562c",
+      "adapted": false
+    },
+    {
+      "path": "public/data/shoot-autosort-v1.json",
+      "upstreamBlobSha": "e152d2d854d23942d403f0e46ac1d6a8c64b4e0e",
+      "localBlobSha": "e152d2d854d23942d403f0e46ac1d6a8c64b4e0e",
+      "adapted": false
+    },
+    {
+      "path": "public/icons/dealer-profile/facebook.svg",
+      "upstreamBlobSha": "d39c6439398bddb34b47f5e06f24fc099dc36a58",
+      "localBlobSha": "d39c6439398bddb34b47f5e06f24fc099dc36a58",
+      "adapted": false
+    },
+    {
+      "path": "public/icons/dealer-profile/instagram.svg",
+      "upstreamBlobSha": "d3e109e765c7e3f586fbd1b41f530185ad84f06f",
+      "localBlobSha": "d3e109e765c7e3f586fbd1b41f530185ad84f06f",
+      "adapted": false
+    },
+    {
+      "path": "public/icons/dealer-profile/speech-bubble-as24.svg",
+      "upstreamBlobSha": "80b8ba09789a831c78d13e6a1f589d71b0fa6a50",
+      "localBlobSha": "80b8ba09789a831c78d13e6a1f589d71b0fa6a50",
+      "adapted": false
+    },
+    {
+      "path": "public/icons/dealer-profile/tiktok.svg",
+      "upstreamBlobSha": "980d48ae7134e104fd13e516efc081c065391934",
+      "localBlobSha": "980d48ae7134e104fd13e516efc081c065391934",
+      "adapted": false
+    },
+    {
+      "path": "public/icons/dealer-profile/youtube.svg",
+      "upstreamBlobSha": "a303b552da7fb6870ea397418073d68b4516c6ac",
+      "localBlobSha": "a303b552da7fb6870ea397418073d68b4516c6ac",
+      "adapted": false
+    },
+    {
+      "path": "public/icons/reddit-shoot/add-outline-24.svg",
+      "upstreamBlobSha": "6d1c0b171be298fc21a6ab634306b17b621a3331",
+      "localBlobSha": "6d1c0b171be298fc21a6ab634306b17b621a3331",
+      "adapted": false
+    },
+    {
+      "path": "public/icons/reddit-shoot/aspect-ratio-outline.svg",
+      "upstreamBlobSha": "0253c370604d9ba7e18d5df27f26f68ab6efeab7",
+      "localBlobSha": "0253c370604d9ba7e18d5df27f26f68ab6efeab7",
+      "adapted": false
+    },
+    {
+      "path": "public/icons/reddit-shoot/back-outline-24.svg",
+      "upstreamBlobSha": "24f3849051a5f23d49fe17e2662ab82577587dc7",
+      "localBlobSha": "24f3849051a5f23d49fe17e2662ab82577587dc7",
+      "adapted": false
+    },
+    {
+      "path": "public/icons/reddit-shoot/camera-outline-24.svg",
+      "upstreamBlobSha": "6a5e003f68c2f9d60eb12cbd19291b07cab3453a",
+      "localBlobSha": "6a5e003f68c2f9d60eb12cbd19291b07cab3453a",
+      "adapted": false
+    },
+    {
+      "path": "public/icons/reddit-shoot/caret-down-fill.svg",
+      "upstreamBlobSha": "c02ba9c74bd9db77e7384d31df2106c5bafc45e6",
+      "localBlobSha": "c02ba9c74bd9db77e7384d31df2106c5bafc45e6",
+      "adapted": false
+    },
+    {
+      "path": "public/icons/reddit-shoot/checkmark-fill.svg",
+      "upstreamBlobSha": "bd746f3afbd098bba5bc5efbd53ffb485678fb2a",
+      "localBlobSha": "bd746f3afbd098bba5bc5efbd53ffb485678fb2a",
+      "adapted": false
+    },
+    {
+      "path": "public/icons/reddit-shoot/close-outline.svg",
+      "upstreamBlobSha": "3dbfadbc08816231c710a904f91d8a35bce47393",
+      "localBlobSha": "3dbfadbc08816231c710a904f91d8a35bce47393",
+      "adapted": false
+    },
+    {
+      "path": "public/icons/reddit-shoot/crop-outline.svg",
+      "upstreamBlobSha": "927c77e73acd04d992c61c6c8eaeebe09f1415f7",
+      "localBlobSha": "927c77e73acd04d992c61c6c8eaeebe09f1415f7",
+      "adapted": false
+    },
+    {
+      "path": "public/icons/reddit-shoot/delete-outline.svg",
+      "upstreamBlobSha": "f21a44b5d878754a12ca8df36c75831bcb7724fe",
+      "localBlobSha": "f21a44b5d878754a12ca8df36c75831bcb7724fe",
+      "adapted": false
+    },
+    {
+      "path": "public/icons/reddit-shoot/edit-outline.svg",
+      "upstreamBlobSha": "be2f874141f4b177878dacafda54524b7828e3a6",
+      "localBlobSha": "be2f874141f4b177878dacafda54524b7828e3a6",
+      "adapted": false
+    },
+    {
+      "path": "public/icons/reddit-shoot/forward-outline.svg",
+      "upstreamBlobSha": "7cd531c2080656bc95d7c3ddc7ce6c60ebadc9ab",
+      "localBlobSha": "7cd531c2080656bc95d7c3ddc7ce6c60ebadc9ab",
+      "adapted": false
+    },
+    {
+      "path": "public/icons/reddit-shoot/help-outline.svg",
+      "upstreamBlobSha": "f5b4ccddc40d51a3ff83f7591f0a05d934e69be8",
+      "localBlobSha": "f5b4ccddc40d51a3ff83f7591f0a05d934e69be8",
+      "adapted": false
+    },
+    {
+      "path": "public/icons/reddit-shoot/image-post-outline.svg",
+      "upstreamBlobSha": "db1ecf0cec7edca116c8c0ed262b92e3c58b6a85",
+      "localBlobSha": "db1ecf0cec7edca116c8c0ed262b92e3c58b6a85",
+      "adapted": false
+    },
+    {
+      "path": "public/icons/reddit-shoot/mask-outline.svg",
+      "upstreamBlobSha": "948d95be9a28df797c13808111ff9a31f7c399dd",
+      "localBlobSha": "948d95be9a28df797c13808111ff9a31f7c399dd",
+      "adapted": false
+    },
+    {
+      "path": "public/icons/reddit-shoot/play-fill.svg",
+      "upstreamBlobSha": "1fde6b1ff4186589a75a416c6fc711b8e9314e77",
+      "localBlobSha": "1fde6b1ff4186589a75a416c6fc711b8e9314e77",
+      "adapted": false
+    },
+    {
+      "path": "public/icons/reddit-shoot/powerup-fill.svg",
+      "upstreamBlobSha": "bc5d965a722d5310802bd3707828bae014b8bf65",
+      "localBlobSha": "bc5d965a722d5310802bd3707828bae014b8bf65",
+      "adapted": false
+    },
+    {
+      "path": "public/icons/reddit-shoot/powerup-outline.svg",
+      "upstreamBlobSha": "5dc7da1d9b4e178b8bc9d1d27a4dfd2cbb079665",
+      "localBlobSha": "5dc7da1d9b4e178b8bc9d1d27a4dfd2cbb079665",
+      "adapted": false
+    },
+    {
+      "path": "public/icons/reddit-shoot/refresh-outline.svg",
+      "upstreamBlobSha": "fd337e0ad8e1d7f8b4c734d409157a3d3101270a",
+      "localBlobSha": "fd337e0ad8e1d7f8b4c734d409157a3d3101270a",
+      "adapted": false
+    },
+    {
+      "path": "public/icons/reddit-shoot/rotate-image-outline.svg",
+      "upstreamBlobSha": "a93edc391f1fe02760767a7be272fb24cac7d790",
+      "localBlobSha": "a93edc391f1fe02760767a7be272fb24cac7d790",
+      "adapted": false
+    },
+    {
+      "path": "public/icons/reddit-shoot/spoiler-outline.svg",
+      "upstreamBlobSha": "495fa935ca4c966a7f72f583c6331c0c44ddf37c",
+      "localBlobSha": "495fa935ca4c966a7f72f583c6331c0c44ddf37c",
+      "adapted": false
+    },
+    {
+      "path": "public/icons/reddit-shoot/sticker-outline.svg",
+      "upstreamBlobSha": "9dd44eac1af26000a8f8cf091d4978a4a6787ffb",
+      "localBlobSha": "9dd44eac1af26000a8f8cf091d4978a4a6787ffb",
+      "adapted": false
+    },
+    {
+      "path": "public/icons/reddit-shoot/tap-outline.svg",
+      "upstreamBlobSha": "3b127eb3d01d9ce83b1ed91fc8d6cf134ce843e0",
+      "localBlobSha": "3b127eb3d01d9ce83b1ed91fc8d6cf134ce843e0",
+      "adapted": false
+    },
+    {
+      "path": "public/icons/reddit-shoot/undo-outline.svg",
+      "upstreamBlobSha": "ccb96b1d3320eda0a4d4006cd7acab82b3ca9037",
+      "localBlobSha": "ccb96b1d3320eda0a4d4006cd7acab82b3ca9037",
+      "adapted": false
+    },
+    {
+      "path": "public/icons/reddit-shoot/video-camera-outline.svg",
+      "upstreamBlobSha": "95249051b3f45e200a0af5c7515cf3e3138de982",
+      "localBlobSha": "95249051b3f45e200a0af5c7515cf3e3138de982",
+      "adapted": false
+    },
+    {
+      "path": "public/icons/reddit-shoot/view-grid-outline.svg",
+      "upstreamBlobSha": "42b21e23eedcfe241a73fa6ef98b393193d99fdd",
+      "localBlobSha": "42b21e23eedcfe241a73fa6ef98b393193d99fdd",
+      "adapted": false
+    }
+  ],
+  "adaptations": [
+    "New standalone entry point, baseline CSS and Vite build configuration",
+    "SnsPublish.tsx imports identical MadeShortform type from ./types instead of unrelated ShortformStudio"
+  ],
+  "upstreamLicense": "No root LICENSE present at source commit; Pretendard OFL retained"
+}

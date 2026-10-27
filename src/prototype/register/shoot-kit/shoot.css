@@ -1,0 +1,4576 @@
+/* 58同城 중고차 등록 촬영 흐름 재현 — 384 CSS px 기준(폰 1080×2400 ÷2.8125 실측).
+   강조색은 58 주황(#FF552E). 보배드림 파랑으로 바꾸려면 --shoot-accent 하나만 바꾼다. */
+.shoot-root {
+  --shoot-accent: #ff552e;
+  --shoot-accent-2: #ff9b3d;
+  --shoot-text: #222;
+  --shoot-sub: #8c8c8c;
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: #e9e9e9;
+  font-family: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, sans-serif;
+  color: var(--shoot-text);
+  -webkit-tap-highlight-color: transparent;
+}
+:where(.shoot-root) :where(button) {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+}
+.shoot-root button:focus-visible {
+  outline: 2px solid var(--shoot-accent);
+  outline-offset: 2px;
+}
+.shoot-phone {
+  position: relative;
+  height: 100%;
+  max-width: 430px;
+  margin: 0 auto;
+  overflow: hidden;
+  background: #fff;
+}
+.shoot-mask {
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  background: currentColor;
+  -webkit-mask: no-repeat center / contain;
+  mask: no-repeat center / contain;
+  flex: none;
+}
+.shoot-mask.is-flip {
+  transform: scaleX(-1);
+}
+
+/* ── 공통 레이어 ── */
+.shoot-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  background: #000;
+  color: #fff;
+}
+.shoot-top {
+  flex: none;
+  height: 44px;
+  display: grid;
+  grid-template-columns: 52px 1fr 52px;
+  align-items: center;
+  text-align: center;
+}
+.shoot-top h2 {
+  margin: 0;
+  font-size: 18px;
+  line-height: 24px;
+  font-weight: 600;
+}
+.shoot-icon-btn {
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  justify-self: center;
+}
+.shoot-flash.is-on {
+  color: var(--shoot-accent);
+}
+.shoot-view {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  background: #1b1b1b;
+}
+.shoot-live {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  background: #000;
+}
+
+.shoot-nocam {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  gap: 6px;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 14px;
+  background: radial-gradient(circle at 50% 40%, #3a3f44, #121416 70%);
+}
+.shoot-nocam small {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.45);
+}
+.shoot-pill {
+  position: absolute;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  height: 24px;
+  padding: 0 12px;
+  border-radius: 12px;
+  background: rgba(150, 150, 150, 0.85);
+  color: #fff;
+  font-size: 13px;
+  line-height: 24px;
+  white-space: nowrap;
+}
+
+/* 사진 칸 레일: 80×70, 간격 8, 아래 검은 이름 띠 */
+.shoot-rail {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 12px;
+  display: flex;
+  gap: 8px;
+  padding: 0 4px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.shoot-rail::-webkit-scrollbar {
+  display: none;
+}
+.shoot-slot {
+  position: relative;
+  flex: none;
+  width: 80px;
+  height: 70px;
+  scroll-snap-align: start;
+}
+.shoot-slot__hit {
+  position: absolute;
+  inset: 0;
+  border-radius: 4px;
+  overflow: hidden;
+  background: #8a8a8a;
+  box-shadow: inset 0 0 0 2px #6e6e6e;
+}
+.shoot-slot.is-sel .shoot-slot__hit {
+  box-shadow: inset 0 0 0 2px #fff;
+}
+.shoot-slot__hit img {
+  position: absolute;
+  inset: 2px;
+  width: calc(100% - 4px);
+  height: calc(100% - 4px);
+  object-fit: cover;
+  border-radius: 2px;
+}
+.shoot-slot__label {
+  position: absolute;
+  left: 2px;
+  right: 2px;
+  bottom: 2px;
+  height: 20px;
+  background: #000;
+  color: #fff;
+  font-size: 12px;
+  line-height: 20px;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  letter-spacing: -0.2px;
+}
+.shoot-slot__x {
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.55);
+  display: grid;
+  place-items: center;
+  color: #fff;
+}
+.shoot-slot__x .shoot-mask {
+  width: 11px;
+  height: 11px;
+}
+
+/* 아래 조작판 */
+.shoot-bottom {
+  flex: none;
+  position: relative;
+  background: #000;
+  padding-bottom: env(safe-area-inset-bottom);
+}
+.shoot-controls {
+  height: 92px;
+  display: grid;
+  grid-template-columns: 1fr 84px 1fr;
+  align-items: center;
+  padding: 0 16px;
+}
+.shoot-plate {
+  justify-self: start;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: #a6a6a6 !important;
+}
+.shoot-plate__ico {
+  position: relative;
+  width: 22px;
+  height: 22px;
+  border-radius: 3px;
+  background: #2b2b2b;
+  box-shadow: inset 0 0 0 1.5px #555;
+}
+.shoot-plate__ico i {
+  position: absolute;
+  width: 8px;
+  height: 7px;
+  background: #777;
+}
+.shoot-plate__ico i:first-child {
+  right: 4px;
+  top: 4px;
+}
+.shoot-plate__ico i:last-child {
+  left: 4px;
+  bottom: 4px;
+}
+.shoot-plate.is-on .shoot-plate__ico {
+  box-shadow: inset 0 0 0 1.5px #eee;
+}
+.shoot-plate.is-on .shoot-plate__ico i {
+  background: #f2f2f2;
+}
+.shoot-plate.is-on {
+  color: #f2f2f2 !important;
+}
+.shoot-shutter {
+  justify-self: center;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: #444 !important;
+  display: grid;
+  place-items: center;
+  transition: transform 0.08s;
+}
+.shoot-shutter span {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: #fff;
+}
+.shoot-shutter:active {
+  transform: scale(0.92);
+}
+.shoot-count {
+  justify-self: end;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+}
+.shoot-done {
+  min-width: 60px;
+  height: 28px;
+  padding: 0 14px;
+  border-radius: 14px;
+  background: linear-gradient(90deg, var(--shoot-accent), var(--shoot-accent-2)) !important;
+  color: #fff !important;
+  font-size: 15px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.shoot-done:disabled {
+  opacity: 0.5;
+}
+.shoot-modes {
+  position: relative;
+  height: 44px;
+  display: flex;
+  justify-content: center;
+  gap: 40px;
+  align-items: center;
+}
+.shoot-modes button {
+  font-size: 16px;
+  color: #9a9a9a !important;
+  font-weight: 500;
+}
+.shoot-modes button.is-on {
+  color: #fff !important;
+  font-weight: 600;
+}
+.shoot-modes button {
+  position: relative;
+  height: 44px;
+}
+.shoot-modes button.is-on::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 6px;
+  width: 104px;
+  height: 3px;
+  border-radius: 2px;
+  background: #fff;
+  transform: translateX(-50%);
+}
+/* 앨범 */
+.shoot-album-title {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+.shoot-album-title .is-caret {
+  width: 16px;
+  height: 16px;
+  color: #8c8c8c;
+}
+.shoot-album-banner {
+  flex: none;
+  height: 32px;
+  padding: 0 12px;
+  background: linear-gradient(90deg, var(--shoot-accent), #ff7a3d);
+  font-size: 13px;
+  line-height: 32px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.shoot-album-grid {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-auto-rows: 126px;
+  gap: 2px;
+  align-content: start;
+  background: #000;
+}
+.shoot-album-import {
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 6px;
+  background: #1f1f1f !important;
+  font-size: 12px;
+  line-height: 16px;
+  color: #bbb !important;
+}
+.shoot-album-cell {
+  position: relative;
+  overflow: hidden;
+}
+.shoot-album-cell img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.shoot-album-check {
+  position: absolute;
+  right: 8px;
+  bottom: 8px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 1.5px solid #fff;
+  background: rgba(0, 0, 0, 0.15);
+  display: grid;
+  place-items: center;
+}
+.shoot-album-cell.is-on .shoot-album-check {
+  border-color: var(--shoot-accent);
+  background: var(--shoot-accent);
+}
+.shoot-album-check .shoot-mask {
+  width: 13px;
+  height: 13px;
+}
+.shoot-bottom.is-album {
+  height: 64px;
+  display: flex;
+  align-items: center;
+}
+.shoot-bottom.is-album .shoot-modes {
+  flex: 1;
+  justify-content: flex-start;
+  padding-left: 72px;
+}
+.shoot-album-count {
+  position: absolute;
+  left: 236px;
+  font-size: 13px;
+}
+.shoot-album-done {
+  position: absolute;
+  right: 18px;
+}
+
+/* 사진 미리보기 */
+.shoot-stage {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  place-items: center;
+}
+.shoot-stage-img {
+  position: relative;
+  border-radius: 6px;
+  overflow: hidden;
+  touch-action: none;
+}
+.shoot-preview .shoot-stage-img {
+  overflow: visible;
+}
+.shoot-stage-img > img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  user-select: none;
+  border-radius: 6px;
+}
+.shoot-sticker {
+  position: absolute;
+  display: grid;
+  place-items: center;
+  touch-action: none;
+}
+.shoot-sticker.is-active {
+  border: 2px solid #fff;
+}
+.shoot-sticker__face {
+  cursor: move;
+  padding: 4px;
+  line-height: 0;
+}
+.shoot-sticker__canvas {
+  width: 100%;
+  height: auto;
+}
+.shoot-sticker__face {
+  width: calc(100% - 28px);
+}
+.shoot-sticker__canvas {
+  border-radius: 3px;
+}
+.shoot-sticker__h {
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #fff !important;
+  color: #222 !important;
+  display: grid;
+  place-items: center;
+  touch-action: none;
+  cursor: pointer;
+}
+.shoot-sticker__h .shoot-mask {
+  width: 12px;
+  height: 12px;
+}
+.shoot-sticker__h.is-tl {
+  left: -10px;
+  top: -10px;
+}
+.shoot-sticker__h.is-tr {
+  right: -10px;
+  top: -10px;
+}
+.shoot-sticker__h.is-bl {
+  left: -10px;
+  bottom: -10px;
+}
+.shoot-sticker__h.is-br {
+  right: -10px;
+  bottom: -10px;
+}
+.shoot-preview .shoot-strip {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 76px;
+  z-index: 2;
+}
+.shoot-strip {
+  flex: none;
+  height: 92px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.shoot-strip__add {
+  flex: none;
+  width: 32px;
+  height: 76px;
+  border-radius: 0 4px 4px 0;
+  background: #8a8a8a !important;
+  color: #fff !important;
+  display: grid;
+  place-items: center;
+}
+.shoot-strip__item,
+.shoot-strip__redo {
+  position: relative;
+  flex: none;
+  width: 88px;
+  height: 76px;
+  border-radius: 4px;
+}
+.shoot-strip__hit {
+  position: absolute;
+  inset: 0;
+  border-radius: 4px;
+  overflow: hidden;
+  box-shadow: inset 0 0 0 2px transparent;
+}
+.shoot-strip__item.is-sel .shoot-strip__hit {
+  box-shadow: inset 0 0 0 2px #fff;
+}
+.shoot-strip__hit img {
+  position: absolute;
+  inset: 2px;
+  width: calc(100% - 4px);
+  height: calc(100% - 4px);
+  object-fit: cover;
+}
+.shoot-strip__hit span {
+  position: absolute;
+  left: 2px;
+  right: 2px;
+  bottom: 2px;
+  height: 20px;
+  background: rgba(0, 0, 0, 0.8);
+  font-size: 13px;
+  line-height: 20px;
+  text-align: center;
+  white-space: nowrap;
+}
+.shoot-strip__x {
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.6) !important;
+  color: #fff !important;
+  display: grid;
+  place-items: center;
+}
+.shoot-strip__x .shoot-mask {
+  width: 11px;
+  height: 11px;
+}
+.shoot-strip__redo {
+  background: #2a2a2a !important;
+  color: #fff !important;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  font-size: 11px;
+  line-height: 15px;
+  text-align: center;
+}
+.shoot-strip__redo .shoot-mask {
+  width: 16px;
+  height: 16px;
+  margin-bottom: 2px;
+}
+.shoot-tools {
+  flex: none;
+  height: 76px;
+  display: flex;
+  align-items: center;
+  padding: 0 16px 0 0;
+  padding-bottom: env(safe-area-inset-bottom);
+}
+/* 58 도구 위치(432 실측 43·112·162·212 → 384 38·100·144·188) */
+.shoot-tools > button:not(.shoot-done) {
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  font-size: 11px;
+  white-space: nowrap;
+  color: #bdbdbd;
+}
+.shoot-tools > button:nth-child(1) {
+  width: 76px;
+}
+.shoot-tools > button:nth-child(2) {
+  width: 48px;
+}
+.shoot-tools > button:nth-child(3),
+.shoot-tools > button:nth-child(4) {
+  width: 44px;
+}
+.shoot-tools > button.is-accent {
+  color: var(--shoot-accent);
+}
+.shoot-tools .shoot-mask {
+  width: 26px;
+  height: 26px;
+}
+.shoot-tools .shoot-mask.is-ring {
+  width: 26px;
+  height: 26px;
+}
+.shoot-plate__ico.is-accent {
+  width: 26px;
+  height: 26px;
+  background: var(--shoot-accent);
+  box-shadow: none;
+}
+.shoot-plate__ico.is-accent i {
+  background: #111;
+  width: 9px;
+  height: 9px;
+}
+.shoot-tools .shoot-done {
+  margin-left: auto;
+  height: 32px;
+  border-radius: 16px;
+  min-width: 68px;
+}
+
+/* 편집(모자이크·회전·자르기): 흰 화면 */
+.shoot-editor {
+  background: #fff;
+  color: var(--shoot-text);
+}
+.shoot-editor__top {
+  flex: none;
+  height: 52px;
+  display: grid;
+  place-items: center;
+  background: #f6f6f6;
+}
+.shoot-editor__top h2 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+}
+.shoot-editor__stage {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  place-items: center;
+  padding: 0 34px;
+  overflow: hidden;
+}
+.shoot-editor .shoot-stage-img {
+  border-radius: 8px;
+}
+.shoot-mosaic-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  touch-action: none;
+  cursor: crosshair;
+}
+.shoot-editor__controls {
+  flex: none;
+  height: 120px;
+  display: grid;
+  align-items: center;
+  padding: 0 28px;
+}
+.shoot-brush-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+.shoot-brushes {
+  display: grid;
+  justify-items: center;
+  gap: 14px;
+  font-size: 13px;
+  color: #666;
+}
+.shoot-brushes__dots {
+  display: flex;
+  align-items: center;
+  gap: 30px;
+}
+.shoot-brush {
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 2px var(--shoot-accent);
+}
+.shoot-brush.is-0 {
+  width: 22px;
+  height: 22px;
+}
+.shoot-brush.is-1 {
+  width: 26px;
+  height: 26px;
+}
+.shoot-brush.is-2 {
+  width: 30px;
+  height: 30px;
+}
+.shoot-brush.is-on {
+  background: var(--shoot-accent) !important;
+}
+.shoot-history {
+  display: flex;
+  gap: 26px;
+}
+.shoot-history button {
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+  font-size: 13px;
+  color: #666 !important;
+}
+.shoot-history .shoot-mask {
+  color: var(--shoot-accent);
+  width: 26px;
+  height: 26px;
+}
+.shoot-history button:disabled .shoot-mask {
+  opacity: 0.4;
+}
+.shoot-rotate-btn {
+  justify-self: center;
+  display: grid;
+  justify-items: center;
+  gap: 10px;
+  font-size: 13px;
+  color: #666 !important;
+}
+.shoot-rotate-btn > span {
+  position: relative;
+  width: 46px;
+  height: 46px;
+  display: grid;
+  place-items: center;
+  color: var(--shoot-accent);
+}
+.shoot-rotate-btn .shoot-mask {
+  position: absolute;
+  inset: 0;
+  width: 46px;
+  height: 46px;
+}
+.shoot-rotate-btn b {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--shoot-accent);
+}
+.shoot-aspects {
+  display: flex;
+  justify-content: space-around;
+}
+.shoot-aspect {
+  display: grid;
+  justify-items: center;
+  gap: 14px;
+  font-size: 13px;
+  color: #666 !important;
+}
+.shoot-aspect span {
+  display: grid;
+  place-items: center;
+  border: 2px solid var(--shoot-accent);
+  color: var(--shoot-accent);
+  font-size: 12px;
+  font-weight: 500;
+}
+.shoot-aspect.is-wide span {
+  width: 40px;
+  height: 30px;
+}
+.shoot-aspect.is-tall span {
+  width: 30px;
+  height: 40px;
+}
+.shoot-aspect.is-on span {
+  background: rgba(255, 85, 46, 0.08);
+}
+.shoot-crop {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+.shoot-crop__frame {
+  position: absolute;
+  touch-action: none;
+  cursor: move;
+}
+.shoot-crop__grid {
+  position: absolute;
+  background: rgba(255, 255, 255, 0.7);
+}
+.shoot-crop__grid.is-v1,
+.shoot-crop__grid.is-v2 {
+  top: 0;
+  bottom: 0;
+  width: 1px;
+}
+.shoot-crop__grid.is-v1 {
+  left: 33.33%;
+}
+.shoot-crop__grid.is-v2 {
+  left: 66.66%;
+}
+.shoot-crop__grid.is-h1,
+.shoot-crop__grid.is-h2 {
+  left: 0;
+  right: 0;
+  height: 1px;
+}
+.shoot-crop__grid.is-h1 {
+  top: 33.33%;
+}
+.shoot-crop__grid.is-h2 {
+  top: 66.66%;
+}
+.shoot-corner {
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  border: 0 solid #fff;
+}
+.shoot-crop .shoot-corner {
+  border-color: var(--shoot-accent);
+}
+.shoot-corner.is-tl {
+  left: -2px;
+  top: -2px;
+  border-left-width: 3px;
+  border-top-width: 3px;
+}
+.shoot-corner.is-tr {
+  right: -2px;
+  top: -2px;
+  border-right-width: 3px;
+  border-top-width: 3px;
+}
+.shoot-corner.is-bl {
+  left: -2px;
+  bottom: -2px;
+  border-left-width: 3px;
+  border-bottom-width: 3px;
+}
+.shoot-corner.is-br {
+  right: -2px;
+  bottom: -2px;
+  border-right-width: 3px;
+  border-bottom-width: 3px;
+}
+.shoot-editor__foot {
+  flex: none;
+  height: 56px;
+  display: grid;
+  grid-template-columns: 1fr 2.2fr;
+  padding-bottom: env(safe-area-inset-bottom);
+}
+.shoot-editor__foot button {
+  font-size: 18px;
+}
+.shoot-editor__foot .is-save {
+  background: var(--shoot-accent) !important;
+  color: #fff !important;
+}
+
+/* 영상 촬영 */
+.shoot-vframe {
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  top: 112px;
+  aspect-ratio: 4 / 3;
+  max-height: calc(100% - 260px);
+  border: 1px solid rgba(255, 255, 255, 0.85);
+}
+.shoot-vframe .shoot-corner {
+  width: 24px;
+  height: 24px;
+}
+.shoot-countdown {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-size: 110px;
+  font-weight: 300;
+  color: #fff;
+}
+.shoot-timer {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  font-size: 12px;
+  color: #fff;
+}
+.shoot-vhint {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: calc(100% + 12px);
+  margin: 0;
+  text-align: center;
+  font-size: 15px;
+  color: #fff;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+}
+.shoot-stages {
+  position: absolute;
+  left: 4px;
+  right: 4px;
+  bottom: 12px;
+  display: flex;
+  gap: 8px;
+  align-items: flex-end;
+}
+.shoot-stage-chip {
+  position: relative;
+  flex: 1;
+  height: 34px;
+  border-radius: 3px;
+  background: rgba(140, 140, 140, 0.85) !important;
+  color: rgba(70, 70, 70, 0.9) !important;
+  font-size: 13px;
+  overflow: hidden;
+}
+.shoot-stage-chip.is-active:not(.is-expanded) {
+  box-shadow: inset 0 0 0 1.5px #fff;
+}
+.shoot-stage-chip.is-expanded {
+  flex: none;
+  width: 90px;
+  height: 76px;
+  border-radius: 4px;
+  box-shadow: inset 0 0 0 2px #fff;
+  background: #000 !important;
+}
+.shoot-stage-chip.is-expanded .shoot-stage-chip__label {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 2px;
+  color: #fff;
+  font-size: 12px;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.6);
+}
+.shoot-stage-chip__tag {
+  position: absolute;
+  left: 4px;
+  top: 4px;
+  padding: 0 4px;
+  height: 14px;
+  line-height: 14px;
+  font-size: 10px;
+  color: #fff;
+  background: var(--shoot-accent);
+}
+.shoot-tpl {
+  position: absolute;
+  inset: 2px;
+  overflow: hidden;
+  border-radius: 3px;
+  background: #111;
+}
+.shoot-tpl > img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity 0.45s ease;
+}
+.shoot-tpl > img.is-on {
+  opacity: 1;
+}
+/* 카메라가 천천히 움직이는 느낌: 돌기(orbit)·훑기(sweep)·위아래(tilt) */
+.shoot-tpl.is-orbit > img.is-on,
+.shoot-tpl.is-sweep > img.is-on {
+  animation: shoot-tpl-sweep 1.4s linear both;
+}
+.shoot-tpl.is-sweep > img:only-of-type {
+  animation: shoot-tpl-sweep-long 2.8s ease-in-out infinite alternate;
+}
+.shoot-tpl.is-tilt > img {
+  animation: shoot-tpl-tilt 2.8s ease-in-out infinite alternate;
+}
+@keyframes shoot-tpl-sweep {
+  from {
+    transform: scale(1.12) translateX(4%);
+  }
+  to {
+    transform: scale(1.12) translateX(-4%);
+  }
+}
+@keyframes shoot-tpl-sweep-long {
+  from {
+    transform: scale(1.25) translateX(9%);
+  }
+  to {
+    transform: scale(1.25) translateX(-9%);
+  }
+}
+@keyframes shoot-tpl-tilt {
+  from {
+    transform: scale(1.25) translateY(9%);
+  }
+  to {
+    transform: scale(1.25) translateY(-9%);
+  }
+}
+.shoot-tpl-overlay {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.shoot-tpl-arrow {
+  filter: drop-shadow(0 0 1.5px rgba(0, 0, 0, 0.5));
+}
+/* 화살표가 카메라 이동 방향으로 꼬리부터 머리까지 그려졌다 사라진다(머리가 선에 붙은 채) */
+.shoot-tpl-overlay {
+  animation: shoot-arrow-x 2.4s ease-in-out infinite;
+}
+.shoot-tpl.is-tilt .shoot-tpl-overlay {
+  animation-name: shoot-arrow-y;
+}
+@keyframes shoot-arrow-x {
+  0% {
+    clip-path: inset(0 100% 0 0);
+    opacity: 1;
+  }
+  70% {
+    clip-path: inset(0 0 0 0);
+    opacity: 1;
+  }
+  100% {
+    clip-path: inset(0 0 0 0);
+    opacity: 0;
+  }
+}
+@keyframes shoot-arrow-y {
+  0% {
+    clip-path: inset(0 0 100% 0);
+    opacity: 1;
+  }
+  70% {
+    clip-path: inset(0 0 0 0);
+    opacity: 1;
+  }
+  100% {
+    clip-path: inset(0 0 0 0);
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .shoot-tpl-overlay {
+    animation: none !important;
+  }
+  .shoot-tpl > img {
+    animation: none !important;
+    transition: none;
+  }
+}
+/* 예시 크게 보기(촬영팀 안내) */
+.shoot-tpl-sheet {
+  position: absolute;
+  inset: 0;
+  z-index: 45;
+  background: rgba(0, 0, 0, 0.72);
+  display: grid;
+  place-items: center;
+  padding: 20px;
+}
+.shoot-tpl-sheet__box {
+  width: 100%;
+  max-width: 360px;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #1b1b1b;
+  color: #fff;
+}
+.shoot-tpl-sheet__media {
+  position: relative;
+  aspect-ratio: 4 / 3;
+}
+.shoot-tpl-sheet__media .shoot-tpl {
+  inset: 0;
+  border-radius: 0;
+}
+.shoot-tpl-sheet__media .shoot-stage-chip__tag {
+  left: 10px;
+  top: 10px;
+  height: 20px;
+  line-height: 20px;
+  font-size: 12px;
+  padding: 0 6px;
+}
+.shoot-tpl-sheet__text {
+  padding: 14px 16px 6px;
+}
+.shoot-tpl-sheet__text strong {
+  display: block;
+  font-size: 16px;
+  margin-bottom: 6px;
+}
+.shoot-tpl-sheet__text p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 21px;
+  color: #d6d6d6;
+}
+.shoot-tpl-sheet__ok {
+  display: block;
+  width: calc(100% - 32px);
+  margin: 12px 16px 16px;
+  height: 44px;
+  border-radius: 22px;
+  background: linear-gradient(90deg, var(--shoot-accent), var(--shoot-accent-2)) !important;
+  color: #fff !important;
+  font-size: 15px;
+  font-weight: 600;
+}
+.shoot-stage-chip__zoom {
+  position: absolute;
+  right: 4px;
+  top: 4px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.55);
+  color: #fff;
+  display: grid;
+  place-items: center;
+}
+.shoot-stage-chip__zoom .shoot-mask {
+  width: 12px;
+  height: 12px;
+}
+.shoot-stage-chip.is-done {
+  display: grid;
+  grid-template-rows: 1fr 20px;
+  height: 40px;
+  background: rgba(150, 150, 150, 0.85) !important;
+}
+.shoot-stage-chip.is-done .shoot-stage-chip__time {
+  font-size: 11px;
+  color: rgba(70, 70, 70, 0.9);
+  line-height: 20px;
+}
+.shoot-stage-chip.is-done .shoot-stage-chip__label {
+  background: #222;
+  color: #fff;
+  line-height: 20px;
+  font-size: 12px;
+}
+.shoot-stages.is-done-row .shoot-stage-chip.is-empty {
+  opacity: 0.45;
+}
+.shoot-stage-chip__bar {
+  position: absolute;
+  left: 3px;
+  top: 3px;
+  height: 3px;
+  max-width: calc(100% - 6px);
+  background: var(--shoot-accent);
+  border-radius: 2px;
+}
+.shoot-stage-chip__label {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+.shoot-rec-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--shoot-accent);
+}
+.shoot-rec {
+  justify-self: center;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: #444 !important;
+  display: grid;
+  place-items: center;
+}
+.shoot-rec span {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: var(--shoot-accent);
+  display: grid;
+  place-items: center;
+  font-size: 14px;
+  color: #fff;
+}
+.shoot-rec:disabled {
+  opacity: 0.85;
+}
+.shoot-merging {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  background: rgba(0, 0, 0, 0.5);
+  display: grid;
+  place-items: center;
+}
+.shoot-merging i {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #fff;
+  animation: shoot-spin 0.9s linear infinite;
+}
+@keyframes shoot-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.shoot-play {
+  position: absolute;
+  left: 50%;
+  top: 46%;
+  transform: translate(-50%, -50%);
+  width: 64px;
+  height: 64px;
+  display: grid;
+  place-items: center;
+  color: #fff !important;
+}
+.shoot-play .shoot-mask {
+  width: 48px;
+  height: 48px;
+}
+.shoot-bottom.is-vpreview,
+.shoot-bottom.is-cover {
+  height: 92px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 18px 0 24px;
+}
+.shoot-bottom.is-vpreview {
+  justify-content: flex-end;
+  gap: 92px;
+}
+.shoot-vtime {
+  font-size: 14px;
+  font-weight: 600;
+}
+.shoot-bottom.is-cover span {
+  font-size: 13px;
+  color: #bbb;
+}
+.shoot-cover-strip {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 22px;
+  display: flex;
+  gap: 4px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.shoot-cover-cell {
+  position: relative;
+  flex: none;
+  width: 80px;
+  height: 80px;
+  border-radius: 3px;
+  overflow: hidden;
+}
+.shoot-cover-cell img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.shoot-cover-cell.is-on::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border: 2px solid #fff;
+  border-radius: 3px;
+}
+.shoot-cover-check {
+  position: absolute;
+  right: 8px;
+  bottom: 8px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--shoot-accent);
+  display: grid;
+  place-items: center;
+}
+.shoot-cover-check .shoot-mask {
+  width: 10px;
+  height: 10px;
+}
+
+/* 촬영 규칙 */
+.shoot-rules {
+  background: #fff;
+  color: var(--shoot-text);
+}
+.shoot-page-top {
+  flex: none;
+  height: 52px;
+  display: grid;
+  grid-template-columns: 52px 1fr 52px;
+  align-items: center;
+  text-align: center;
+}
+.shoot-page-top h2 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+}
+.shoot-mask.is-back {
+  width: 22px;
+  height: 22px;
+}
+.shoot-rules__body {
+  flex: 1;
+  overflow-y: auto;
+  padding-bottom: 96px;
+}
+.shoot-rules__notice {
+  margin: 0;
+  padding: 20px 20px 18px;
+  background: #fff4f1;
+}
+.shoot-rules__notice strong {
+  display: block;
+  font-size: 16px;
+  line-height: 22px;
+  margin-bottom: 6px;
+}
+.shoot-rules__notice p {
+  margin: 0;
+  font-size: 13px;
+  line-height: 19px;
+  color: var(--shoot-sub);
+}
+.shoot-rules__notice em,
+.shoot-field em,
+.shoot-tipcard em {
+  font-style: normal;
+  color: var(--shoot-accent);
+}
+.shoot-rules__group {
+  padding: 22px 20px 0;
+}
+.shoot-rules__group h3 {
+  margin: 0;
+  font-size: 19px;
+  line-height: 26px;
+  font-weight: 700;
+}
+.shoot-rules__group > p {
+  margin: 6px 0 16px;
+  font-size: 13px;
+  color: var(--shoot-sub);
+}
+.shoot-rules__grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 7px;
+}
+.shoot-rules__grid figure {
+  margin: 0;
+  display: grid;
+  gap: 8px;
+  text-align: center;
+  font-size: 13px;
+  color: var(--shoot-sub);
+}
+.shoot-rule-img {
+  object-fit: cover;
+  width: 100%;
+  aspect-ratio: 92 / 82;
+  border-radius: 8px;
+  display: block;
+  background: #eee;
+}
+.shoot-rules__cta {
+  position: absolute;
+  left: 20px;
+  right: 20px;
+  bottom: calc(16px + env(safe-area-inset-bottom));
+}
+.shoot-rules__cta button,
+.shoot-publish {
+  width: 100%;
+  height: 50px;
+  border-radius: 25px;
+  background: linear-gradient(90deg, var(--shoot-accent), var(--shoot-accent-2)) !important;
+  color: #fff !important;
+  font-size: 17px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+/* 등록 화면 */
+.shoot-main {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+}
+.shoot-main__top {
+  position: relative;
+  flex: none;
+  height: 52px;
+  display: grid;
+  grid-template-columns: 52px 1fr 88px;
+  align-items: center;
+  border-bottom: 1px solid #f2f2f2;
+}
+.shoot-main__title {
+  text-align: center;
+}
+.shoot-main__title h1 {
+  margin: 0;
+  font-size: 19px;
+  line-height: 24px;
+  font-weight: 700;
+}
+.shoot-main__title span {
+  font-size: 11px;
+  color: var(--shoot-accent);
+}
+.shoot-main__progress {
+  position: absolute;
+  left: 0;
+  bottom: -1px;
+  height: 2px;
+  background: var(--shoot-accent);
+  transition: width 0.4s;
+}
+.shoot-drafts {
+  position: relative;
+  font-size: 15px;
+  justify-self: end;
+  padding-right: 14px;
+}
+.shoot-drafts i {
+  position: absolute;
+  right: 2px;
+  top: -10px;
+  min-width: 16px;
+  height: 16px;
+  border-radius: 8px;
+  background: var(--shoot-accent);
+  color: #fff;
+  font-size: 10px;
+  font-style: normal;
+  line-height: 16px;
+  text-align: center;
+}
+.shoot-main__body {
+  flex: 1;
+  overflow-y: auto;
+  padding-bottom: 24px;
+}
+.shoot-field {
+  padding: 26px 20px 4px;
+}
+.shoot-field h3 {
+  margin: 0;
+  font-size: 19px;
+  line-height: 26px;
+  font-weight: 700;
+}
+.shoot-field h3 em {
+  font-size: 13px;
+  font-weight: 500;
+}
+.shoot-field__value {
+  margin: 18px 0 0;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #f0f0f0;
+  font-size: 17px;
+}
+.shoot-field__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.shoot-rules-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 13px;
+  color: var(--shoot-sub) !important;
+}
+.shoot-rules-link .shoot-mask {
+  width: 14px;
+  height: 14px;
+}
+.shoot-hint {
+  margin: 6px 0 14px;
+  font-size: 13px;
+  color: var(--shoot-sub);
+}
+.shoot-hint span {
+  color: #e8342b;
+}
+.shoot-addcards {
+  display: grid;
+  grid-template-columns: 1fr 1px 1fr;
+  align-items: center;
+  height: 104px;
+  border-radius: 8px;
+  box-shadow: 0 1px 8px rgba(0, 0, 0, 0.08);
+}
+.shoot-addcards i {
+  height: 48px;
+  background: #eee;
+}
+.shoot-addcards button {
+  display: grid;
+  justify-items: center;
+  gap: 12px;
+  font-size: 14px;
+  height: 100%;
+  align-content: center;
+}
+.shoot-mask.is-big {
+  width: 32px;
+  height: 32px;
+}
+.shoot-tipcard {
+  margin-bottom: 14px;
+  padding: 14px 16px;
+  border-radius: 8px;
+  box-shadow: 0 1px 8px rgba(0, 0, 0, 0.08);
+  font-size: 13px;
+  line-height: 19px;
+}
+.shoot-tipcard.is-short {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.shoot-tipcard p {
+  margin: 0;
+}
+.shoot-tipcard:not(.is-short) p {
+  padding-left: 40px;
+  color: #444;
+}
+.shoot-tipcard__btn {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 30px;
+  padding: 0 12px;
+  border-radius: 15px;
+  background: linear-gradient(90deg, var(--shoot-accent), var(--shoot-accent-2)) !important;
+  color: #fff !important;
+  font-size: 13px;
+  font-weight: 600;
+}
+.shoot-tipcard__btn .shoot-mask {
+  width: 14px;
+  height: 14px;
+}
+.shoot-tipcard__head {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+  font-size: 15px;
+}
+.shoot-tipcard__head strong {
+  flex: 1;
+  text-align: left;
+}
+.shoot-tipcard__head .is-tipico {
+  width: 28px;
+  height: 28px;
+  color: var(--shoot-accent);
+}
+.shoot-tipcard__head .is-chev {
+  width: 14px;
+  height: 14px;
+  color: #444;
+  transition: transform 0.2s;
+}
+.shoot-tipcard__head .is-chev.is-up {
+  transform: rotate(180deg);
+}
+.shoot-tipcard__list {
+  margin-top: 8px !important;
+  font-weight: 600;
+  color: #222 !important;
+}
+.shoot-tiles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.shoot-tile {
+  position: relative;
+  margin: 0;
+  width: 78px;
+  display: grid;
+  gap: 4px;
+  text-align: center;
+}
+.shoot-tile figcaption {
+  font-size: 13px;
+  line-height: 18px;
+}
+.shoot-tile__img,
+.shoot-tile__wait {
+  position: relative;
+  width: 78px;
+  height: 78px;
+  border-radius: 6px;
+  overflow: hidden;
+  display: block;
+}
+.shoot-tile__img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.shoot-tile__wait {
+  background: #eee;
+  display: grid;
+  place-items: center;
+  color: #fff;
+  font-size: 22px;
+  font-weight: 800;
+}
+.shoot-tile__wm {
+  position: absolute;
+  right: 4px;
+  bottom: 2px;
+  font-size: 9px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.75);
+}
+.shoot-tile__del {
+  position: absolute;
+  right: 4px;
+  top: 4px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.45) !important;
+  color: #fff !important;
+  display: grid;
+  place-items: center;
+}
+.shoot-tile__del .shoot-mask {
+  width: 13px;
+  height: 13px;
+}
+.shoot-tile__play i {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.55);
+  display: grid;
+  place-items: center;
+}
+.shoot-tile__play .shoot-mask {
+  width: 14px;
+  height: 14px;
+}
+.shoot-tile__dots,
+.shoot-tile__play {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  grid-auto-flow: row;
+  gap: 4px;
+  color: #fff;
+}
+.shoot-tile__dots i {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #3a9bd8;
+  animation: shoot-dot 1s ease-in-out infinite;
+}
+.shoot-tile__dots i:nth-child(2) {
+  animation-delay: 0.15s;
+}
+.shoot-tile__dots i:nth-child(3) {
+  animation-delay: 0.3s;
+}
+@keyframes shoot-dot {
+  0%,
+  100% {
+    transform: scale(0.6);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+}
+.shoot-tile--add {
+  width: 78px;
+  height: 78px;
+  border-radius: 6px;
+  box-shadow: 0 1px 8px rgba(0, 0, 0, 0.08);
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 8px;
+  font-size: 13px;
+  align-self: start;
+}
+.shoot-radios {
+  display: flex;
+  justify-content: space-between;
+  margin: 18px 0 16px;
+}
+.shoot-radios label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 16px;
+  cursor: pointer;
+}
+.shoot-radios input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+.shoot-radios i {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 1.5px solid #ccc;
+}
+.shoot-radios label.is-on i {
+  border-color: var(--shoot-accent);
+  box-shadow: inset 0 0 0 3px #fff;
+  background: var(--shoot-accent);
+}
+.shoot-radios label:focus-within i {
+  outline: 2px solid var(--shoot-accent);
+  outline-offset: 2px;
+}
+.shoot-docbox {
+  width: 100%;
+  height: 160px;
+  border-radius: 8px;
+  box-shadow: 0 1px 8px rgba(0, 0, 0, 0.08);
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 14px;
+  font-size: 15px;
+}
+.shoot-main__foot {
+  flex: none;
+  height: 70px;
+  display: grid;
+  grid-template-columns: 64px 1fr;
+  align-items: center;
+  gap: 8px;
+  padding: 0 16px 0 8px;
+  padding-bottom: env(safe-area-inset-bottom);
+  box-shadow: 0 -1px 0 #f0f0f0;
+}
+.shoot-savedraft {
+  display: grid;
+  justify-items: center;
+  gap: 2px;
+  font-size: 11px;
+}
+.shoot-savedraft .shoot-mask {
+  width: 24px;
+  height: 24px;
+}
+
+/* 팝업·토스트 */
+.shoot-dim {
+  position: absolute;
+  inset: 0;
+  z-index: 40;
+  background: rgba(0, 0, 0, 0.5);
+  display: grid;
+  place-items: center;
+}
+.shoot-confirm {
+  width: 300px;
+  border-radius: 12px;
+  background: #fff;
+  color: #222;
+  text-align: center;
+  overflow: hidden;
+}
+.shoot-confirm strong {
+  display: block;
+  padding-top: 22px;
+  font-size: 18px;
+  font-weight: 600;
+}
+.shoot-confirm p {
+  margin: 12px 0 18px;
+  font-size: 14px;
+  color: var(--shoot-sub);
+}
+.shoot-confirm__row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  border-top: 1px solid #eee;
+}
+.shoot-confirm__row button {
+  height: 50px;
+  font-size: 17px;
+}
+.shoot-confirm__row button + button {
+  border-left: 1px solid #eee;
+}
+.shoot-confirm__row .is-ok {
+  color: var(--shoot-accent) !important;
+}
+.shoot-toast {
+  position: absolute;
+  z-index: 60;
+  left: 50%;
+  top: 46%;
+  transform: translateX(-50%);
+  max-width: calc(100% - 64px);
+  padding: 12px 16px;
+  border-radius: 8px;
+  background: rgba(40, 40, 40, 0.92);
+  color: #fff;
+  font-size: 15px;
+  line-height: 21px;
+  text-align: center;
+  word-break: keep-all;
+}
+.shoot-layer[hidden] {
+  display: none;
+}
+.shoot-editor {
+  z-index: 12;
+}
+
+/* 자르기 틀 모서리 손잡이(보이지 않는 36×36 터치 영역, 보이는 모서리는 .shoot-corner) */
+.shoot-crop__h {
+  position: absolute;
+  width: 36px;
+  height: 36px;
+  touch-action: none;
+  z-index: 1;
+}
+.shoot-crop__h.is-tl {
+  left: -18px;
+  top: -18px;
+  cursor: nwse-resize;
+}
+.shoot-crop__h.is-tr {
+  right: -18px;
+  top: -18px;
+  cursor: nesw-resize;
+}
+.shoot-crop__h.is-bl {
+  left: -18px;
+  bottom: -18px;
+  cursor: nesw-resize;
+}
+.shoot-crop__h.is-br {
+  right: -18px;
+  bottom: -18px;
+  cursor: nwse-resize;
+}
+
+/* ── 2026-10-24 QA 10배 대조: 58 uiautomator 덤프·잉크 실측값(432 단위 ÷ 1.125 = CSS px) ── */
+/* 등록 화면 */
+.shoot-main__top {
+  height: 43px;
+  grid-template-columns: 52px 1fr 88px;
+}
+.shoot-main__title {
+  position: absolute;
+  left: 50%;
+  top: 4px;
+  transform: translateX(-50%);
+  white-space: nowrap;
+}
+.shoot-main__title h1 {
+  line-height: 22px;
+}
+.shoot-main__title span {
+  display: block;
+  line-height: 12px;
+  margin-top: 1.8px;
+}
+.shoot-main__top > .shoot-drafts {
+  grid-column: 3;
+}
+.shoot-field {
+  padding-left: 21px;
+  padding-right: 20px;
+}
+.shoot-main__body > .shoot-field:nth-of-type(2) {
+  padding-top: 9px;
+}
+.shoot-main__body > .shoot-field:nth-of-type(3) {
+  padding-top: 27.4px;
+}
+.shoot-field__value {
+  margin-top: 31.2px;
+}
+.shoot-hint {
+  margin-top: 7.1px;
+}
+.shoot-addcards {
+  margin-top: 18.4px;
+}
+/* 58: 첫 칸 x30, 셋째 칸은 오른쪽 끝(409)에 붙는다. 한국어 이름이 길어 좁은 폰에서는 글자를 조금 줄인다. */
+.shoot-radios {
+  display: flex;
+  justify-content: space-between;
+  padding-left: 5.7px;
+  margin-top: 16.9px;
+}
+.shoot-radios label {
+  font-size: min(16px, 3.6vw);
+  gap: 6px;
+  white-space: nowrap;
+}
+
+/* 촬영 화면 공통: 아래 판 94(→83.6), 탭 줄 60(→53.3), 흰 막대는 화면 가운데 고정(58 slide_line 157~274) */
+.shoot-controls {
+  height: 83.6px;
+}
+.shoot-plate {
+  margin-left: 26.2px;
+  gap: 4px;
+}
+.shoot-capture .shoot-bottom:not(.is-album) .shoot-modes {
+  height: 53.3px;
+  align-items: flex-start;
+}
+.shoot-capture .shoot-bottom:not(.is-album) .shoot-modes button {
+  height: 40px;
+}
+.shoot-modes button.is-on::after {
+  content: none;
+}
+.shoot-modes::after {
+  content: "";
+  position: absolute;
+  left: calc(50% - 52px);
+  top: 39.3px;
+  width: 104px;
+  height: 5px;
+  border-radius: 2.5px;
+  background: #fff;
+}
+.shoot-pill {
+  top: 9.8px;
+}
+.shoot-capture.is-video .shoot-pill {
+  top: 20.4px;
+}
+
+/* 앨범: 배너 32(→28.4), 4열 108×140(→ 1fr × 124.4), 아래 줄 70(→62.2) */
+.shoot-album-banner {
+  height: 28.4px;
+  line-height: 28.4px;
+}
+.shoot-album-grid {
+  grid-template-columns: repeat(4, 1fr);
+  grid-auto-rows: 124.4px;
+}
+.shoot-bottom.is-album {
+  height: 62.2px;
+}
+.shoot-bottom.is-album .shoot-modes {
+  height: 62.2px;
+  padding-left: 78.2px;
+  align-items: flex-start;
+}
+.shoot-bottom.is-album .shoot-modes button {
+  height: 48.8px;
+}
+.shoot-bottom.is-album .shoot-modes::after {
+  left: 104.9px;
+  top: 48px;
+}
+.shoot-album-count {
+  left: 217.8px;
+}
+
+/* 영상 촬영: 틀 410×299 · 단계 칸 피치 101(=폭의 23.38%) · 칸 92×38 / 펼친 칸 92×84 */
+.shoot-vframe {
+  left: 9.8px;
+  right: 9.8px;
+  top: 99.6px;
+  height: 265.8px;
+  aspect-ratio: auto;
+  max-height: none;
+}
+.shoot-vhint {
+  top: calc(100% + 10.7px);
+  font-size: 14px;
+  line-height: 18.7px;
+}
+.shoot-capture.is-video .shoot-stages {
+  left: 0;
+  right: 0;
+  bottom: 9.8px;
+  display: grid;
+  grid-template-columns: repeat(4, 23.457%);
+  gap: 0;
+  align-items: end;
+}
+.shoot-capture.is-video .shoot-stage-chip {
+  flex: none;
+  width: 90.8%;
+  margin-left: 4.4%;
+  height: 33.8px;
+  border-radius: 3px;
+  font-size: 12px;
+}
+.shoot-capture.is-video .shoot-stage-chip.is-done {
+  height: 33.8px;
+  grid-template-rows: 1fr 15px;
+}
+.shoot-capture.is-video .shoot-stage-chip.is-done .shoot-stage-chip__label {
+  line-height: 15px;
+  font-size: 11px;
+}
+.shoot-capture.is-video .shoot-stage-chip.is-done .shoot-stage-chip__time {
+  line-height: 18px;
+}
+.shoot-capture.is-video .shoot-stage-chip.is-expanded {
+  width: 90.8%;
+  height: 74.7px;
+  border-radius: 4px;
+  box-shadow: inset 0 0 0 1.8px #fff;
+}
+.shoot-capture.is-video .shoot-stage-chip.is-expanded .shoot-tpl {
+  inset: 1.8px 1.8px 12.5px 1.8px;
+  border-radius: 2px 2px 0 0;
+}
+.shoot-capture.is-video .shoot-stage-chip.is-expanded .shoot-stage-chip__label {
+  left: 1.8px;
+  right: 1.8px;
+  bottom: 1.8px;
+  height: 10.7px;
+  line-height: 10.7px;
+  font-size: 10px;
+  background: rgba(0, 0, 0, 0.55);
+  text-shadow: none;
+}
+.shoot-capture.is-video .shoot-stage-chip.is-expanded .shoot-stage-chip__tag {
+  left: 6.2px;
+  top: 5.3px;
+  height: 13.3px;
+  line-height: 13.3px;
+  min-width: 26.7px;
+  padding: 0 3px;
+  text-align: center;
+  font-size: 10px;
+  border-radius: 1px;
+}
+
+/* 영상 보기·편집(등록 화면 영상 칸) */
+.shoot-tile--video .shoot-tile__img {
+  display: block;
+}
+.shoot-tile--video .shoot-tile__img:disabled {
+  opacity: 1;
+}
+.shoot-stages.is-done-row .shoot-stage-chip.is-now {
+  box-shadow: inset 0 0 0 1.5px #fff;
+}
+.shoot-vedit-actions {
+  display: flex;
+  gap: 18px;
+}
+.shoot-vedit-actions button {
+  display: grid;
+  justify-items: center;
+  gap: 4px;
+  font-size: 12px;
+  color: #fff !important;
+}
+.shoot-vedit-actions .shoot-mask {
+  width: 22px;
+  height: 22px;
+}
+.shoot-bottom.is-vpreview:has(.shoot-vedit-actions) {
+  justify-content: space-between;
+  gap: 0;
+}
+
+.shoot-capture.is-video .shoot-timer {
+  top: 21px;
+  right: 24px;
+  font-size: 12px;
+  line-height: 14px;
+}
+
+/* 사진 미리보기: 사진은 제목 아래 전체(99~907)에 맞추고 칸 줄·도구 판을 위에 얹는다 */
+.shoot-preview .shoot-tools {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 2;
+  height: 68.4px;
+  display: block;
+  padding: 0;
+  background: #000;
+}
+.shoot-preview .shoot-tools > button:not(.shoot-done) {
+  position: absolute;
+  top: 13.3px;
+  width: 54px;
+  gap: 6.2px;
+  font-size: 10px;
+  line-height: 13.3px;
+}
+.shoot-preview .shoot-tools > button:nth-child(1) {
+  left: 23.2px;
+  width: 54px;
+}
+.shoot-preview .shoot-tools > button:nth-child(2) {
+  left: 72.6px;
+  width: 54px;
+}
+.shoot-preview .shoot-tools > button:nth-child(3) {
+  left: 117.9px;
+  width: 54px;
+}
+.shoot-preview .shoot-tools > button:nth-child(4) {
+  left: 162.3px;
+  width: 54px;
+}
+.shoot-preview .shoot-tools .shoot-mask,
+.shoot-preview .shoot-tools .shoot-mask.is-ring,
+.shoot-preview .shoot-plate__ico.is-accent {
+  width: 24.9px;
+  height: 24.9px;
+}
+.shoot-preview .shoot-tools .shoot-done {
+  position: absolute;
+  left: auto;
+  right: 19.6px;
+  top: 19.6px;
+  margin: 0;
+  min-width: 0;
+  width: 60.4px;
+  height: 28.4px;
+  border-radius: 14.2px;
+  font-size: 14px;
+}
+.shoot-preview .shoot-strip {
+  bottom: 68.4px;
+  height: 80px;
+  align-items: flex-start;
+  gap: 0;
+}
+.shoot-preview .shoot-strip__add {
+  width: 28.4px;
+  height: 70.2px;
+  margin-right: 5.4px;
+}
+.shoot-preview .shoot-strip__item,
+.shoot-preview .shoot-strip__redo {
+  width: 75.6px;
+  height: 65.8px;
+  margin: 1.8px 12.4px 0 0;
+}
+.shoot-preview .shoot-strip__hit img {
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.shoot-preview .shoot-strip__hit span {
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 17.8px;
+  line-height: 17.8px;
+  font-size: 12px;
+}
+.shoot-preview .shoot-strip__x {
+  top: 0;
+  right: 0;
+  width: 17.8px;
+  height: 17.8px;
+}
+.shoot-preview .shoot-strip__x .shoot-mask {
+  width: 10px;
+  height: 10px;
+}
+
+/* 편집(모자이크·회전·자르기): 제목 51 · 사진 622 · 조절 135 · 아래 버튼 51(432 단위) */
+.shoot-editor__top {
+  height: 45.3px;
+}
+.shoot-editor__stage {
+  padding: 0;
+}
+.shoot-editor .shoot-stage-img,
+.shoot-editor .shoot-stage-img > img {
+  border-radius: 0;
+}
+.shoot-editor__controls {
+  position: relative;
+  display: block;
+  height: 120px;
+  padding: 0;
+}
+.shoot-editor__foot {
+  height: 45.3px;
+  grid-template-columns: 107.6px 1fr;
+}
+.shoot-editor__foot button {
+  font-size: 16px;
+}
+.shoot-brush-row {
+  position: absolute;
+  inset: 0;
+  display: block;
+}
+.shoot-brushes,
+.shoot-brushes__dots,
+.shoot-history {
+  display: contents;
+}
+.shoot-brush {
+  position: absolute;
+}
+.shoot-brush.is-0 {
+  left: 32px;
+  top: 34.7px;
+  width: 19.6px;
+  height: 19.6px;
+}
+.shoot-brush.is-1 {
+  left: 81.8px;
+  top: 32.9px;
+  width: 23.1px;
+  height: 23.1px;
+}
+.shoot-brush.is-2 {
+  left: 134.2px;
+  top: 32px;
+  width: 25.8px;
+  height: 25.8px;
+}
+/* 58은 고르기 전에는 세 붓 모두 테두리만 보인다. 누른 붓만 채운다. */
+.shoot-brush.is-on:not(.is-picked) {
+  background: transparent !important;
+}
+.shoot-brushes > span {
+  position: absolute;
+  left: 96px;
+  top: 72.9px;
+  transform: translateX(-50%);
+  font-size: 12px;
+  line-height: 15px;
+  white-space: nowrap;
+}
+.shoot-history button {
+  position: absolute;
+  top: 32.9px;
+  width: 56px;
+  gap: 17.6px;
+  font-size: 12px;
+  line-height: 15px;
+}
+.shoot-history button:first-child {
+  left: 232.4px;
+}
+.shoot-history button:last-child {
+  left: 287.6px;
+}
+.shoot-history .shoot-mask {
+  width: 21.3px;
+  height: 21.3px;
+}
+.shoot-rotate-btn {
+  position: absolute;
+  left: 50%;
+  top: 24px;
+  transform: translateX(-50%);
+  font-size: 12px;
+  line-height: 15px;
+}
+.shoot-aspects {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+.shoot-aspect {
+  height: 100%;
+  align-content: end;
+  padding-bottom: 25px;
+  gap: 18px;
+  font-size: 12px;
+  line-height: 15px;
+}
+.shoot-aspect.is-wide span {
+  width: 37.3px;
+  height: 28.4px;
+}
+.shoot-aspect.is-tall span {
+  width: 28.4px;
+  height: 40px;
+}
+.shoot-main__foot {
+  height: 63.8px;
+  padding-left: 9px;
+}
+.shoot-publish {
+  height: 47.1px;
+  border-radius: 23.6px;
+}
+.shoot-savedraft {
+  gap: 0;
+  line-height: 12.4px;
+}
+.shoot-savedraft .shoot-mask {
+  width: 26.7px;
+  height: 26.7px;
+}
+/* 등록 팁 카드·사진 칸(58: 칸 90×90 · 피치 95 · 말풍선 38×36 · 글 13/18.4 · 글 시작 x78) */
+.shoot-tipcard:not(.is-short) {
+  padding-left: 13.3px;
+}
+.shoot-tipcard__head .is-tipico {
+  width: 33.8px;
+  height: 32px;
+}
+.shoot-tipcard__head {
+  gap: 7px;
+}
+.shoot-tipcard__head .is-chev {
+  width: 10px;
+  height: 10px;
+  margin-right: 6px;
+}
+.shoot-tipcard:not(.is-short) p {
+  padding-left: 35px;
+  padding-right: 6.7px;
+  font-size: 13px;
+  line-height: 18.4px;
+}
+.shoot-tiles {
+  gap: 4px 4.4px;
+}
+.shoot-tile,
+.shoot-tile__img,
+.shoot-tile__wait {
+  width: 80px;
+}
+.shoot-tile__img,
+.shoot-tile__wait {
+  height: 80px;
+}
+.shoot-tile--add {
+  height: 80px;
+}
+.shoot-tipcard__head {
+  gap: 4.3px;
+}
+.shoot-tipcard__head .is-chev {
+  margin-right: 9.6px;
+}
+.shoot-tiles {
+  margin: 22.9px 0 9.8px -1.4px;
+}
+/* 사진 촬영 칸 줄: 선택 칸 테두리 x4.4·y663(432 단위) */
+.shoot-rail {
+  bottom: 9.3px;
+  padding-left: 3.9px;
+  scroll-padding-left: 3.9px;
+}
+.shoot-plate {
+  margin-left: 22.6px;
+}
+
+/* ── 추가 촬영 시안(?vstage=plus): 4칸 피치(폭의 23.46%)를 그대로 두고 옆으로 넘긴다 ── */
+.shoot-capture.is-video .shoot-stages.is-plus,
+.shoot-stages.is-done-row.is-plus {
+  display: flex;
+  align-items: flex-end;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.shoot-stages.is-plus::-webkit-scrollbar {
+  display: none;
+}
+.shoot-capture.is-video .shoot-stages.is-plus > .shoot-stage-chip {
+  flex: 0 0 21.3%;
+  width: 21.3%;
+  margin: 0 1.13% 0 1.03%;
+}
+.shoot-stages.is-done-row.is-plus > .shoot-stage-chip {
+  flex: 0 0 21.3%;
+}
+/* 추가 단계(아직 안 찍음)는 점선 테두리로 필수 단계와 구분 */
+.shoot-stage-chip.is-extra:not(.is-done):not(.is-expanded):not(.is-active) {
+  background: rgba(140, 140, 140, 0.55) !important;
+  outline: 1px dashed rgba(255, 255, 255, 0.75);
+  outline-offset: -1px;
+}
+.shoot-stage-add {
+  position: absolute;
+  right: 9.8px;
+  bottom: 94px;
+  z-index: 2;
+  height: 28px;
+  padding: 0 11px 0 7px;
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  border-radius: 14px;
+  background: rgba(0, 0, 0, 0.55) !important;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.6);
+  color: #fff !important;
+  font-size: 12px;
+  font-weight: 600;
+}
+.shoot-stage-add .shoot-mask {
+  width: 16px;
+  height: 16px;
+}
+/* 흠집 표시 점(누른 자리) */
+.shoot-mark {
+  position: absolute;
+  z-index: 2;
+  width: 22px;
+  height: 22px;
+  margin: -11px 0 0 -11px;
+  border-radius: 50%;
+  border: 2px solid #fff;
+  background: rgba(255, 85, 46, 0.85);
+  box-shadow: 0 0 0 4px rgba(255, 85, 46, 0.3);
+  pointer-events: none;
+  animation: shoot-mark-in 0.25s ease-out;
+}
+@keyframes shoot-mark-in {
+  from {
+    transform: scale(0.4);
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .shoot-mark {
+    animation: none;
+  }
+}
+.shoot-marks {
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  bottom: 62px;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  font-size: 12px;
+  color: #fff;
+}
+.shoot-marks > span {
+  flex: none;
+  font-weight: 600;
+}
+.shoot-marks button {
+  flex: none;
+  height: 24px;
+  padding: 0 9px;
+  border-radius: 12px;
+  background: rgba(255, 85, 46, 0.9) !important;
+  color: #fff !important;
+  font-size: 12px;
+}
+
+/* 추가 촬영 고르기 시트 */
+.shoot-xpick {
+  position: absolute;
+  inset: 0;
+  z-index: 46;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: flex-end;
+}
+.shoot-xpick__box {
+  width: 100%;
+  max-height: 82%;
+  display: flex;
+  flex-direction: column;
+  border-radius: 14px 14px 0 0;
+  background: #1b1b1b;
+  color: #fff;
+}
+.shoot-xpick header {
+  padding: 18px 16px 10px;
+}
+.shoot-xpick header strong {
+  display: block;
+  font-size: 17px;
+  line-height: 24px;
+}
+.shoot-xpick header p {
+  margin: 4px 0 0;
+  font-size: 13px;
+  line-height: 19px;
+  color: #bdbdbd;
+}
+.shoot-xpick ul {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  margin: 0;
+  padding: 0 8px;
+  list-style: none;
+}
+.shoot-xpick__row {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 22px 72px 1fr;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 8px;
+  border-radius: 10px;
+  text-align: left;
+  color: #fff !important;
+}
+.shoot-xpick__row.is-on {
+  background: rgba(255, 85, 46, 0.12) !important;
+}
+.shoot-xpick__row:disabled {
+  opacity: 0.45;
+}
+.shoot-xpick__row:has(.is-lock):disabled {
+  opacity: 1;
+}
+.shoot-xpick__check {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 1.5px solid #8c8c8c;
+  display: grid;
+  place-items: center;
+}
+.shoot-xpick__row.is-on .shoot-xpick__check {
+  border-color: var(--shoot-accent);
+  background: var(--shoot-accent);
+}
+.shoot-xpick__check .shoot-mask {
+  width: 13px;
+  height: 13px;
+}
+.shoot-xpick__row img {
+  width: 72px;
+  height: 54px;
+  border-radius: 4px;
+  object-fit: cover;
+}
+.shoot-xpick__txt {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+.shoot-xpick__txt b {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 15px;
+  line-height: 21px;
+}
+.shoot-xpick__txt em {
+  font-style: normal;
+  font-weight: 400;
+  font-size: 12px;
+  color: #9a9a9a;
+}
+.shoot-xpick__txt em.is-lock {
+  color: var(--shoot-accent);
+}
+.shoot-xpick__txt > span {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  font-size: 12px;
+  line-height: 17px;
+  color: #bdbdbd;
+}
+.shoot-xpick footer {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 10px;
+  padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
+}
+.shoot-xpick footer button {
+  height: 46px;
+  border-radius: 23px;
+  font-size: 15px;
+  font-weight: 600;
+  background: #333 !important;
+  color: #fff !important;
+}
+.shoot-xpick footer .is-ok {
+  background: linear-gradient(90deg, var(--shoot-accent), var(--shoot-accent-2)) !important;
+}
+
+/* 실내 세부 순서 카드(녹화 중 틀 위쪽) */
+.shoot-istep {
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  top: 40px;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 4px 8px;
+  padding: 9px 10px 10px 12px;
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.55);
+  color: #fff;
+}
+.shoot-istep__dots {
+  grid-column: 1 / -1;
+  display: flex;
+  gap: 4px;
+}
+.shoot-istep__dots i {
+  flex: 1;
+  height: 3px;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.3);
+}
+.shoot-istep__dots i.is-done {
+  background: rgba(255, 255, 255, 0.85);
+}
+.shoot-istep__dots i.is-on {
+  background: var(--shoot-accent);
+}
+.shoot-istep b {
+  font-size: 15px;
+  line-height: 21px;
+}
+.shoot-istep__hand {
+  grid-column: 1;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  line-height: 17px;
+  color: #e6e6e6;
+}
+.shoot-istep__hand .shoot-mask {
+  flex: none;
+  width: 15px;
+  height: 15px;
+}
+.shoot-istep__next {
+  grid-column: 2;
+  grid-row: 2 / span 2;
+  height: 30px;
+  padding: 0 11px;
+  border-radius: 15px;
+  background: rgba(255, 255, 255, 0.16) !important;
+  color: #fff !important;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+/* 실내 칸 진행 막대 6칸 눈금 */
+.shoot-stage-chip__ticks {
+  position: absolute;
+  left: 3px;
+  right: 3px;
+  top: 3px;
+  height: 3px;
+  background: repeating-linear-gradient(90deg, transparent 0 calc(16.666% - 1px), rgba(0, 0, 0, 0.6) calc(16.666% - 1px) 16.666%);
+  pointer-events: none;
+}
+.shoot-marks.is-steps button {
+  background: rgba(255, 255, 255, 0.18) !important;
+}
+.shoot-marks.is-up {
+  bottom: 92px;
+}
+
+/* 가로로 돌리면 세로로 들라는 안내(58 앱은 세로 고정, 숏폼 9:16) */
+.shoot-rotate-hint {
+  display: none;
+}
+@media (orientation: landscape) and (max-height: 520px) {
+  .shoot-capture .shoot-rotate-hint {
+    position: absolute;
+    inset: 0;
+    z-index: 60;
+    display: grid;
+    place-content: center;
+    justify-items: center;
+    gap: 8px;
+    background: rgba(0, 0, 0, 0.88);
+    color: #fff;
+    font-size: 16px;
+    font-weight: 600;
+    text-align: center;
+  }
+  .shoot-rotate-hint .shoot-mask {
+    width: 40px;
+    height: 40px;
+  }
+  .shoot-rotate-hint small {
+    font-size: 13px;
+    font-weight: 400;
+    color: #bdbdbd;
+  }
+}
+
+/* 시간대 표시(2026-10-24): 녹화 중 틀 아래쪽에 최소·최대·지금 위치, 실내는 부위 경계 눈금 */
+.shoot-capture.is-video .shoot-timer small {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.7);
+}
+.shoot-timeline {
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  bottom: 12px;
+  z-index: 2;
+  display: grid;
+  gap: 6px;
+  pointer-events: none;
+}
+.shoot-timeline__track {
+  position: relative;
+  height: 4px;
+  border-radius: 2px;
+  background: rgba(255, 255, 255, 0.3);
+}
+.shoot-timeline__fill {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  border-radius: 2px;
+  background: #fff;
+}
+.shoot-timeline.is-ok .shoot-timeline__fill {
+  background: var(--shoot-accent);
+}
+.shoot-timeline__min {
+  position: absolute;
+  top: -3px;
+  width: 2px;
+  height: 10px;
+  margin-left: -1px;
+  border-radius: 1px;
+  background: var(--shoot-accent);
+}
+.shoot-timeline__step {
+  position: absolute;
+  top: 0;
+  width: 1px;
+  height: 4px;
+  background: rgba(0, 0, 0, 0.45);
+}
+.shoot-timeline__text {
+  font-size: 12px;
+  line-height: 17px;
+  color: #fff;
+  text-align: center;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+.shoot-istep__slot {
+  font-size: 12px;
+  font-weight: 400;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+/* 촬영 코스 고르기(2026-10-24): 코스 행 = 원형 선택 + 이름·최대 길이 + 동선 설명 + 순서 알약 */
+.shoot-course {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 22px 1fr;
+  align-items: start;
+  gap: 10px;
+  padding: 12px 8px;
+  border-radius: 10px;
+  text-align: left;
+  color: #fff !important;
+}
+.shoot-course.is-on {
+  background: rgba(255, 85, 46, 0.12) !important;
+}
+.shoot-course:disabled {
+  opacity: 0.45;
+}
+.shoot-course .shoot-xpick__txt > span:not(.shoot-course__steps) {
+  -webkit-line-clamp: 2;
+}
+.shoot-xpick__check.is-radio {
+  margin-top: 0;
+}
+.shoot-course.is-on .shoot-xpick__check {
+  border-color: var(--shoot-accent);
+}
+.shoot-xpick__check.is-radio i {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--shoot-accent);
+}
+.shoot-course__steps {
+  display: flex !important;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 4px;
+  -webkit-line-clamp: unset !important;
+}
+.shoot-course__steps span {
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.1);
+  font-size: 12px;
+  line-height: 17px;
+  color: #e6e6e6;
+}
+.shoot-course__steps span.is-opt {
+  background: transparent;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.35);
+}
+.shoot-course__opt {
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+}
+.shoot-xpick footer .is-ok:disabled {
+  opacity: 0.45;
+}
+
+/* 사진 윤곽선 안내 시안(?guide=on, PhotoFairy · Car Studio AI · AOS 벤치마킹) */
+.shoot-guide {
+  position: absolute;
+  left: 16px;
+  right: 16px;
+  top: 48px;
+  bottom: 94px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  pointer-events: none;
+}
+.shoot-guide__shape {
+  width: 100%;
+  max-height: calc(100% - 64px);
+  fill: rgba(255, 255, 255, 0.06);
+  stroke: rgba(255, 255, 255, 0.92);
+  stroke-width: 2;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+  filter: drop-shadow(0 0 2px rgba(0, 0, 0, 0.55));
+}
+.shoot-guide__shape .is-ground {
+  fill: none;
+  stroke-dasharray: 6 6;
+  stroke: rgba(255, 255, 255, 0.6);
+}
+.shoot-guide__hint {
+  margin: 0;
+  max-width: 300px;
+  padding: 6px 12px;
+  border-radius: 14px;
+  background: rgba(0, 0, 0, 0.5);
+  color: #fff;
+  font-size: 13px;
+  line-height: 18px;
+  text-align: center;
+  word-break: keep-all;
+}
+.shoot-guide__level {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 24px;
+  padding: 0 10px;
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.5);
+  color: #fff;
+  font-size: 12px;
+}
+.shoot-guide__level i {
+  width: 28px;
+  height: 2px;
+  border-radius: 1px;
+  background: #fff;
+  transition: transform 0.1s linear;
+}
+.shoot-guide__level.is-ok {
+  color: #7ee08a;
+}
+.shoot-guide__level.is-ok i {
+  background: #7ee08a;
+}
+.shoot-guide-toggle {
+  justify-self: end;
+  height: 28px;
+  margin-right: 6px;
+  padding: 0 7px;
+  white-space: nowrap;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  background: transparent;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+}
+.shoot-guide-toggle.is-on {
+  border-color: var(--shoot-accent);
+  background: var(--shoot-accent);
+}
+
+/* 내 폰에 저장(mp4) — 2026-10-24 */
+.shoot-save-btn {
+  min-width: 40px;
+}
+.shoot-dim.is-sheet {
+  place-items: end center;
+}
+.shoot-save-sheet {
+  width: 100%;
+  max-width: 480px;
+  padding: 20px 16px calc(12px + env(safe-area-inset-bottom, 0px));
+  border-radius: 16px 16px 0 0;
+  background: #fff;
+  color: #222;
+  display: grid;
+  gap: 8px;
+}
+.shoot-save-sheet strong {
+  font-size: 18px;
+  line-height: 24px;
+  font-weight: 700;
+}
+.shoot-save-sheet p {
+  margin: 0 0 6px;
+  font-size: 13px;
+  line-height: 18px;
+  color: var(--shoot-sub);
+  word-break: keep-all;
+}
+.shoot-save-sheet button {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 48px;
+  padding: 0 14px;
+  border-radius: 10px;
+  border: 1px solid #e4e7ec;
+  background: #fff;
+  color: #222;
+  font-size: 15px;
+  font-weight: 500;
+}
+.shoot-save-sheet button em {
+  font-style: normal;
+  font-size: 13px;
+  color: var(--shoot-sub);
+}
+.shoot-save-sheet button.is-all {
+  border-color: var(--shoot-accent);
+  background: var(--shoot-accent);
+  color: #fff;
+  font-weight: 600;
+}
+.shoot-save-sheet button.is-all em {
+  color: rgba(255, 255, 255, 0.85);
+}
+.shoot-save-sheet button.is-cancel {
+  justify-content: center;
+  border: 0;
+  color: var(--shoot-sub);
+}
+.shoot-save-progress {
+  width: 260px;
+  padding: 20px 18px 18px;
+  border-radius: 12px;
+  background: #fff;
+  color: #222;
+  display: grid;
+  gap: 6px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.shoot-save-progress strong {
+  font-size: 15px;
+  font-weight: 600;
+}
+.shoot-save-progress span {
+  font-size: 13px;
+  color: var(--shoot-sub);
+}
+.shoot-save-progress i {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 3px;
+  background: var(--shoot-accent);
+  transition: width 0.2s linear;
+}
+
+/* ── 촬영 앱(/shoot/) 설치 안내 (2026-10-25) — 등록 화면 하단 버튼 줄 위, 촬영 화면이 열리면 숨김 ── */
+.shoot-install {
+  position: fixed;
+  left: 50%;
+  bottom: calc(76px + env(safe-area-inset-bottom));
+  z-index: 1001;
+  transform: translateX(-50%);
+  width: min(398px, calc(100% - 32px));
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 8px 12px 12px;
+  border-radius: 16px;
+  background: #222;
+  color: #fff;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18);
+  font-family: "Pretendard Variable", Pretendard, -apple-system, BlinkMacSystemFont, sans-serif;
+}
+body:has(.shoot-layer) .shoot-install {
+  display: none;
+}
+.shoot-install img {
+  flex: none;
+  border-radius: 10px;
+}
+.shoot-install__text {
+  flex: 1;
+  min-width: 0;
+  display: grid;
+  gap: 2px;
+}
+.shoot-install__text strong {
+  font-size: 15px;
+  line-height: 21px;
+  font-weight: 700;
+}
+.shoot-install__text span {
+  font-size: 12px;
+  line-height: 17px;
+  color: rgba(255, 255, 255, 0.72);
+  word-break: keep-all;
+}
+.shoot-install button {
+  font: inherit;
+  border: 0;
+  cursor: pointer;
+}
+.shoot-install__go {
+  flex: none;
+  height: 32px;
+  padding: 0 14px;
+  border-radius: 16px;
+  background: #fff;
+  color: #222;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+}
+.shoot-install__x {
+  flex: none;
+  width: 32px;
+  height: 32px;
+  display: grid;
+  place-items: center;
+  border-radius: 16px;
+  background: none;
+  color: rgba(255, 255, 255, 0.72);
+}
+.shoot-install button:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+}
+
+/* ── 촬영 항목 JSON 연동(2026-10-25 shoot-items.json) ── */
+/* 사진 화면 머리줄 오른쪽: 플래시(윤곽선 시안이면 그 왼쪽에 윤곽선 버튼) */
+.shoot-top__right {
+  justify-self: end;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+}
+/* 필수 칸: 아직 안 찍었으면 오른쪽 위 빨간 점 */
+.shoot-slot__req {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #ff2d2d;
+  box-shadow: 0 0 0 1.5px #fff;
+  pointer-events: none;
+}
+/* 첫 칸(대표 사진) 안내: 이름 위 한 줄 */
+.shoot-slot__label:has(.shoot-slot__note) {
+  height: 32px;
+  display: flex;
+  flex-direction: column-reverse;
+  justify-content: center;
+  line-height: 14px;
+}
+.shoot-slot__note {
+  display: block;
+  font-size: 10px;
+  line-height: 13px;
+  color: var(--shoot-accent-2);
+}
+.shoot-photo-count {
+  white-space: nowrap;
+}
+.shoot-photo-count small {
+  font-size: 11px;
+  opacity: 0.8;
+}
+/* 영상 화면 아래 시간(0:00 / 0:15) */
+.shoot-vcount {
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+  color: rgba(255, 255, 255, 0.85);
+  white-space: nowrap;
+}
+/* 단계 칩 완료 체크 + 녹화 길이 */
+.shoot-stage-chip__time {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+}
+.shoot-stage-chip__check {
+  width: 11px;
+  height: 11px;
+  color: var(--shoot-accent);
+}
+/* 촬영 규칙 필수·권장·선택 배지 */
+.shoot-rules__badge {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 0 7px;
+  height: 20px;
+  border-radius: 10px;
+  vertical-align: 3px;
+  font-size: 11px;
+  line-height: 20px;
+  font-weight: 600;
+  background: #f2f2f2;
+  color: #595959;
+}
+.shoot-rules__badge.is-required {
+  background: var(--shoot-accent);
+  color: #fff;
+}
+.shoot-rules__badge.is-recommended {
+  background: #fff1ec;
+  color: var(--shoot-accent);
+}
+.shoot-rule-img.is-empty {
+  box-sizing: border-box;
+  border: 1px dashed #d0d0d0;
+  background: #fafafa;
+}
+/* 메인: 섹션 머리 오른쪽 진행 카운터 · 규칙 보기는 안내 줄 오른쪽으로 */
+.shoot-media-count {
+  flex: none;
+  font-size: 13px;
+  color: var(--shoot-sub);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+.shoot-media-count b {
+  font-weight: 600;
+  color: #e8342b;
+}
+.shoot-media-count b.is-ok {
+  color: var(--shoot-text);
+}
+.shoot-hint-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+}
+.shoot-hint-row .shoot-hint {
+  flex: 1;
+  min-width: 0;
+}
+/* 필수 미충족 등록하기: 회색(누르면 사진·영상 칸으로 이동) */
+.shoot-publish.is-disabled {
+  background: #d9d9d9 !important;
+  color: #fff !important;
+}
+
+/* ── 2026-10-25 컨설팅 2건 반영 ── */
+/* 첫 칸 「대표」 딱지(예전 10px 안내를 대체) */
+.shoot-slot__tag {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  height: 16px;
+  padding: 0 5px;
+  border-radius: 3px;
+  background: var(--shoot-accent);
+  color: #fff;
+  font-size: 11px;
+  font-style: normal;
+  font-weight: 600;
+  line-height: 16px;
+  pointer-events: none;
+}
+/* 칸 줄 오른쪽 밖 필수 빈 칸 수 */
+.shoot-rail-more {
+  position: absolute;
+  right: 6px;
+  bottom: calc(9.3px + 35px - 12px);
+  height: 24px;
+  min-width: 32px;
+  padding: 0 8px;
+  border-radius: 12px;
+  background: rgba(0, 0, 0, 0.72);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 24px;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.35);
+}
+.shoot-rail-more::before {
+  content: "";
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  margin-right: 4px;
+  border-radius: 50%;
+  background: #ff2d2d;
+  vertical-align: 1px;
+}
+/* 사진 카운터 2줄: 필수 / 전체 */
+.shoot-photo-count {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: 15px;
+}
+.shoot-photo-count b {
+  font-weight: 600;
+}
+.shoot-photo-count small {
+  font-size: 11px;
+  opacity: 0.75;
+}
+/* 메인 카운터: 처음엔 회색, 등록하기를 눌렀는데 모자랄 때만 빨강. 영상은 선택이라 회색 */
+.shoot-media-count b {
+  color: var(--shoot-sub);
+}
+.shoot-media-count b.is-warn {
+  color: #e8342b;
+}
+.shoot-media-count .is-opt {
+  color: var(--shoot-sub);
+}
+/* 회색 등록하기 버튼에 이유 문구 */
+.shoot-publish__need {
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+/* 촬영 규칙: 그룹과 등급이 다른 항목 딱지, 차종 안내 */
+.shoot-rules__itembadge {
+  display: inline-block;
+  margin-left: 4px;
+  padding: 0 5px;
+  height: 16px;
+  border-radius: 8px;
+  font-size: 10px;
+  line-height: 16px;
+  font-weight: 600;
+  background: #fff1ec;
+  color: var(--shoot-accent);
+}
+.shoot-rules__vehicle {
+  display: block;
+  margin-top: 6px;
+  font-size: 12px;
+  line-height: 17px;
+  color: var(--shoot-sub);
+}
+
+/* 쇼츠 장면 표시(2026-10-25): 녹화 중 두 번 누르면 틀 왼쪽 위에 ★ 개수, 가운데에 잠깐 알림 */
+.shoot-hl-badge {
+  position: absolute;
+  left: 10px;
+  top: 10px;
+  z-index: 3;
+  height: 24px;
+  padding: 0 9px;
+  display: inline-flex;
+  align-items: center;
+  border-radius: 12px;
+  background: var(--shoot-accent);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+  pointer-events: none;
+}
+.shoot-hl-flash {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: 3;
+  transform: translate(-50%, -50%);
+  padding: 8px 14px;
+  border-radius: 18px;
+  background: rgba(0, 0, 0, 0.72);
+  color: #fff;
+  font-size: 13px;
+  line-height: 18px;
+  white-space: nowrap;
+  pointer-events: none;
+  animation: shoot-hl-pop 0.9s ease-out both;
+}
+@keyframes shoot-hl-pop {
+  0% { opacity: 0; transform: translate(-50%, -40%); }
+  15% { opacity: 1; transform: translate(-50%, -50%); }
+  80% { opacity: 1; }
+  100% { opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .shoot-hl-flash { animation: none; }
+}
+.shoot-timeline.is-over .shoot-timeline__fill {
+  background: #ffb020;
+}
+
+/* 미리보기 아래: 쇼츠 만들기 + 다음 */
+.shoot-vprev-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.shoot-bottom.is-vpreview:has(.shoot-vprev-actions .shoot-shorts-open) {
+  justify-content: space-between;
+  gap: 0;
+}
+.shoot-shorts-open {
+  height: 36px;
+  padding: 0 14px 0 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.14) !important;
+  color: #fff !important;
+  font-size: 13px;
+  font-weight: 600;
+}
+.shoot-shorts-open .shoot-mask {
+  width: 18px;
+  height: 18px;
+}
+.shoot-shorts-open em {
+  font-style: normal;
+  font-weight: 600;
+  color: var(--shoot-accent-2);
+  margin-left: 2px;
+}
+
+/* 촬영 코스: 차종 추천 · 내 부위 · 시간 설정 */
+.shoot-recsel,
+.shoot-time {
+  padding: 6px 8px 10px;
+}
+.shoot-time {
+  margin-top: 6px;
+  border-top: 1px solid #2e2e2e;
+  padding-top: 14px;
+}
+.shoot-recsel__t {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: #bdbdbd;
+  margin-bottom: 8px;
+}
+.shoot-recsel__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.shoot-recsel__chips button,
+.shoot-myform__t button {
+  height: 30px;
+  padding: 0 12px;
+  border-radius: 15px;
+  border: 1px solid #444 !important;
+  background: transparent !important;
+  color: #ddd !important;
+  font-size: 13px;
+}
+.shoot-recsel__chips button.is-on,
+.shoot-myform__t button.is-on {
+  border-color: var(--shoot-accent) !important;
+  background: rgba(255, 85, 46, 0.16) !important;
+  color: #fff !important;
+  font-weight: 600;
+}
+.shoot-xpick__txt em.is-rec {
+  color: var(--shoot-accent-2);
+}
+.shoot-xpick__txt em.is-mine {
+  color: #7fb4ff;
+}
+.shoot-xpick__line {
+  position: relative;
+}
+.shoot-xpick__line:has(.shoot-xpick__del) .shoot-xpick__row {
+  padding-right: 56px;
+}
+.shoot-xpick__del {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 28px;
+  padding: 0 10px;
+  border-radius: 14px;
+  background: #333 !important;
+  color: #ddd !important;
+  font-size: 12px;
+}
+.shoot-myadd {
+  width: calc(100% - 16px);
+  margin: 4px 8px 6px;
+  height: 40px;
+  border-radius: 10px;
+  border: 1px dashed #555 !important;
+  background: transparent !important;
+  color: #fff !important;
+  font-size: 14px;
+  font-weight: 600;
+}
+.shoot-myform {
+  margin: 4px 8px 8px;
+  padding: 12px;
+  border-radius: 10px;
+  background: #252525;
+  display: grid;
+  gap: 10px;
+}
+.shoot-myform label {
+  display: grid;
+  gap: 4px;
+}
+.shoot-myform label span {
+  font-size: 12px;
+  color: #bdbdbd;
+}
+.shoot-myform input {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  height: 40px;
+  padding: 0 12px;
+  border-radius: 8px;
+  border: 1px solid #444;
+  background: #1b1b1b;
+  color: #fff;
+  font-size: 15px;
+}
+.shoot-myform input:focus {
+  outline: none;
+  border-color: #fff;
+}
+.shoot-myform__t {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.shoot-myform__act {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 8px;
+}
+.shoot-myform__act button {
+  height: 40px;
+  border-radius: 20px;
+  background: #333 !important;
+  color: #fff !important;
+  font-size: 14px;
+  font-weight: 600;
+}
+.shoot-myform__act .is-ok {
+  background: var(--shoot-accent) !important;
+}
+.shoot-myform__act .is-ok:disabled {
+  opacity: 0.4;
+}
+.shoot-time__row {
+  display: grid;
+  grid-template-columns: 1fr auto 32px 32px;
+  align-items: center;
+  gap: 6px;
+  height: 40px;
+  font-size: 14px;
+}
+.shoot-time__row em {
+  font-style: normal;
+  font-size: 13px;
+  color: #bdbdbd;
+  margin-right: 4px;
+}
+.shoot-time__row button {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #333 !important;
+  color: #fff !important;
+  font-size: 16px;
+}
+.shoot-time__row button:disabled {
+  opacity: 0.35;
+}
+.shoot-time__auto {
+  grid-template-columns: 22px 1fr;
+  margin-top: 6px;
+  padding-left: 0;
+  padding-right: 0;
+}
+.shoot-xpick footer.has-save {
+  grid-template-columns: 0.8fr 1.1fr 1.6fr;
+  gap: 8px;
+}
+.shoot-xpick footer .is-save:disabled,
+.shoot-xpick footer .is-ok:disabled {
+  opacity: 0.4;
+}
+.shoot-xpick footer.has-save button {
+  font-size: 14px;
+}
+
+/* ── 2026-10-25 컨설팅 4건 반영 ─────────────────────── */
+/* 녹화 버튼: 가운데는 모양만(빨간 원 = 시작, 흰 네모 = 완료), 이름은 왼쪽에 */
+.shoot-rec.is-plus span {
+  transition: border-radius 0.15s, width 0.15s, height 0.15s;
+}
+.shoot-rec.is-plus.is-recording span {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  background: #fff;
+}
+.shoot-rec-label {
+  justify-self: end;
+  margin-right: 12px;
+  font-size: 14px;
+  line-height: 18px;
+  font-weight: 600;
+  color: #fff;
+  text-align: right;
+  white-space: nowrap;
+}
+.shoot-rec-label.is-wait {
+  color: rgba(255, 255, 255, 0.6);
+  font-weight: 500;
+}
+.shoot-finish {
+  height: 32px;
+  padding: 0 14px;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.5) !important;
+  background: transparent !important;
+  color: #fff !important;
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+@media (prefers-reduced-motion: reduce) {
+  .shoot-rec.is-plus span { transition: none; }
+}
+/* 화면 낭독기만 읽는 상태 알림 */
+.shoot-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+/* 카메라 권한 안내: 촬영 화면 위를 덮는 따로 된 화면 */
+.shoot-perm {
+  position: absolute;
+  inset: 0;
+  z-index: 40;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 0 32px;
+  background: #111;
+  color: #fff;
+  text-align: center;
+}
+.shoot-perm__icon {
+  width: 44px;
+  height: 44px;
+  margin-bottom: 4px;
+}
+.shoot-perm strong {
+  font-size: 18px;
+  line-height: 26px;
+}
+.shoot-perm p {
+  margin: 0 0 12px;
+  font-size: 14px;
+  line-height: 21px;
+  color: #bdbdbd;
+  word-break: keep-all;
+}
+.shoot-perm button {
+  width: min(100%, 300px);
+  height: 48px;
+  border-radius: 24px;
+  background: #333 !important;
+  color: #fff !important;
+  font-size: 15px;
+  font-weight: 600;
+}
+.shoot-perm button.is-ok {
+  background: linear-gradient(90deg, var(--shoot-accent), var(--shoot-accent-2)) !important;
+}
+/* 미리보기: 안 찍은 단계 알림 줄 */
+.shoot-missing {
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  top: 60px;
+  z-index: 4;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  min-height: 40px;
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: rgba(0, 0, 0, 0.78) !important;
+  color: #fff !important;
+  font-size: 13px;
+  line-height: 18px;
+  text-align: left;
+  word-break: keep-all;
+}
+.shoot-missing b {
+  flex: none;
+  color: var(--shoot-accent-2);
+  font-weight: 700;
+}
+.shoot-stage-chip.is-empty .shoot-stage-chip__time {
+  color: rgba(255, 255, 255, 0.55);
+}
+/* 코스 고르기: 딜러 간편 / 촬영팀 전문 */
+.shoot-xpick__modes {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px;
+  margin-top: 12px;
+  padding: 3px;
+  border-radius: 10px;
+  background: #2a2a2a;
+}
+.shoot-xpick__modes button {
+  height: 36px;
+  border-radius: 8px;
+  background: transparent !important;
+  color: #bdbdbd !important;
+  font-size: 14px;
+  font-weight: 600;
+}
+.shoot-xpick__modes button.is-on {
+  background: #444 !important;
+  color: #fff !important;
+}
+.shoot-recsel__more {
+  margin: 8px 0 0;
+  font-size: 12px;
+  line-height: 17px;
+  color: #bdbdbd;
+  word-break: keep-all;
+}
+.shoot-course-list {
+  list-style: none;
+}
+.shoot-mysec {
+  padding: 0 0 4px;
+}
+.shoot-time__row.is-order {
+  grid-template-columns: 1fr auto 32px 32px 32px 32px;
+}
+.shoot-xpick__box:focus-within button:focus-visible {
+  outline: 2px solid #fff;
+  outline-offset: 2px;
+}
+
+/* 2026-10-25 배포본 컨설팅 반영 */
+/* 확인창 글자가 창 가장자리에 붙지 않게 */
+.shoot-confirm p {
+  padding: 0 20px;
+  line-height: 20px;
+  word-break: keep-all;
+}
+/* 권한 화면 닫기: 다른 촬영 화면과 같은 왼쪽 위 자리 */
+.shoot-perm .shoot-perm__close {
+  position: absolute;
+  top: 0;
+  left: 4px;
+  width: 44px;
+  height: 44px;
+  border-radius: 0;
+  background: transparent !important;
+  color: #fff !important;
+}
+/* 녹화 중 표시(아래 오른쪽 시간 자리) */
+.shoot-recstate {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #fff;
+  white-space: nowrap;
+}
+.shoot-recstate i {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #ff3b30;
+  animation: shoot-recblink 1s steps(2, start) infinite;
+}
+@keyframes shoot-recblink {
+  to { visibility: hidden; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .shoot-recstate i { animation: none; }
+}
+/* 단계 칩 글자 대비: 회색 바탕 위 어두운 회색 → 밝은 글자 */
+.shoot-stages.is-kit .shoot-stage-chip {
+  background: rgba(60, 60, 60, 0.88) !important;
+  color: #e6e6e6 !important;
+}
+.shoot-stages.is-kit .shoot-stage-chip.is-done .shoot-stage-chip__time {
+  color: #e6e6e6;
+}
+/* 미리보기의 안 찍은 단계: 흐리게 숨기지 않고 주황 점선으로 구분 */
+.shoot-stages.is-done-row.is-kit .shoot-stage-chip.is-empty {
+  opacity: 1;
+  background: rgba(40, 40, 40, 0.88) !important;
+  box-shadow: none;
+  outline: 1px dashed rgba(255, 120, 40, 0.9);
+  outline-offset: -1px;
+}
+.shoot-stages.is-done-row.is-kit .shoot-stage-chip.is-empty .shoot-stage-chip__time {
+  color: #ffb27a;
+  font-weight: 600;
+}
+.shoot-stages.is-done-row.is-kit .shoot-stage-chip.is-empty .shoot-stage-chip__label {
+  background: transparent;
+  color: #e6e6e6;
+}
+/* 순서 버튼(↑↓)과 시간 버튼(−＋) 사이를 띄워 잘못 누르지 않게 */
+.shoot-time__row.is-order {
+  grid-template-columns: 1fr auto 32px 32px 8px 32px 32px;
+}
+.shoot-time__row.is-order button:nth-of-type(3) {
+  grid-column: 6;
+}
+
+/* ── 2026-10-25 컨설팅 6건 통합 반영(키트 전용 .is-kit) ── */
+/* 작은 회색·주황 글자 대비(흰 바탕): #8C8C8C 3.4:1 → #707070 5.0:1, #FF552E 3.2:1 → #D63E12 4.6:1 */
+.shoot-root.is-kit :is(.shoot-main, .shoot-rules, .shoot-confirm, .shoot-region) {
+  --shoot-sub: #707070;
+}
+.shoot-root.is-kit :is(.shoot-tipcard em, .shoot-main__title span, .shoot-main__title .shoot-progress-why, .shoot-confirm__row .is-ok, .shoot-field h3 em, .shoot-media-count .is-warn) {
+  color: #d63e12 !important;
+}
+/* 작은 글자 버튼도 손가락 터치 영역 44 (보이는 크기는 그대로) */
+.shoot-root.is-kit .shoot-drafts,
+.shoot-root.is-kit .shoot-rules-link {
+  position: relative;
+}
+.shoot-root.is-kit .shoot-drafts::after,
+.shoot-root.is-kit .shoot-rules-link::after {
+  content: "";
+  position: absolute;
+  left: -8px;
+  right: -8px;
+  top: 50%;
+  height: 44px;
+  transform: translateY(-50%);
+}
+/* 차량 소재지 고르기 */
+.shoot-region-btn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  min-height: 48px;
+  margin-top: 10px;
+  padding: 0 2px 0 0;
+  border-bottom: 1px solid #f0f0f0;
+  font-size: 17px;
+  color: #b0b0b0 !important;
+  text-align: left;
+}
+.shoot-region-btn.is-on {
+  color: #222 !important;
+}
+.shoot-region-btn.is-warn {
+  border-bottom-color: #d63e12;
+  color: #d63e12 !important;
+}
+.shoot-region-btn .shoot-mask {
+  width: 18px;
+  height: 18px;
+  color: #b0b0b0;
+}
+.shoot-mask.is-fwd {
+  transform: scaleX(-1);
+}
+.shoot-region {
+  position: absolute;
+  inset: 0;
+  z-index: 60;
+  display: flex;
+  align-items: flex-end;
+  background: rgba(0, 0, 0, 0.45);
+}
+.shoot-region__box {
+  width: 100%;
+  max-height: 78%;
+  display: flex;
+  flex-direction: column;
+  border-radius: 16px 16px 0 0;
+  background: #fff;
+  color: #222;
+}
+.shoot-region__box header {
+  display: grid;
+  grid-template-columns: 44px 1fr 44px;
+  align-items: center;
+  height: 56px;
+  padding: 0 6px;
+  border-bottom: 1px solid #eee;
+}
+.shoot-region__box h2 {
+  margin: 0;
+  text-align: center;
+  font-size: 17px;
+  font-weight: 700;
+}
+.shoot-region__grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  padding: 16px 16px calc(20px + env(safe-area-inset-bottom));
+  overflow-y: auto;
+}
+.shoot-region__grid button {
+  height: 44px;
+  border-radius: 10px;
+  border: 1px solid #e4e7ec;
+  background: #fff !important;
+  color: #222 !important;
+  font-size: 15px;
+}
+.shoot-region__grid button.is-on {
+  border-color: #222;
+  font-weight: 700;
+}
+.shoot-field__soon {
+  margin: 10px 0 0;
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--shoot-sub);
+}
+/* 권한 · 카메라 없음 화면: 코스 먼저 고르기는 글자 버튼 */
+.shoot-perm .shoot-perm__link {
+  height: 44px;
+  background: transparent !important;
+  color: #ddd !important;
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+/* 영상 앨범: 빈 화면 대신 큰 불러오기 */
+.shoot-vimport {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 0 32px;
+  text-align: center;
+  color: #fff;
+}
+.shoot-vimport__ico {
+  width: 44px;
+  height: 44px;
+  color: #fff;
+}
+.shoot-vimport strong {
+  font-size: 18px;
+  line-height: 26px;
+}
+.shoot-vimport p {
+  margin: 0 0 8px;
+  font-size: 14px;
+  line-height: 21px;
+  color: #bdbdbd;
+  word-break: keep-all;
+}
+.shoot-vimport__btn {
+  width: min(100%, 300px);
+  height: 52px;
+  border-radius: 26px;
+  background: linear-gradient(90deg, var(--shoot-accent), var(--shoot-accent-2)) !important;
+  color: #fff !important;
+  font-size: 16px;
+  font-weight: 700;
+}
+.shoot-vimport small {
+  font-size: 12px;
+  line-height: 17px;
+  color: #9a9a9a;
+}
+/* 코스 확정 버튼: 할 일 + 최대 시간 */
+.shoot-xpick footer .is-ok small {
+  margin-left: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  opacity: 0.85;
+}
+/* 촬영 규칙: 마지막 사진이 아래 고정 버튼에 가리지 않게 */
+.shoot-root.is-kit .shoot-rules__body {
+  padding-bottom: calc(120px + env(safe-area-inset-bottom));
+}
+
+/* ── 최종 크로스체크(2026-10-25) ───────────────────────── */
+/* 「● +N」 알약이 마지막 칸(빨간 점·사진)을 덮던 것: 칸 줄 바로 위 오른쪽으로 올린다 */
+.shoot-root.is-kit .shoot-rail-more {
+  bottom: calc(9.3px + 70px + 8px);
+  right: 8px;
+}
+.shoot-root.is-kit .shoot-rail-more::after,
+.shoot-root.is-kit .shoot-plate::after,
+.shoot-root.is-kit .shoot-slot__x::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+/* 보이는 크기는 그대로 두고 누르는 곳만 넓힌다 */
+.shoot-root.is-kit .shoot-rail-more::after {
+  width: calc(100% + 8px);
+  height: 40px;
+}
+.shoot-root.is-kit .shoot-plate {
+  position: relative;
+}
+.shoot-root.is-kit .shoot-plate::after {
+  width: 100%;
+  height: 44px;
+}
+.shoot-root.is-kit .shoot-slot__x::after {
+  width: 32px;
+  height: 32px;
+}
+
+/* ── 부위 나누기 · 사진 끌어서 칸 바꾸기(2026-10-25) ───────────── */
+.shoot-tile[data-drag-id],
+.shoot-sort__cell[data-drag-id] {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+}
+.shoot-tile.is-drag-src,
+.shoot-sort__cell.is-drag-src {
+  opacity: 0.35;
+}
+.shoot-tile.is-drop .shoot-tile__img,
+.shoot-sort__cell.is-drop .shoot-sort__img {
+  box-shadow: 0 0 0 3px var(--shoot-accent);
+}
+.shoot-drag-ghost {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 200;
+  margin: 0;
+  pointer-events: none;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.28);
+  border-radius: 8px;
+  background: #fff;
+  transform-origin: 0 0;
+}
+.shoot-tile__rep,
+.shoot-sort__rep {
+  position: absolute;
+  left: 4px;
+  top: 4px;
+  height: 18px;
+  padding: 0 6px;
+  border-radius: 4px;
+  background: var(--shoot-accent);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 18px;
+}
+.shoot-sortlink {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 12px;
+  font-size: 13px;
+  line-height: 18px;
+  color: var(--shoot-sub);
+}
+.shoot-sortlink button {
+  flex: none;
+  height: 32px;
+  padding: 0 12px;
+  border-radius: 16px;
+  box-shadow: inset 0 0 0 1px #e4e7ec;
+  color: var(--shoot-text);
+  font-size: 13px;
+  font-weight: 600;
+}
+.shoot-sort {
+  background: #fff;
+  color: var(--shoot-text);
+}
+.shoot-sort__body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 4px 16px 112px;
+}
+.shoot-sort__card {
+  display: grid;
+  gap: 8px;
+  padding: 16px;
+  border-radius: 12px;
+  background: #f6f7f9;
+}
+.shoot-sort__card strong {
+  font-size: 16px;
+  line-height: 22px;
+}
+.shoot-sort__card p,
+.shoot-sort__sum p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 20px;
+  color: #444;
+  word-break: keep-all;
+}
+.shoot-sort__card small {
+  font-size: 12px;
+  line-height: 17px;
+  color: var(--shoot-sub);
+  word-break: keep-all;
+}
+.shoot-sort__card.is-warn {
+  background: #fff4ef;
+}
+.shoot-sort__row {
+  display: grid;
+  grid-template-columns: 1fr 1.4fr;
+  gap: 8px;
+  margin-top: 4px;
+}
+.shoot-sort__row button {
+  height: 44px;
+  border-radius: 22px;
+  background: #fff;
+  box-shadow: inset 0 0 0 1px #e4e7ec;
+  font-size: 15px;
+  font-weight: 600;
+}
+.shoot-sort__row button.is-ok {
+  background: var(--shoot-accent);
+  box-shadow: none;
+  color: #fff;
+}
+.shoot-sort__bar {
+  display: block;
+  height: 6px;
+  border-radius: 3px;
+  background: #e4e7ec;
+  overflow: hidden;
+}
+.shoot-sort__bar b {
+  display: block;
+  height: 100%;
+  background: var(--shoot-accent);
+  transition: width 0.2s;
+}
+.shoot-sort__sum {
+  display: grid;
+  gap: 4px;
+  padding: 4px 0 4px;
+}
+.shoot-sort__sum strong {
+  font-size: 16px;
+  line-height: 22px;
+}
+.shoot-sort__sum em {
+  font-style: normal;
+  font-weight: 500;
+  color: var(--shoot-accent);
+}
+.shoot-sort__sum em.is-ok {
+  color: #1a7f37;
+}
+.shoot-sort__grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px 8px;
+  margin-top: 14px;
+}
+.shoot-sort__cell {
+  margin: 0;
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+.shoot-sort__img {
+  position: relative;
+  aspect-ratio: 1;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #f1f1f1;
+  display: block;
+  width: 100%;
+}
+.shoot-sort__img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.shoot-sort__cell.is-wait .shoot-sort__img::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.55);
+}
+.shoot-sort__cell.is-empty .shoot-sort__img {
+  display: grid;
+  place-items: center;
+  background: #fff;
+  box-shadow: inset 0 0 0 1.5px #f4b39c;
+  border: 0;
+  font-size: 13px;
+  color: var(--shoot-accent);
+  outline: 1px dashed transparent;
+}
+.shoot-sort__check {
+  position: absolute;
+  right: 4px;
+  top: 4px;
+  height: 18px;
+  padding: 0 6px;
+  border-radius: 4px;
+  background: #fff;
+  color: var(--shoot-accent);
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 18px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+.shoot-sort__cell figcaption {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  min-width: 0;
+  font-size: 13px;
+  line-height: 18px;
+  font-weight: 500;
+}
+.shoot-sort__cell figcaption.is-req {
+  color: var(--shoot-accent);
+  font-weight: 600;
+}
+.shoot-sort__cell figcaption.is-other {
+  color: var(--shoot-sub);
+}
+.shoot-sort__cell figcaption .is-caret {
+  flex: none;
+  width: 14px;
+  height: 14px;
+}
+.shoot-sort__foot {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 12px 16px calc(16px + env(safe-area-inset-bottom));
+  background: #fff;
+  box-shadow: 0 -1px 0 #eee;
+}
+.shoot-sort__done {
+  width: 100%;
+  height: 52px;
+  border-radius: 26px;
+  background: var(--shoot-accent);
+  color: #fff;
+  font-size: 16px;
+  font-weight: 600;
+}
+.shoot-sort__done:disabled {
+  background: #d9d9d9;
+}
+.shoot-sort-sheet {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  max-height: 80%;
+  display: flex;
+  flex-direction: column;
+  border-radius: 16px 16px 0 0;
+  background: #fff;
+  color: var(--shoot-text);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+.shoot-sort-sheet__head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 16px 8px;
+}
+.shoot-sort-sheet__head img {
+  width: 48px;
+  height: 48px;
+  border-radius: 6px;
+  object-fit: cover;
+}
+.shoot-sort-sheet__head strong {
+  font-size: 17px;
+  line-height: 24px;
+}
+.shoot-sort-sheet__list {
+  overflow-y: auto;
+  padding: 0 16px 8px;
+}
+.shoot-sort-sheet__list h4 {
+  margin: 12px 0 8px;
+  font-size: 13px;
+  line-height: 18px;
+  color: var(--shoot-sub);
+}
+.shoot-sort-sheet__list section > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.shoot-sort-sheet__list button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 36px;
+  padding: 0 12px;
+  border-radius: 18px;
+  box-shadow: inset 0 0 0 1px #e4e7ec;
+  font-size: 14px;
+  font-weight: 500;
+}
+.shoot-sort-sheet__list button.is-req {
+  color: var(--shoot-accent);
+}
+.shoot-sort-sheet__list button.is-on {
+  background: #222;
+  color: #fff;
+  box-shadow: none;
+}
+.shoot-sort-sheet__list button img {
+  width: 22px;
+  height: 22px;
+  border-radius: 4px;
+  object-fit: cover;
+}
+.shoot-sort-sheet__note {
+  margin: 0;
+  padding: 8px 16px 16px;
+  font-size: 12px;
+  line-height: 17px;
+  color: var(--shoot-sub);
+}
+.shoot-sort__shoot {
+  justify-self: start;
+  height: 36px;
+  margin: 4px 0 2px;
+  padding: 0 14px;
+  border-radius: 18px;
+  background: #222;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+/* ── 10배 기준 크로스체크(2026-10-25): 등록 화면 사진 삭제 버튼 22px → 누르는 곳 36px(보이는 크기는 그대로) ── */
+.shoot-root.is-kit .shoot-tile__del::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 36px;
+  height: 36px;
+  transform: translate(-50%, -50%);
+}
+
+/* 영상 미리보기 큰 저장 버튼(2026-10-26 「mp4 저장 큰 버튼 추가」): 영상과 아래 버튼 줄 사이, 전체 폭 48 */
+.shoot-vsave {
+  flex: none;
+  padding: 12px 16px 0;
+}
+.shoot-vsave button {
+  width: 100%;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border-radius: 12px;
+  background: #fff !important;
+  color: #222 !important;
+  font-size: 15px;
+  font-weight: 700;
+}
+.shoot-vsave button:active {
+  opacity: 0.6;
+}
+.shoot-vsave em {
+  font-style: normal;
+  font-size: 13px;
+  font-weight: 500;
+  color: #707070;
+}
+
+/* 불러온 영상(가로 원본 포함)은 미리보기·표지에서 자르지 않고 전체를 보여 준다(2026-10-26 컨설팅) */
+.shoot-root.is-kit .shoot-live.is-fit {
+  object-fit: contain;
+  background: #000;
+}
+
+/* 완성도를 누르면 계산 방법 안내(2026-10-26 컨설팅: 무엇을 채우면 오르는지). 보이는 크기는 그대로, 누르는 곳만 넓힘 */
+.shoot-root.is-kit .shoot-progress-why {
+  position: relative;
+  display: block;
+  margin: 1.8px auto 0;
+  padding: 0;
+  font-size: 11px;
+  line-height: 12px;
+  color: var(--shoot-accent);
+  background: none;
+}
+.shoot-root.is-kit .shoot-progress-why i {
+  font-style: normal;
+  font-size: 10px;
+}
+.shoot-root.is-kit .shoot-progress-why::after {
+  content: "";
+  position: absolute;
+  inset: -12px -10px;
+}
+
+/* ── 2026-10-26 10배 크로스체크 ── */
+/* 회색 등록하기: 흰 글자 대비 1.4:1 → 진한 회색 글자 4.7:1. 이 글자가 「사진을 1장 이상 올려 주세요」 같은 핵심 안내다. */
+.shoot-root.is-kit .shoot-publish.is-disabled {
+  background: #ebebeb !important;
+  color: #6b6b6b !important;
+}
+/* 안내 문구가 낱말 중간(「보 / 여요」)에서 끊기지 않게 */
+.shoot-root.is-kit .shoot-hint,
+.shoot-root.is-kit .shoot-confirm p,
+.shoot-root.is-kit .shoot-perm p {
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+}
+/* 미리보기: 썸네일 줄(아래 겹침)이 세로 사진 아래쪽(번호판 자리)을 가리지 않게 사진을 그 위에만 놓는다 */
+.shoot-root.is-kit .shoot-preview .shoot-stage {
+  padding-bottom: 82px;
+}
+/* 작은 누름 영역: 보이는 크기는 그대로, 누르는 곳만 넓힌다 */
+/* (× · 스티커 손잡이 · 붓 점은 이미 absolute라 그대로 둔다) */
+.shoot-root.is-kit .shoot-preview .shoot-strip__add,
+.shoot-root.is-kit .shoot-vedit-actions button {
+  position: relative;
+}
+.shoot-root.is-kit .shoot-preview .shoot-strip__x::after,
+.shoot-root.is-kit .shoot-sticker__h::after {
+  content: "";
+  position: absolute;
+  inset: -11px;
+}
+.shoot-root.is-kit .shoot-preview .shoot-strip__add::after {
+  content: "";
+  position: absolute;
+  inset: 0 -6px;
+}
+.shoot-root.is-kit .shoot-brush::after {
+  content: "";
+  position: absolute;
+  inset: -6px;
+  border-radius: 50%;
+}
+.shoot-root.is-kit .shoot-vedit-actions {
+  gap: 6px;
+}
+.shoot-root.is-kit .shoot-vedit-actions button {
+  min-width: 52px;
+  min-height: 44px;
+}
+
+/* ── 2026-10-27 배포본 컨설팅 ── */
+/* 녹화 전·중 안내 글자: 밝은 화면(낮 · 흰 차)에서도 읽히게 위 단계 알약과 같은 반투명 검정 알약 */
+.shoot-root.is-kit .shoot-vhint {
+  left: 50%;
+  right: auto;
+  width: max-content;
+  max-width: calc(100% - 32px);
+  transform: translateX(-50%);
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.5);
+  text-shadow: none;
+  word-break: keep-all;
+}
+
+/* ── 2026-10-27 배포본 컨설팅 2차 ── */
+/* 최소 시간 전 멈춤 버튼: 흐리게(누르면 안내 글자만 흔들림) */
+.shoot-root.is-kit .shoot-rec.is-wait span {
+  opacity: 0.45;
+}
+.shoot-timeline__text.is-nudge {
+  color: #ffd166;
+  font-weight: 700;
+  animation: shoot-nudge 0.4s ease-in-out;
+}
+@keyframes shoot-nudge {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-4px); }
+  40%, 80% { transform: translateX(4px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .shoot-timeline__text.is-nudge { animation: none; }
+}
+/* 규칙 사진의 번호판 가림(촬영 화면 스티커와 같은 흰 판) */
+.shoot-rule-wrap {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  border-radius: 8px;
+}
+.shoot-rule-plate {
+  position: absolute;
+  box-sizing: border-box;
+  border-radius: 3px;
+  background: #fff;
+  border: 1px solid rgba(0, 0, 0, 0.18);
+}
+/* 완성도: 빨강처럼 보이던 진한 주황 대신 중립 회색(채운 막대는 주황 그대로) */
+.shoot-root.is-kit .shoot-main__title .shoot-progress-why {
+  color: #595959 !important;
+}
+.shoot-root.is-kit .shoot-region-tip {
+  margin: 6px 0 0;
+  font-size: 12px;
+  line-height: 16px;
+  color: #707070;
+}
+/* 내 폰에 저장: 주 버튼(쇼츠 만들기 · 이 영상 쓰기)보다 가볍게 — 테두리 · 44 */
+.shoot-root.is-kit .shoot-vsave button {
+  height: 44px;
+  background: transparent !important;
+  color: #fff !important;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  font-size: 14px;
+  font-weight: 600;
+}
+.shoot-root.is-kit .shoot-vsave em {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 12px;
+}
+/* 완성도 버튼 누르는 곳 44 높이(보이는 글자 11px 그대로) */
+.shoot-root.is-kit .shoot-progress-why::after {
+  inset: -16px -12px;
+}
+.shoot-course__secs {
+  display: block;
+  margin-top: 2px;
+  font-size: 12px;
+  line-height: 16px;
+  color: #8c8c8c;
+}
+
+/* ── 2026-10-27 실제 폰 시험 전 점검 ── */
+/* 작은 화면(360×640 · 320×568): 틀 높이를 줄여 안내 문구가 단계 칸·예시에 가리지 않게 한다. 큰 화면은 그대로(265.8) */
+.shoot-root.is-kit .shoot-capture.is-video .shoot-vframe {
+  height: min(265.8px, max(120px, calc(100% - 262px)));
+}
+/* 30장을 채우면 셔터를 흐리게 */
+.shoot-root.is-kit .shoot-shutter:disabled {
+  opacity: 0.35;
+}
