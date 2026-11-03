@@ -1,0 +1,16 @@
+{
+  "note": "2026-11-03 숏폼 보기 시안(카스24 비디오 투어 보기 방식). 1번은 딜러 매장 설명 영상을 부위 시각으로 나눈 예시, 2번부터는 한지훈 딜러(플로시모터스) 인스타그램 릴스. 릴스는 부위 시각 자료가 없어 부위 아이콘 줄 없이 진행 막대만 보인다(시각을 지어내지 않음). 가격 정보가 없어 모두 「가격 상담」.",
+  "dealerReels": {
+    "dealer": "한지훈 딜러 · 플로시모터스",
+    "dealerLink": "?qf=guazi&profile=dealer&shop=450560&emp=3",
+    "dir": ["assets", "dealer-instagram", "450560-emp3"],
+    "items": [
+      { "code": "DevODScTN-9", "title": "람보르기니 우루스 S" },
+      { "code": "DenduxQTKvk", "title": "벤틀리 컨티넨탈 GT W12" },
+      { "code": "DeQWziAzUNg", "title": "맥라렌 720S" },
+      { "code": "Dd7wIYbTAtF", "title": "페라리 12칠린드리 스파이더" },
+      { "code": "DcnVlgwxC0S", "title": "롤스로이스 컬리넌 블랙 배지" },
+      { "code": "Dc_GCBeTF2E", "title": "랜드로버 레인지로버 P530" }
+    ]
+  }
+}

@@ -1,28 +1,25 @@
 {
-  "name": "shootkit",
-  "version": "2.0.0",
+  "name": "bobaedream-nuxt-shootkit",
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "nuxt dev --host 127.0.0.1",
-    "build": "nuxt build",
-    "generate": "nuxt generate",
-    "preview": "nuxt preview",
+    "dev": "nuxt dev --port 5190",
+    "build": "nuxt generate",
+    "preview": "node scripts/serve.mjs",
     "typecheck": "nuxt typecheck",
-    "postinstall": "nuxt prepare"
+    "export": "nuxt generate && node scripts/copy-to-site.mjs"
   },
   "dependencies": {
     "@huggingface/transformers": "3.8.1",
+    "@vercel/blob": "^1.1.1",
     "mediabunny": "1.61.3",
-    "nuxt": "4.6.3",
+    "nuxt": "3.21.11",
+    "onnxruntime-web": "1.22.0-dev.20250409-89f8206ba4",
     "qrcode-generator": "2.0.4",
-    "vue": "3.5.44"
+    "vue": "3.5.43"
   },
   "devDependencies": {
     "typescript": "^5.9.3",
-    "vue-tsc": "3.3.13"
-  },
-  "engines": {
-    "node": ">=22.22"
+    "vue-tsc": "^3.3.11"
   }
 }

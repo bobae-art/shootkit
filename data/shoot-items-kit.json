@@ -1,0 +1,859 @@
+{
+  "version": 2,
+  "updated": "2026-10-30",
+  "source": "노션 「등록 촬영 사진·영상 컨설팅 (58동성 비교)」 2026-10-25 · 58同城 二手车发布 촬영 레일 · 컨설팅 2건 통합 반영 2026-10-25 · 컨설팅 6건 통합(필수 4장 = 대각 2장 + 계기판 · 대시보드) 2026-10-25 · 3차 컨설팅(부위 컷 마스터 · 사진 가로 기본 · 실내 독립 컷 · 역할 값) 2026-10-29",
+  "rulesTitle": "이 4장을 먼저 찍어 주세요",
+  "rulesNotice": "좌측 전면 45° · 우측 후면 45° · 계기판 · 대시보드 4장을 먼저 찍으면 좋아요. 대각선 2장이면 차의 네 면이 다 보이고, 계기판으로 주행거리를 확인할 수 있어요. 사진은 1장부터 등록할 수 있어요.",
+  "levelLabels": {
+    "required": "우선",
+    "recommended": "권장",
+    "optional": "선택"
+  },
+  "photo": {
+    "min": 4,
+    "max": 30,
+    "hint": "우선 4장부터 찍어 주세요",
+    "otherItemId": "other",
+    "hintDone": "나머지 각도와 엔진룸·트렁크도 찍으면 더 잘 보여요",
+    "autoSortNote": "앨범 사진 부위 자동 선별(2026-10-25): 항목 auto = 인식 부류. 같은 부류가 여러 칸이면 레일 순서대로 채운다(좌우 방향은 구분하지 않음).",
+    "enforceRequired": false,
+    "publishMin": 1,
+    "keyTitle": "먼저 찍으면 좋은",
+    "enforceNote": "2026-10-25 「필수 사진 강제를 일단은 빼자」: enforceRequired=false면 4장은 「우선」 안내만 하고 사진 publishMin장 + 소재지로 등록. 「권장」과 헷갈리지 않게 「추천」 대신 「우선」. 58 재현(&vstage=58)은 enforcedText 문구로 늘 강제.",
+    "orientationNote": "사진 방향(2026-10-29 3차 컨설팅): landscape = 가로 4:3 틀(외관 · 엔진룸 · 트렁크, 매물 목록·상세·엔카 재사용), portrait = 세로 허용(실내 · 계기판), any = 틀 없음. 58 재현(&vstage=58)은 방향을 쓰지 않는다",
+    "plateDefault": false,
+    "plateHeroLock": true,
+    "plateNote": "번호판 가리기(2026-10-29 후속 ④ 결정): 키트 기본 꺼짐(딜러 매물은 번호판 공개 원칙 · 클린엔카 07 노출 1장 필수). 대표 사진(첫 칸)은 가림을 붙일 수 없다(plateHeroLock). 58 재현은 원본대로 꺼짐."
+  },
+  "video": {
+    "perStageSec": {
+      "min": 8,
+      "max": 15
+    },
+    "extraStages": [
+      {
+        "key": "cluster",
+        "label": "계기판",
+        "min": 3,
+        "max": 10,
+        "retired": true
+      },
+      {
+        "key": "start",
+        "label": "시동 소리",
+        "min": 5,
+        "max": 15
+      },
+      {
+        "key": "light-front",
+        "label": "앞 라이트·그릴",
+        "min": 3,
+        "max": 10,
+        "hint": "라이트를 켜고 정면에서 시작해 그릴 가까이 다가가요. 라이트가 켜진 채로 찍어요."
+      },
+      {
+        "key": "light-rear",
+        "label": "뒤 라이트·배기",
+        "min": 3,
+        "max": 10,
+        "hint": "브레이크를 밟아 뒤 라이트가 켜진 모습과 배기구를 가까이 찍어요."
+      },
+      {
+        "key": "mirror",
+        "label": "미러·도어 핸들",
+        "min": 3,
+        "max": 8,
+        "hint": "사이드미러가 접히는 모습과 도어 핸들(터치 잠금·웰컴 라이트)을 손으로 보여 주세요."
+      },
+      {
+        "key": "tyre",
+        "label": "휠·타이어",
+        "min": 5,
+        "max": 15
+      },
+      {
+        "key": "damage",
+        "label": "흠집 표시",
+        "min": 3,
+        "max": 15
+      },
+      {
+        "key": "feature",
+        "label": "옵션 작동",
+        "min": 5,
+        "max": 15,
+        "hint": "마사지시트 · 냉장고 · 뒷좌석 모니터 · 엠비언트 라이트처럼 실내 컷에서 못 보여 준 옵션을 켜서 작동하는 모습을 찍어 주세요."
+      },
+      {
+        "key": "comfort",
+        "label": "편의 장비",
+        "min": 5,
+        "max": 15,
+        "retired": true
+      },
+      {
+        "key": "door",
+        "label": "문·트렁크",
+        "min": 3,
+        "max": 15
+      },
+      {
+        "key": "under",
+        "label": "하부",
+        "min": 3,
+        "max": 10
+      },
+      {
+        "key": "key",
+        "label": "차 키",
+        "min": 3,
+        "max": 10,
+        "hint": "차 키를 모두 손바닥에 올려 보여 주세요. 스마트키 · 보조키 · 카드키 개수가 보이게 찍어요."
+      },
+      {
+        "key": "charge",
+        "label": "충전구·프렁크",
+        "min": 3,
+        "max": 15
+      }
+    ],
+    "optional": true,
+    "customTimes": [
+      {
+        "label": "3~10초",
+        "min": 3,
+        "max": 10
+      },
+      {
+        "label": "5~15초",
+        "min": 5,
+        "max": 15
+      },
+      {
+        "label": "10~30초",
+        "min": 10,
+        "max": 30
+      },
+      {
+        "label": "15~40초",
+        "min": 15,
+        "max": 40
+      }
+    ],
+    "targets": [
+      {
+        "label": "제한 없음",
+        "sec": 0
+      },
+      {
+        "label": "30초",
+        "sec": 30
+      },
+      {
+        "label": "60초",
+        "sec": 60
+      }
+    ],
+    "recommend": [
+      {
+        "id": "super",
+        "label": "슈퍼카",
+        "stages": [
+          "start",
+          "light-front",
+          "tyre"
+        ]
+      },
+      {
+        "id": "luxury",
+        "label": "고급 세단",
+        "stages": [
+          "in-pass",
+          "in-console",
+          "feature"
+        ]
+      },
+      {
+        "id": "suv",
+        "label": "SUV·미니밴",
+        "stages": [
+          "in-roof",
+          "in-third",
+          "door"
+        ]
+      },
+      {
+        "id": "ev",
+        "label": "전기차",
+        "replace": {
+          "engine": "charge"
+        },
+        "hide": [
+          "start",
+          "under"
+        ],
+        "stages": [
+          "in-center",
+          "feature",
+          "tyre"
+        ]
+      },
+      {
+        "id": "old",
+        "label": "10년 넘은 차",
+        "stages": [
+          "under",
+          "tyre",
+          "start"
+        ]
+      }
+    ],
+    "shorts": {
+      "lengths": [
+        15,
+        30,
+        60
+      ],
+      "skip": [
+        "damage"
+      ],
+      "keepSound": [
+        "start"
+      ],
+      "cutMin": 1.5,
+      "cutMax": 6,
+      "highlightCut": 2.5
+    },
+    "extraNote": "2026-10-29 3차 컨설팅: 「시트」는 실내 독립 컷(cuts)으로, 「휠·브레이크」는 「휠·타이어」로 합침. 라이트·그릴 · 뒤 라이트·배기 · 미러는 영국 Autotrader 세부 컷 목록에서 · 2026-10-30 실내 컷 확정: 「계기판」은 실내 컷 「시동·계기판」으로, 「편의 장비」는 「옵션 작동」으로 합침(retired = 새 코스·추가 목록에서 숨김, 예전 기록은 그대로 열림)",
+    "cuts": [
+      {
+        "key": "in-door",
+        "label": "운전석 문 열기",
+        "item": "front-seat",
+        "min": 3,
+        "max": 5,
+        "hint": "운전석 문을 열고 실내 전체를 한 번에 비춘 뒤 도어 트림·스피커 배지까지 보여 주세요(첫인상 컷).",
+        "crewOnly": true
+      },
+      {
+        "key": "in-seat",
+        "label": "운전석 시트",
+        "item": "front-seat",
+        "min": 3,
+        "max": 6,
+        "hint": "시트 전체 → 옆 볼스터 가까이 → 손으로 쿠션 누르기 → 시트 버튼(전동·통풍·메모리) 순서로 보여 주세요."
+      },
+      {
+        "key": "in-wheel",
+        "label": "핸들·패들",
+        "item": "dashboard",
+        "min": 3,
+        "max": 5,
+        "hint": "핸들 가죽 잡는 부분 → 핸들 버튼 → 패들시프트 순서로 가까이 보여 주세요.",
+        "crewOnly": true
+      },
+      {
+        "key": "in-cluster",
+        "label": "시동·계기판",
+        "item": "cluster",
+        "min": 5,
+        "max": 10,
+        "hint": "시동 버튼을 누르고 경고등이 켜졌다 꺼지는 모습 → 주행거리 숫자에서 2초 멈춰 주세요. 전기차는 충전량·주행 가능 거리 화면이에요."
+      },
+      {
+        "key": "in-center",
+        "label": "센터 화면·카메라",
+        "item": "dashboard",
+        "min": 3,
+        "max": 6,
+        "hint": "가운데 화면을 켜고 내비 → 후진 기어로 후방·360 카메라 화면까지 보여 주세요.",
+        "crewOnly": true
+      },
+      {
+        "key": "in-console",
+        "label": "공조·센터 콘솔",
+        "item": "dashboard",
+        "min": 3,
+        "max": 6,
+        "hint": "에어컨 패널 → 기어 노브 → 컵홀더·무선충전·USB 순서로 비춰 주세요.",
+        "crewOnly": true
+      },
+      {
+        "key": "in-pass",
+        "label": "조수석·글로브박스",
+        "item": "front-seat",
+        "min": 3,
+        "max": 5,
+        "hint": "조수석 문을 열고 시트를 비춘 뒤 글로브박스를 열어 주세요.",
+        "crewOnly": true
+      },
+      {
+        "key": "in-rear",
+        "label": "뒷좌석",
+        "item": "rear-seat",
+        "min": 3,
+        "max": 6,
+        "hint": "뒷문을 열고 쿠션·등받이 → 발 공간 → 뒷좌석 송풍구·열선·커튼 순서로 비춰 주세요."
+      },
+      {
+        "key": "in-roof",
+        "label": "천장·선루프",
+        "item": "front-seat",
+        "min": 3,
+        "max": 5,
+        "hint": "천장 → 선루프 열기(있으면) → 실내등 순서로 비춰 주세요.",
+        "crewOnly": true
+      },
+      {
+        "key": "in-third",
+        "label": "3열",
+        "item": "rear-seat",
+        "min": 3,
+        "max": 5,
+        "hint": "3열 시트를 펴고 접는 모습까지 비춰 주세요(SUV·미니밴).",
+        "crewOnly": true
+      }
+    ],
+    "cutsNote": "실내 독립 컷(2026-10-29 3차 컨설팅, Stampyt 캡슐 방식): 한 파일에 자막으로 순서만 안내하던 「실내」 대신 컷마다 따로 녹화한다. item = 같은 부위의 사진 칸(부위 컷 마스터: 사진·영상·메모가 같은 부위 id를 쓴다). crewOnly = 촬영팀 상세 코스에만. 58 재현(&vstage=58)은 예전 「실내」 한 단계 그대로 · 2026-10-30 실내 10컷 확정: 운전석 문에서 시작해 앞 → 가운데 → 조수석 → 뒤 → 위 순서로 한 컷씩 따로 녹화(편집 시 컷 = 부위). 「대시보드·계기판」은 「핸들·패들」과 「시동·계기판」으로 나눔",
+    "courses": {
+      "dealer": [
+        {
+          "key": "quick",
+          "label": "빠른 3단계",
+          "sub": "외관 → 시동·계기판 → 트렁크 · 엔진룸은 사진으로",
+          "stages": [
+            "exterior",
+            "in-cluster",
+            "trunk"
+          ]
+        },
+        {
+          "key": "basic",
+          "label": "표준 6단계",
+          "sub": "외관 → 운전석 시트 → 시동·계기판 → 뒷좌석 → 엔진룸 → 트렁크",
+          "stages": [
+            "exterior",
+            "in-seat",
+            "in-cluster",
+            "in-rear",
+            "engine",
+            "trunk"
+          ]
+        },
+        {
+          "key": "tour",
+          "label": "비디오 투어 8단계",
+          "sub": "외관 한 바퀴 → 옵션 작동 → 대시보드·천장 → 시트 → 운전석 시점 → 트렁크 → 타이어 → 엔진룸 · 카스24형 보기 화면",
+          "stages": [
+            "tour-walk",
+            "tour-feature",
+            "tour-dash",
+            "tour-seat",
+            "tour-pov",
+            "tour-boot",
+            "tour-tyre",
+            "tour-engine"
+          ]
+        }
+      ],
+      "crew": [
+        {
+          "key": "basic",
+          "label": "표준 8단계",
+          "sub": "외관 → 운전석 문 → 운전석 시트 → 시동·계기판 → 센터 화면 → 뒷좌석 → 엔진룸 → 트렁크",
+          "stages": [
+            "exterior",
+            "in-door",
+            "in-seat",
+            "in-cluster",
+            "in-center",
+            "in-rear",
+            "engine",
+            "trunk"
+          ]
+        },
+        {
+          "key": "full",
+          "label": "상세 16단계",
+          "sub": "외관 → 휠·타이어 → 앞 라이트·그릴 → 실내 9컷 → 시동 소리 → 옵션 작동 → 엔진룸 → 트렁크",
+          "stages": [
+            "exterior",
+            "tyre",
+            "light-front",
+            "in-door",
+            "in-seat",
+            "in-wheel",
+            "in-cluster",
+            "in-center",
+            "in-console",
+            "in-pass",
+            "in-rear",
+            "in-roof",
+            "start",
+            "feature",
+            "engine",
+            "trunk"
+          ]
+        },
+        {
+          "key": "tour",
+          "label": "비디오 투어 8단계",
+          "sub": "외관 한 바퀴 → 옵션 작동 → 대시보드·천장 → 시트 → 운전석 시점 → 트렁크 → 타이어 → 엔진룸 · 카스24형 보기 화면",
+          "stages": [
+            "tour-walk",
+            "tour-feature",
+            "tour-dash",
+            "tour-seat",
+            "tour-pov",
+            "tour-boot",
+            "tour-tyre",
+            "tour-engine"
+          ]
+        }
+      ],
+      "58": []
+    },
+    "coursesNote": "역할별 코스(2026-10-29): 딜러는 빠른·표준 2개만(결정을 줄임), 촬영팀은 표준·상세 + 직접 고르기. 58 재현은 그룹 4단계 그대로",
+    "tour": {
+      "name": "비디오 투어(카스24형)",
+      "note": "호주 CARS24 비디오 투어 10대를 재서 정한 순서·길이예요. 8개 부위를 같은 순서로 찍으면 보는 화면에서 부위 아이콘을 눌러 그 장면으로 바로 갈 수 있어요.",
+      "stages": [
+        {
+          "key": "tour-walk",
+          "label": "외관 한 바퀴",
+          "short": "외관",
+          "guide": "exterior",
+          "icon": [
+            "assets",
+            "cars24-au",
+            "tour-icons",
+            "exterior.svg"
+          ],
+          "min": 20,
+          "max": 24,
+          "hint": "허리 높이에서 운전석 앞쪽부터 시작해 끊지 않고 차 주위를 한 바퀴 돌아요. 바퀴 쪽으로 조금 붙어 천천히 걸어요."
+        },
+        {
+          "key": "tour-feature",
+          "label": "옵션 작동",
+          "short": "옵션",
+          "guide": "feature",
+          "icon": [
+            "assets",
+            "cars24-au",
+            "tour-icons",
+            "electrical.svg"
+          ],
+          "min": 18,
+          "max": 24,
+          "hint": "운전석에서 손으로 화면 · 핸들 버튼 · 선루프 · 후방카메라 · 통풍시트를 하나씩 눌러 작동하는 모습을 보여 줘요."
+        },
+        {
+          "key": "tour-dash",
+          "label": "대시보드·천장",
+          "short": "대시보드",
+          "guide": "in-dash",
+          "icon": [
+            "assets",
+            "cars24-au",
+            "tour-icons",
+            "interior.svg"
+          ],
+          "min": 8,
+          "max": 11,
+          "hint": "뒷좌석 가운데에서 앞을 보고 대시보드 전체를 좌우가 같게 담은 뒤 천장(선루프)으로 천천히 올려요."
+        },
+        {
+          "key": "tour-seat",
+          "label": "시트",
+          "short": "시트",
+          "guide": "in-seat",
+          "icon": [
+            "assets",
+            "cars24-au",
+            "tour-icons",
+            "seats.svg"
+          ],
+          "min": 11,
+          "max": 15,
+          "hint": "문을 열고 바깥에서 앞좌석 → 뒷좌석 순서로 시트 상태를 보여 줘요."
+        },
+        {
+          "key": "tour-pov",
+          "label": "운전석 시점",
+          "short": "운전석",
+          "guide": "in-cluster",
+          "icon": [
+            "assets",
+            "cars24-au",
+            "tour-icons",
+            "steering.svg"
+          ],
+          "min": 7,
+          "max": 12,
+          "hint": "운전석에 앉은 눈높이로 앞 유리 → 계기판 → 핸들을 보여 줘요. 시동을 켜서 주행거리가 보이게 해요."
+        },
+        {
+          "key": "tour-boot",
+          "label": "트렁크",
+          "short": "트렁크",
+          "guide": "trunk",
+          "icon": [
+            "assets",
+            "cars24-au",
+            "tour-icons",
+            "boot.svg"
+          ],
+          "min": 9,
+          "max": 11,
+          "hint": "뒤 배지에서 시작해 트렁크가 열리는 모습을 담고 안쪽 바닥까지 보여 줘요."
+        },
+        {
+          "key": "tour-tyre",
+          "label": "타이어",
+          "short": "타이어",
+          "guide": "tyre",
+          "icon": [
+            "assets",
+            "cars24-au",
+            "tour-icons",
+            "tyre.svg"
+          ],
+          "min": 7,
+          "max": 11,
+          "hint": "앞바퀴 휠에서 타이어 홈(트레드)으로 가까이 다가가 닳은 정도가 보이게 찍어요."
+        },
+        {
+          "key": "tour-engine",
+          "label": "엔진룸",
+          "short": "엔진룸",
+          "guide": "engine",
+          "icon": [
+            "assets",
+            "cars24-au",
+            "tour-icons",
+            "engine.svg"
+          ],
+          "min": 6,
+          "max": 10,
+          "hint": "보닛을 끝까지 열고 위에서 아래로 천천히 내려 엔진룸 전체를 보여 줘요."
+        }
+      ],
+      "demo": {
+        "title": "2019 레인지로버 SV 오토바이오그래피 LWB",
+        "meta": "5.1만km · 가솔린 · 서울오토갤러리",
+        "price": "가격 상담",
+        "dealer": "김태규 딜러 · 투제이모터웍스",
+        "dealerLink": "?qf=guazi&profile=dealer&shop=450554&emp=1",
+        "src": [
+          "shortform-samples",
+          "dealer-narration-v01",
+          "rangerover-v01.mp4"
+        ],
+        "note": "딜러가 직접 찍은 매장 설명 영상(63초)을 부위 시각으로 나눈 시안이에요. 이 영상에는 타이어 · 대시보드 장면이 따로 없어요.",
+        "chapters": [
+          {
+            "key": "tour-walk",
+            "from": 0,
+            "to": 18.9
+          },
+          {
+            "key": "tour-engine",
+            "from": 18.9,
+            "to": 23.2
+          },
+          {
+            "key": "tour-seat",
+            "from": 23.2,
+            "to": 29.7
+          },
+          {
+            "key": "tour-pov",
+            "from": 29.7,
+            "to": 39.5
+          },
+          {
+            "key": "tour-feature",
+            "from": 39.5,
+            "to": 48.0
+          },
+          {
+            "key": "tour-boot",
+            "from": 48.0,
+            "to": 63.5
+          }
+        ]
+      },
+      "iconNote": "부위 아이콘 = 노션 「베스트 › 호주_카스 24 (1)」 CARS24 원본(검사보고서 · 기본정보 아이콘, 파일 수정 없음, 2026-11-03 「노션에 동일한 호주 카스 24 아이콘 사용」)",
+      "damageIcon": [
+        "assets",
+        "cars24-au",
+        "tour-icons",
+        "imperfections.svg"
+      ]
+    }
+  },
+  "groups": [
+    {
+      "id": "exterior",
+      "label": "외관",
+      "level": "recommended",
+      "videoStage": true,
+      "videoKey": "exterior",
+      "items": [
+        {
+          "id": "front-left-45",
+          "label": "좌측 전면 45°",
+          "note": "대표",
+          "rule": "frontLeft",
+          "guide": {
+            "kind": "q34",
+            "hint": "차 앞모서리를 윤곽 모서리에 맞춰 주세요"
+          },
+          "level": "required",
+          "auto": [
+            "front34"
+          ]
+        },
+        {
+          "id": "front",
+          "label": "정면",
+          "rule": "front",
+          "guide": {
+            "kind": "front",
+            "hint": "차 정면이 윤곽 안에 꽉 차게 맞춰 주세요"
+          },
+          "auto": [
+            "front"
+          ]
+        },
+        {
+          "id": "front-right-45",
+          "label": "우측 전면 45°",
+          "rule": "frontRight",
+          "guide": {
+            "kind": "q34",
+            "flip": true,
+            "hint": "차 앞모서리를 윤곽 모서리에 맞춰 주세요"
+          },
+          "auto": [
+            "front34"
+          ]
+        },
+        {
+          "id": "side-right",
+          "label": "우측면",
+          "rule": "sideRight",
+          "guide": {
+            "kind": "side",
+            "flip": true,
+            "hint": "바퀴 두 개를 동그라미에 맞춰 주세요"
+          },
+          "auto": [
+            "side"
+          ]
+        },
+        {
+          "id": "rear-right-45",
+          "label": "우측 후면 45°",
+          "rule": "rearRight",
+          "level": "required",
+          "guide": {
+            "kind": "q34",
+            "flip": true,
+            "hint": "차 뒷모서리를 윤곽 모서리에 맞춰 주세요"
+          },
+          "auto": [
+            "rear34"
+          ]
+        },
+        {
+          "id": "rear",
+          "label": "후면",
+          "rule": "rear",
+          "guide": {
+            "kind": "rear",
+            "hint": "차 뒷면이 윤곽 안에 꽉 차게 맞춰 주세요"
+          },
+          "auto": [
+            "rear"
+          ]
+        },
+        {
+          "id": "side-left",
+          "label": "좌측면",
+          "rule": "side",
+          "guide": {
+            "kind": "side",
+            "hint": "바퀴 두 개를 동그라미에 맞춰 주세요"
+          },
+          "auto": [
+            "side"
+          ]
+        }
+      ],
+      "videoSec": {
+        "min": 15,
+        "max": 30
+      },
+      "orientation": "landscape"
+    },
+    {
+      "id": "interior",
+      "label": "실내",
+      "level": "recommended",
+      "videoStage": true,
+      "videoKey": "interior",
+      "items": [
+        {
+          "id": "cluster",
+          "label": "계기판",
+          "rule": "cluster",
+          "guide": {
+            "kind": "cluster",
+            "hint": "시동을 켜고 주행거리 숫자가 보이게 찍어 주세요"
+          },
+          "level": "required",
+          "auto": [
+            "cluster"
+          ]
+        },
+        {
+          "id": "dashboard",
+          "label": "대시보드",
+          "rule": "dash",
+          "guide": {
+            "kind": "dash",
+            "hint": "핸들과 가운데 화면이 함께 보이게 찍어 주세요"
+          },
+          "level": "required",
+          "auto": [
+            "dashboard",
+            "center"
+          ]
+        },
+        {
+          "id": "front-seat",
+          "label": "앞좌석",
+          "rule": "frontSeat",
+          "guide": {
+            "kind": "free",
+            "hint": "운전석·조수석 시트가 함께 보이게 찍어 주세요"
+          },
+          "auto": [
+            "frontseat"
+          ]
+        },
+        {
+          "id": "rear-seat",
+          "label": "뒷좌석",
+          "rule": "rearSeat",
+          "guide": {
+            "kind": "free",
+            "hint": "뒷문을 열고 뒷좌석 전체가 보이게 찍어 주세요"
+          },
+          "auto": [
+            "rearseat"
+          ]
+        }
+      ],
+      "videoSec": {
+        "min": 10,
+        "max": 20
+      },
+      "orientation": "portrait"
+    },
+    {
+      "id": "engine",
+      "label": "엔진룸",
+      "level": "recommended",
+      "videoStage": true,
+      "videoKey": "engine",
+      "items": [
+        {
+          "id": "engine-bay",
+          "label": "엔진룸",
+          "rule": "engine",
+          "guide": {
+            "kind": "engine",
+            "hint": "보닛을 끝까지 열고 엔진룸 전체가 보이게 찍어 주세요"
+          },
+          "auto": [
+            "engine"
+          ]
+        }
+      ],
+      "orientation": "landscape"
+    },
+    {
+      "id": "trunk",
+      "label": "트렁크",
+      "level": "recommended",
+      "videoStage": true,
+      "videoKey": "trunk",
+      "items": [
+        {
+          "id": "trunk-open",
+          "label": "트렁크",
+          "rule": "trunk",
+          "guide": {
+            "kind": "trunk",
+            "hint": "트렁크를 열고 바닥까지 보이게 찍어 주세요"
+          },
+          "auto": [
+            "trunk"
+          ]
+        }
+      ],
+      "orientation": "landscape"
+    },
+    {
+      "id": "other",
+      "label": "기타",
+      "level": "optional",
+      "videoStage": false,
+      "items": [
+        {
+          "id": "other",
+          "label": "기타",
+          "repeatable": true,
+          "guide": {
+            "kind": "free",
+            "hint": "찍을 부분이 네 모서리 안에 들어오게 맞춰 주세요"
+          }
+        }
+      ],
+      "orientation": "any"
+    }
+  ],
+  "vehicleType": "car",
+  "vehicleNote": "중고차(승용) 기준 목록이에요.",
+  "enforcedText": {
+    "note": "강제할 때(enforceRequired true 또는 58 재현 &vstage=58) 쓰는 문구",
+    "levelLabel": "필수",
+    "rulesTitle": "필수 4장은 꼭 찍어 주세요",
+    "rulesNotice": "좌측 전면 45° · 우측 후면 45° · 계기판 · 대시보드 4장을 찍어야 등록할 수 있어요. 대각선 2장이면 차의 네 면이 다 보이고, 계기판으로 주행거리를 확인할 수 있어요.",
+    "hint": "필수 4장을 찍으면 등록할 수 있어요"
+  },
+  "roles": {
+    "dealer": {
+      "label": "딜러",
+      "orientationToggle": false,
+      "course": "quick",
+      "maxExtra": 3
+    },
+    "crew": {
+      "label": "촬영팀",
+      "orientationToggle": true,
+      "course": "basic",
+      "maxExtra": 8
+    },
+    "58": {
+      "label": "58 재현",
+      "orientationToggle": false,
+      "course": "58",
+      "maxExtra": 0
+    }
+  },
+  "rolesNote": "역할 값(2026-10-29 3차 컨설팅): ?role=dealer|crew 또는 코스 창의 「딜러 간편 / 촬영팀 전문」. 로그인이 생기면 계정 역할로 바꾼다. orientationToggle = 사진 가로·세로 전환 버튼, course = 기본 코스, maxExtra = 더할 수 있는 부위 수 · 촬영팀도 표준으로 시작하고 상세는 코스 창에서 고른다(2026-10-29 자가 체크) · 2026-10-29 후속 ④: 「58」도 역할 프리셋(?vstage=58). 화면 분기의 단일 축은 roleNow() 하나이고 PLUS = 역할이 58이 아님."
+}

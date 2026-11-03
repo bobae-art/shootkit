@@ -1,0 +1,18 @@
+{
+  "id": "./",
+  "name": "보배드림 등록 촬영",
+  "short_name": "등록 촬영",
+  "description": "중고차 매물 사진과 영상을 찍고 등록하기",
+  "lang": "ko-KR",
+  "start_url": "./?source=app",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#000000",
+  "theme_color": "#000000",
+  "icons": [
+    { "src": "../shoot/icon-192.png?v=1", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "../shoot/icon-512.png?v=1", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "../shoot/icon-maskable-512.png?v=1", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
