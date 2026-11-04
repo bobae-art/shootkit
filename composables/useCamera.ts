@@ -62,6 +62,16 @@ const writeSaved = (key: string | undefined, v: Saved) => {
 
 /** 카메라 이름으로 앞 카메라 · 아이폰의 「여러 렌즈 묶음」(자동 전환용 가상 카메라)을 거른다 */
 const isFront = (label: string) => /front|user|전면|셀카/i.test(label);
+/** 후면 카메라라고 「확실히」 알 수 있는 것만(2026-11-04 호환 점검).
+ * 브라우저가 알려 주는 방향(facingMode) → 이름(back · rear · 후면). 둘 다 모르면 후면으로 치지 않는다
+ * (이름에 방향이 없는 폰에서 앞 카메라를 메인으로 잘못 고르지 않게. 그런 폰은 렌즈 기능 없이 예전처럼 동작) */
+const isBackCam = (d: MediaDeviceInfo) => {
+  const fm = (d as MediaDeviceInfo & { getCapabilities?: () => { facingMode?: string[] } }).getCapabilities?.()?.facingMode ?? [];
+  if (fm.includes("user")) return false;
+  if (fm.includes("environment")) return true;
+  if (isFront(d.label)) return false;
+  return /back|rear|environment|후면/i.test(d.label);
+};
 const isVirtualIos = (label: string) => /dual|triple/i.test(label);
 /** 메인 후면 카메라 찾기
  * 1) 안드로이드: 이름의 카메라 번호가 가장 작은 것(「camera2 0, facing back」 · 「camera 0, facing back」 두 형식 모두. 0번 = 메인이 관례)
@@ -118,6 +128,8 @@ export function useCamera(
   /** 다른 렌즈에서 줌 버튼을 누르면: 기본 렌즈로 바꾼 뒤 이 배율을 건다 */
   let pendingZoom = 1;
   let devList: MediaDeviceInfo[] = [];
+  /** 메인 카메라로 다시 열기는 화면당 한 번만 */
+  let pinRetried = false;
   let current: MediaStream | null = null;
   let stop: (() => void) | null = null;
 
@@ -128,7 +140,7 @@ export function useCamera(
       const all = (await navigator.mediaDevices.enumerateDevices()).filter((d) => d.kind === "videoinput" && d.deviceId && d.label);
       devList = all;
       const curId = s.getVideoTracks()[0]?.getSettings?.().deviceId ?? null;
-      const backs = all.filter((d) => !isFront(d.label) && !isVirtualIos(d.label));
+      const backs = all.filter((d) => isBackCam(d) && !isVirtualIos(d.label));
       const main = mainOf(backs);
       if (main) {
         baseId = main.deviceId;
@@ -143,7 +155,11 @@ export function useCamera(
       if (lensId.value && !back.some((d) => d.deviceId === lensId.value)) lensId.value = null;
       save();
       // 기본으로 열린 카메라가 메인이 아니면(갤럭시에서 초광각이 열림) 메인으로 다시 연다
-      if (main && !lensId.value && curId && curId !== main.deviceId) nonce.value += 1;
+      // 한 번만(브라우저가 알려 주는 카메라 id가 어긋나도 끝없이 다시 열지 않게)
+      if (main && !lensId.value && curId && curId !== main.deviceId && !pinRetried) {
+        pinRetried = true;
+        nonce.value += 1;
+      }
     } catch {
       lenses.value = [];
     }
@@ -186,7 +202,30 @@ export function useCamera(
     const pin = !chosen && basePinned && baseId ? baseId : null;
     const video: MediaTrackConstraints = chosen || pin ? { deviceId: { exact: (chosen || pin)! }, ...dims } : base;
     const open = (v: MediaTrackConstraints) => md.getUserMedia({ video: v, audio }).catch((e: unknown) => (audio ? md.getUserMedia({ video: v, audio: false }) : Promise.reject(e)));
-    open(video)
+    // 특정 카메라를 지정해 열 때 응답이 없으면 4초 뒤 폰이 고른 카메라로(늦게 열린 스트림은 닫는다)
+    const openPinned = (v: MediaTrackConstraints) =>
+      new Promise<MediaStream>((resolve, reject) => {
+        let late = false;
+        const p = open(v);
+        const t = window.setTimeout(() => {
+          late = true;
+          reject(Object.assign(new Error("timeout"), { name: "TimeoutError" }));
+          p.then((st) => st.getTracks().forEach((tr) => tr.stop()), () => undefined);
+        }, 4000);
+        p.then(
+          (st) => {
+            if (late) return;
+            window.clearTimeout(t);
+            resolve(st);
+          },
+          (e: unknown) => {
+            if (late) return;
+            window.clearTimeout(t);
+            reject(e);
+          },
+        );
+      });
+    (chosen || pin ? openPinned(video) : open(video))
       // 고른 렌즈를 못 열면(권한 거절은 빼고) 기본 카메라로 다시 연다 — 지금까지의 동작이 늘 남는다
       .catch((e: unknown) => {
         if ((!chosen && !pin) || (e as { name?: string })?.name === "NotAllowedError") return Promise.reject(e);
