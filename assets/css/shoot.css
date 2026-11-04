@@ -6262,3 +6262,21 @@ body:has(.shoot-layer) .shoot-install {
 .shoot-capture.is-video .shoot-lens {
   bottom: 132px;
 }
+
+/* 2026-11-04 저장한 글 시트: 「최근에 닫은 작업」 소제목 */
+.shoot-drafts-sub {
+  margin: 12px 20px 4px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #333;
+}
+.shoot-drafts-sub small {
+  margin-left: 6px;
+  font-weight: 400;
+  color: #888;
+}
+.shoot-drafts-open small .is-soon {
+  display: block;
+  font-style: normal;
+  color: #d63e12;
+}
