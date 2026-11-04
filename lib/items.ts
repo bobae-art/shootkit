@@ -4,7 +4,7 @@ import raw from "../data/shoot-items-kit.json";
 import type { VideoStage } from "./stages";
 
 export type ShootLevel = "required" | "recommended" | "optional";
-export type GuideKind = "side" | "front" | "rear" | "q34" | "dash" | "cluster" | "engine" | "trunk" | "free";
+export type GuideKind = "side" | "front" | "rear" | "q34" | "rq34" | "dash" | "cluster" | "engine" | "trunk" | "free";
 export type ShootItem = {
   id: string;
   label: string;
