@@ -40,7 +40,7 @@ const notify = (t: string) => emit("notify", t);
 
 const mode = ref<"cam" | "album">(props.startMode);
 // 2026-10-29 자가 체크(7라운드 지적): 사진 카메라는 4:3으로 요청해 가로 틀 저장 크기를 키운다(세로 폰 1200×900). 58 재현은 예전 16:9
-const { stream, error, torchSupported, retry, setTorch, lenses, lensOptions, selectLens, lensDebug } = useCamera(
+const { stream, error, torchSupported, retry, setTorch, lenses, lensOptions, selectLens, lensDebug, zoomSteps, zoom, setZoom } = useCamera(
   () => mode.value === "cam",
   () => false,
   PLUS ? { width: { ideal: 1600 }, height: { ideal: 1200 } } : undefined,
@@ -343,8 +343,8 @@ const slotShot = (i: number) => (shotPicked(slotShots.value[i]) ? slotShots.valu
       <div ref="videoRef" class="shoot-view">
         <LiveVideo v-if="stream" :stream="stream" />
         <NoCam v-else :denied="error === 'denied'" />
-        <!-- 2026-11-04 렌즈 바꾸기: 후면 카메라가 둘 이상일 때만 -->
-        <LensButton v-if="stream && lenses.length" :options="lensOptions" :debug="lensDebug" @select="selectLens" />
+        <!-- 2026-11-04 렌즈 바꾸기: 후면 카메라가 둘 이상일 때 · 줌: 지금 카메라가 줌을 지원할 때 -->
+        <LensButton v-if="stream && (lenses.length || zoomSteps.length)" :options="lensOptions" :debug="lensDebug" :zooms="zoomSteps" :zoom="zoom" @select="selectLens" @zoom="setZoom" />
         <!-- 가로 칸: 4:3 틀(틀 밖은 어둡게) — 저장되는 사진 = 틀 안(2026-10-29) -->
         <div v-if="isLandscape" class="shoot-frame43" aria-hidden="true"><div ref="frameRef" class="shoot-frame43__box"><em>가로 4:3</em></div></div>
         <ShotGuide v-if="guide" :slot="curSlot" :class="isLandscape ? 'is-landscape' : ''" />

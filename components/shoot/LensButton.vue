@@ -5,13 +5,29 @@
 // ?lens=info: 이 폰에서 찾은 후면 카메라 수를 아래에 보여 준다(실기 확인용)
 import { query } from "../../lib/site";
 import type { LensOption } from "../../composables/useCamera";
-defineProps<{ options: LensOption[]; debug?: string[] }>();
-const emit = defineEmits<{ select: [id: string | null] }>();
+defineProps<{ options: LensOption[]; debug?: string[]; zooms?: number[]; zoom?: number }>();
+const emit = defineEmits<{ select: [id: string | null]; zoom: [z: number] }>();
+// 2026-11-04 줌: 지금 카메라가 줌을 지원하면 렌즈 줄 위에 1× 2× 3× 5×(최대 배율까지만)
+const zx = (z: number) => `${z}×`;
 const INFO = query().get("lens") === "info";
 </script>
 <template>
   <div class="shoot-lens" @pointerdown.stop>
-    <div class="shoot-lens__row" role="radiogroup" aria-label="렌즈">
+    <div v-if="zooms && zooms.length > 1" class="shoot-lens__row is-zoom" role="radiogroup" aria-label="줌">
+      <button
+        v-for="z in zooms"
+        :key="z"
+        type="button"
+        role="radio"
+        :aria-checked="z === zoom"
+        :aria-label="`줌 ${z}배`"
+        :class="`shoot-lens__btn ${z === zoom ? 'is-on' : ''}`"
+        @click="emit('zoom', z)"
+      >
+        {{ zx(z) }}
+      </button>
+    </div>
+    <div v-if="options.length > 1" class="shoot-lens__row" role="radiogroup" aria-label="렌즈">
       <button
         v-for="o in options"
         :key="o.id ?? 'base'"
