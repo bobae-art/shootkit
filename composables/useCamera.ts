@@ -11,6 +11,8 @@ import { FAKE_ONLY } from "../lib/core";
 export type CameraError = "" | "denied" | "unavailable";
 /** 바꿀 수 있는 후면 렌즈(기본 카메라 말고). label = 버튼에 보일 이름 */
 export type Lens = { id: string; label: string; raw: string };
+/** 렌즈 버튼 한 칸(id null = 기본) */
+export type LensOption = { id: string | null; label: string; active: boolean };
 export type CameraState = {
   stream: Ref<MediaStream | null>;
   /** "denied" 권한 거절, "unavailable" 카메라 없음(PC 등) */
@@ -25,6 +27,10 @@ export type CameraState = {
   lensLabel: ComputedRef<string>;
   /** 기본 → 렌즈 1 → 렌즈 2 → … → 기본 */
   nextLens: () => void;
+  /** 렌즈 버튼 나열(아이폰: 초광각 · 기본 · 망원 순, 안드로이드: 기본 · 렌즈 2 · 렌즈 3 순) · 지금 렌즈 표시 */
+  lensOptions: ComputedRef<LensOption[]>;
+  /** 렌즈 고르기(null = 기본) */
+  selectLens: (id: string | null) => void;
   /** 이 폰에서 찾은 후면 카메라 수(기본 포함, ?lens=info 진단용) */
   lensCount: ComputedRef<number>;
 };
@@ -57,7 +63,10 @@ const mainOf = (backs: MediaDeviceInfo[]) => {
   return backs.find((d) => /^back camera$/i.test(d.label.trim())) ?? null;
 };
 /** 아이폰은 이름에 렌즈 종류가 있어 그대로 알려 준다. 안드로이드는 이름이 「camera2 2, facing back」뿐이라 번호로 */
-const lensName = (label: string, n: number) => (/ultra\s*wide/i.test(label) ? "광각" : /tele/i.test(label) ? "망원" : `렌즈 ${n}`);
+// 2026-11-04: 아이폰 Ultra Wide는 「초광각」(기본 렌즈가 광각)
+const lensName = (label: string, n: number) => (/ultra\s*wide/i.test(label) ? "초광각" : /tele/i.test(label) ? "망원" : `렌즈 ${n}`);
+/** 나열 순서: 초광각 → 기본 → (번호 렌즈) → 망원 */
+const rank = (label: string) => (label === "초광각" ? 0 : label === "기본" ? 1 : label === "망원" ? 3 : 2);
 
 export function useCamera(
   active: () => boolean,
@@ -182,7 +191,18 @@ export function useCamera(
     save();
   };
   const lensLabel = computed(() => lenses.value.find((l) => l.id === lensId.value)?.label ?? "기본");
+  const lensOptions = computed<LensOption[]>(() =>
+    [{ id: null, label: "기본" }, ...lenses.value.map((l) => ({ id: l.id, label: l.label }))]
+      .map((o, i) => ({ ...o, i, active: o.id === lensId.value }))
+      .sort((a, b) => rank(a.label) - rank(b.label) || a.i - b.i)
+      .map(({ id, label, active }) => ({ id, label, active })),
+  );
+  const selectLens = (id: string | null) => {
+    if (id === lensId.value || (id && !lenses.value.some((l) => l.id === id))) return;
+    lensId.value = id;
+    save();
+  };
   const lensCount = computed(() => lenses.value.length + 1);
 
-  return { stream, error, torchSupported, setTorch, retry: () => (nonce.value += 1), lenses, lensLabel, nextLens, lensCount };
+  return { stream, error, torchSupported, setTorch, retry: () => (nonce.value += 1), lenses, lensLabel, nextLens, lensCount, lensOptions, selectLens };
 }
