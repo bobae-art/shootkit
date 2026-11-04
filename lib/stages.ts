@@ -81,10 +81,7 @@ export const RULE_FILE: Record<string, string> = { trunk: "trk-1" };
 
 // 번호판이 보이는 규칙 사진의 번호판 자리(화면에 보이는 92:82 칸 기준 %: 왼쪽 · 위 · 폭 · 높이).
 // 2026-10-27 컨설팅: 사진 파일은 고치지 않고 촬영 화면의 가림 스티커와 같은 흰 판을 위에 덮는다(키트만).
-export const RULE_PLATES: Record<string, [number, number, number, number]> = {
-  front: [33.6, 58, 32.4, 9.6],
-  rear: [33.6, 34.2, 32.4, 9.6],
-  frontLeft: [0, 52.4, 6, 10],
-  side: [0, 31.4, 9.6, 9.6],
-};
+// 2026-11-04: 외관 예시 사진 7장을 회색 차 렌더(scripts/guide-shapes/render-photos.html, 번호판은 빈 흰 판)로 바꿔 덮을 자리가 없다.
+// 실제 번호판이 보이는 사진으로 다시 바꾸면 여기에 자리를 적는다.
+export const RULE_PLATES: Record<string, [number, number, number, number]> = {};
 
