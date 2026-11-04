@@ -5,7 +5,7 @@ import { setCustomGuide, setTourGuide, stageGuide, type VideoStage } from "./sta
 import { loadPrefs, type StagePrefs } from "./stage-prefs";
 import type { Highlight } from "./shorts";
 import { query } from "./site";
-import { CUTS, ENFORCE_REQUIRED, ITEMS, OTHER_ID, PHOTO_MAX, PLATE_DEFAULT, PLATE_HERO_LOCK, ROLES, SHOOT, VIDEO_GROUPS, TOUR, coursesOf, cutOf, groupOf, isRequiredItem, levelLabel, stageSec, type RoleDef, type ShootRole } from "./items";
+import { CUTS, ENFORCE_REQUIRED, ITEMS, OTHER_ID, PHOTO_MAX, PLATE_DEFAULT, PLATE_HERO_LOCK, ROLES, SHOOT, VIDEO_GROUPS, TOUR, coursesOf, cutOf, groupOf, levelLabel, stageSec, type RoleDef, type ShootRole } from "./items";
 
 export const OTHER = OTHER_ID;
 export const MAX_PHOTOS = PHOTO_MAX;
@@ -95,10 +95,11 @@ export const baseStages = () => baseStagesOf(roleNow());
 /** retired(2026-10-30 실내 컷 확정: 계기판 · 편의 장비) = 예전 기록은 열리지만 새로 고르는 목록에선 숨긴다 */
 export const EXTRA_STAGES: VideoStage[] = [...SHOOT.video.extraStages.filter((x) => !x.retired).map((x) => x.key), ...CUTS.map((c) => c.key)];
 export const STAGES = BASE_STAGES.map((k) => def(k));
-/** 사진 칸 레일 순서(그룹 순서대로 펼친 항목 id). 키트는 규칙 화면처럼 우선 4장을 맨 앞에 둔다(2026-10-26 컨설팅: 규칙·레일 순서 통일) */
-export const PHOTO_SLOTS: string[] = PLUS
-  ? [...ITEMS.filter((i) => isRequiredItem(i.id)), ...ITEMS.filter((i) => !isRequiredItem(i.id))].map((i) => i.id)
-  : ITEMS.map((i) => i.id);
+/** 사진 칸 레일 순서 = 그룹 순서대로 펼친 항목 id(data/shoot-items-kit.json 순서 그대로).
+ * 2026-11-04 필드테스트 「동선이 어려움」: 예전 키트는 우선 4장을 맨 앞에 모아(좌측 전면 → 우측 후면 → 계기판 → 대시보드) 차 반대편으로 갔다가
+ * 바로 실내로 들어가게 했다. 이제 차를 한 바퀴 도는 순서(좌측 전면 → 정면 → 우측 전면 → 우측면 → 우측 후면 → 후면 → 좌측면)로 외관을 다 찍고
+ * 실내로 들어간다. 우선 4장 표시 · 대표 사진(첫 칸 = 좌측 전면)은 그대로다. */
+export const PHOTO_SLOTS: string[] = ITEMS.map((i) => i.id);
 /** 대표 사진 칸(첫 칸). 번호판 가림을 붙일 수 없다(2026-10-29 후속 ④ 결정: 대표 1장 노출 잠금) */
 export const HERO_SLOT = PHOTO_SLOTS[0];
 export const plateLocked = (slot: string) => PLUS && PLATE_HERO_LOCK && slot === HERO_SLOT;
