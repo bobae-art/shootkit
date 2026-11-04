@@ -31,6 +31,8 @@ export type CameraState = {
   lensOptions: ComputedRef<LensOption[]>;
   /** 렌즈 고르기(null = 기본) */
   selectLens: (id: string | null) => void;
+  /** ?lens=info 진단 줄(카메라마다 이름 · 최대 해상도, 지금 열린 카메라 · 줌 범위) */
+  lensDebug: Ref<string[]>;
   /** 이 폰에서 찾은 후면 카메라 수(기본 포함, ?lens=info 진단용) */
   lensCount: ComputedRef<number>;
 };
@@ -87,6 +89,8 @@ export function useCamera(
   let basePinned = Boolean(saved.pin && saved.base);
   const save = () => writeSaved(lensKey, { lens: lensId.value, base: baseId, pin: basePinned });
   const lenses = ref<Lens[]>([]);
+  const lensDebug = ref<string[]>([]);
+  let devList: MediaDeviceInfo[] = [];
   let current: MediaStream | null = null;
   let stop: (() => void) | null = null;
 
@@ -95,6 +99,7 @@ export function useCamera(
     if (lenses.value.length || !navigator.mediaDevices?.enumerateDevices) return;
     try {
       const all = (await navigator.mediaDevices.enumerateDevices()).filter((d) => d.kind === "videoinput" && d.deviceId && d.label);
+      devList = all;
       const curId = s.getVideoTracks()[0]?.getSettings?.().deviceId ?? null;
       const backs = all.filter((d) => !isFront(d.label) && !isVirtualIos(d.label));
       const main = mainOf(backs);
@@ -114,6 +119,26 @@ export function useCamera(
       if (main && !lensId.value && curId && curId !== main.deviceId) nonce.value += 1;
     } catch {
       lenses.value = [];
+    }
+  };
+
+  // ?lens=info 진단: 카메라마다 이름 · 최대 해상도(크롬은 열지 않아도 알려 줌), 지금 열린 카메라 · 해상도 · 줌 범위
+  const describe = (s: MediaStream) => {
+    try {
+      const t = s.getVideoTracks()[0];
+      const st = t?.getSettings?.() ?? {};
+      const tc = (t?.getCapabilities?.() ?? {}) as { zoom?: { min: number; max: number } };
+      const name = (id?: string) => devList.find((d) => d.deviceId === id)?.label ?? "?";
+      const maxRes = (d: MediaDeviceInfo) => {
+        const c = (d as MediaDeviceInfo & { getCapabilities?: () => { width?: { max?: number }; height?: { max?: number } } }).getCapabilities?.();
+        return c?.width?.max ? `${c.width.max}×${c.height?.max ?? "?"}` : "?";
+      };
+      lensDebug.value = [
+        `지금: ${name(st.deviceId)} · ${st.width ?? "?"}×${st.height ?? "?"} · 줌 ${tc.zoom ? `${tc.zoom.min}~${tc.zoom.max}` : "없음"}`,
+        ...devList.filter((d) => !isFront(d.label)).map((d) => `${d.label} · 최대 ${maxRes(d)}${d.deviceId === baseId ? " [기본]" : ""}`),
+      ];
+    } catch {
+      lensDebug.value = [];
     }
   };
 
@@ -157,7 +182,7 @@ export function useCamera(
         const track = s.getVideoTracks()[0];
         const caps = (track?.getCapabilities?.() ?? {}) as { torch?: boolean };
         torchSupported.value = Boolean(caps.torch);
-        void loadLenses(s);
+        void loadLenses(s).then(() => describe(s));
       })
       .catch((e: unknown) => {
         if (cancelled) return;
@@ -204,5 +229,5 @@ export function useCamera(
   };
   const lensCount = computed(() => lenses.value.length + 1);
 
-  return { stream, error, torchSupported, setTorch, retry: () => (nonce.value += 1), lenses, lensLabel, nextLens, lensCount, lensOptions, selectLens };
+  return { stream, error, torchSupported, setTorch, retry: () => (nonce.value += 1), lenses, lensLabel, nextLens, lensCount, lensOptions, selectLens, lensDebug };
 }
