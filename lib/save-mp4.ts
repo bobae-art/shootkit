@@ -185,12 +185,20 @@ async function remux(blobs: Blob[], onProgress?: (p: number) => void): Promise<B
   }
 }
 
-/** 폰은 공유창(아이폰 「동영상 저장」으로 사진첩), 공유창이 없으면 다운로드. */
+/** 아이폰 · 아이패드(사파리 엔진). 아이패드는 데스크톱 표시로 와도 터치 지점으로 구분 */
+export const isIOS = () =>
+  typeof navigator !== "undefined" && (/iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1));
+/** 안드로이드 등 터치 폰(아이폰 아님): 다운로드로 바로 저장되고 갤러리의 Download 앨범에 보인다 */
+export const savedWhere = () => (typeof window !== "undefined" && window.matchMedia?.("(pointer: coarse)").matches && !isIOS() ? " · 갤러리의 「Download」 앨범에 있어요" : "");
+
+/** 내 폰에 저장.
+ * 2026-11-04 필드테스트 「내 폰에 저장을 누르면 공유가 뜸(카톡으로 보내고 받아서 저장)」:
+ * 아이폰만 공유창(웹은 사진첩에 바로 못 넣어 「동영상 저장」이 유일한 길), 안드로이드 · PC는 바로 다운로드. */
 export async function saveToDevice(blob: Blob, name: string): Promise<"shared" | "downloaded" | "cancelled"> {
   const file = new File([blob], name, { type: "video/mp4" });
   const touch = typeof window !== "undefined" && window.matchMedia?.("(pointer: coarse)").matches;
   const nav = navigator as Navigator & { canShare?: (d: ShareData) => boolean };
-  if (touch && nav.canShare?.({ files: [file] })) {
+  if (touch && isIOS() && nav.canShare?.({ files: [file] })) {
     try {
       await nav.share({ files: [file], title: name });
       return "shared";
