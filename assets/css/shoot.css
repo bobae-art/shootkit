@@ -4816,9 +4816,14 @@ body:has(.shoot-layer) .shoot-install {
   width: 20px;
   height: 20px;
 }
-/* 저장한 글 수 배지가 「글」 글자를 덮지 않게 오른쪽 위로 */
+/* 저장한 글 수 배지가 「글」 글자를 덮지 않게 오른쪽 위로.
+   2026-11-04 필드테스트 「빨간 원이 잘림」: 버튼이 화면 오른쪽 끝에 붙어 있어 right: -10px 이면 배지가 화면 밖으로 나가 잘렸다.
+   버튼 오른쪽 여백(18px) 안에 배지(16px, 끝에서 2px)를 넣어 글자도 덮지 않고 화면 안에 들어오게 한다. */
+.shoot-root.is-kit .shoot-main__top > .shoot-drafts {
+  padding-right: 18px;
+}
 .shoot-root.is-kit .shoot-drafts i {
-  right: -10px;
+  right: 2px;
   top: -8px;
 }
 
