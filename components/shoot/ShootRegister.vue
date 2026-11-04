@@ -26,7 +26,7 @@ import { bakeSticker, normalizeFile } from "../../lib/image-ops";
 import { QC_TAG, QC_TEXT, checkPhoto, firstIssue } from "../../lib/quality";
 import { primeSound } from "../../lib/sound";
 import { dialogStack } from "../../lib/dialog-stack";
-import { AUTO_ID, CLOSED_ID, getClosedMeta, addDraft, deleteDraft, draftWhen, fromRecord, getDraft, isEmptyDraft, isQuota, listDrafts, putDraft, toRecord, EMPTY_DOCS, type DocFile, type Docs, type Draft, type DraftMeta, type DraftRec } from "../../lib/drafts";
+import { AUTO_ID, CLOSED_ID, KEEP_DAYS, getClosedMeta, purgeOld, addDraft, deleteDraft, draftWhen, fromRecord, getDraft, isEmptyDraft, isQuota, listDrafts, putDraft, toRecord, EMPTY_DOCS, type DocFile, type Docs, type Draft, type DraftMeta, type DraftRec } from "../../lib/drafts";
 import { icon, query, rd } from "../../lib/site";
 import type { VideoStage } from "../../lib/stages";
 import { BASE_STAGES, ENFORCE, ENF_TEXT, MAX_PHOTOS, OTHER, PLATE_KINDS, PLUS, def, mmss, noteCount, PREFS, platePlace, plateLocked, releaseVideo, reqLabel, roleNow, setPrefs, sortBySlot, stageGroup, uid, type Notes, type Photo, type Take, type Video } from "../../lib/core";
@@ -225,9 +225,15 @@ onMounted(() => {
     (window as PopWin).__bbmShootPop = onPop;
     // 임시저장: 저장한 글 수를 세고, 지난번에 찍던 내용(자동 보관)이 있으면 묻지 않고 바로 이어서 한다
     // (2026-11-04 실기 의견: 딜러는 전화가 언제 올지 모르는데 「이어서 할까요?」에서 「새로 시작」을 잘못 누르면 처음부터 다시 해야 했다)
-    void refreshDrafts();
+    // 보관 기한(30일)이 지난 것을 먼저 정리한 뒤 목록을 세고 자동 보관을 읽는다
     autoOff = true;
-    void getDraft(AUTO_ID)
+    void purgeOld()
+      .then((n) => n && console.info(`[임시저장] ${KEEP_DAYS}일 지난 보관본 ${n}건을 정리했어요`))
+      .catch(() => undefined)
+      .then(() => {
+        void refreshDrafts();
+        return getDraft(AUTO_ID);
+      })
       .then((rec) => {
         // 2026-10-31 50배 크로스체크: 소재지 · 서류만 있어도 되살린다(전에는 무시하고 덮어써 사라졌다)
         if (rec && (rec.photos.length || rec.video || rec.region || rec.docs?.inspection)) {

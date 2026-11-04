@@ -7,7 +7,7 @@
 import { ref } from "vue";
 import Mask from "./Mask.vue";
 import { useDialogFocus } from "../../composables/useDialogFocus";
-import { MAX_DRAFTS, draftWhen, type DraftMeta } from "../../lib/drafts";
+import { KEEP_DAYS, MAX_DRAFTS, daysLeft, draftWhen, type DraftMeta } from "../../lib/drafts";
 import { rd } from "../../lib/site";
 
 // closed: 「저장 안 함」으로 닫은 작업(2026-11-04, 잘못 눌렀을 때 되살리기). 열기 · 지우기는 저장한 글과 같다
@@ -15,6 +15,11 @@ defineProps<{ items: DraftMeta[]; closed?: DraftMeta | null; busy?: boolean }>()
 const emit = defineEmits<{ close: []; open: [id: string]; remove: [id: string] }>();
 const box = ref<HTMLElement | null>(null);
 useDialogFocus(box, () => emit("close"));
+// 지워지기 7일 전부터 「N일 뒤 지워져요」(2026-11-04 30일 보관)
+const soon = (m: DraftMeta) => {
+  const d = daysLeft(m.savedAt);
+  return d <= 7 ? (d <= 1 ? "오늘 지워져요" : `${d}일 뒤 지워져요`) : "";
+};
 const place = (m: DraftMeta) => (m.region ? `${m.region.sido}${m.region.gu ? ` ${m.region.gu}` : ""}` : "소재지 안 고름");
 </script>
 <template>
@@ -34,7 +39,7 @@ const place = (m: DraftMeta) => (m.region ? `${m.region.sido}${m.region.gu ? ` $
               <i v-else class="is-blank" />
               <span>
                 <b>사진 {{ closed.photoCount }}장{{ closed.hasVideo ? " · 영상" : "" }}</b>
-                <small>{{ place(closed) }} · {{ draftWhen(closed.savedAt) }}</small>
+                <small>{{ place(closed) }} · {{ draftWhen(closed.savedAt) }}<em v-if="soon(closed)" class="is-soon">{{ soon(closed) }}</em></small>
               </span>
             </button>
             <button type="button" class="shoot-drafts-del" aria-label="최근에 닫은 작업 지우기" :disabled="busy" @click="emit('remove', closed.id)"><Mask :src="rd('delete-outline')" /></button>
@@ -50,13 +55,13 @@ const place = (m: DraftMeta) => (m.region ? `${m.region.sido}${m.region.gu ? ` $
             <i v-else class="is-blank" />
             <span>
               <b>사진 {{ m.photoCount }}장{{ m.hasVideo ? " · 영상" : "" }}</b>
-              <small>{{ place(m) }} · {{ draftWhen(m.savedAt) }}</small>
+              <small>{{ place(m) }} · {{ draftWhen(m.savedAt) }}<em v-if="soon(m)" class="is-soon">{{ soon(m) }}</em></small>
             </span>
           </button>
           <button type="button" class="shoot-drafts-del" :aria-label="`${draftWhen(m.savedAt)}에 저장한 글 지우기`" :disabled="busy" @click="emit('remove', m.id)"><Mask :src="rd('delete-outline')" /></button>
         </li>
       </ul>
-      <p class="shoot-drafts-note">이 폰 브라우저에만 저장돼요(최대 {{ MAX_DRAFTS }}건). 브라우저 기록을 지우면 함께 지워져요.</p>
+      <p class="shoot-drafts-note">이 폰 브라우저에만 저장돼요(최대 {{ MAX_DRAFTS }}건 · {{ KEEP_DAYS }}일 보관). {{ KEEP_DAYS }}일이 지나거나 브라우저 기록을 지우면 함께 지워져요.</p>
     </div>
   </div>
 </template>
