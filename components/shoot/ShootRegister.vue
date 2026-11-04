@@ -195,6 +195,7 @@ const leave = () => {
   region.value = null;
   docs.value = EMPTY_DOCS;
   tried.value = false;
+  forgetSaved();
   setScreen({ name: "main" });
   window.scrollTo(0, 0);
   later(() => notify("새 매물 등록을 처음부터 시작해요"), 0);
@@ -447,7 +448,12 @@ const hasMedia = computed(() => photos.value.length > 0 || Boolean(video.value))
 const showTipCard = computed(() => status.value === "done" && photos.value.length > 0 && missing.value.length > 0);
 const hintText = computed(() => (PLUS && showTipCard.value ? "" : requiredOk.value ? SHOOT.photo.hintDone : ENFORCE ? ENF_TEXT.hint : SHOOT.photo.hint));
 
-const onBack = () => (PLUS && !photos.value.length && !video.value && !region.value && !docs.value.inspection ? leave() : (askLeave.value = true));
+const onBack = () => {
+  if (PLUS && !photos.value.length && !video.value && !region.value && !docs.value.inspection) return leave();
+  // 임시저장한 뒤 바뀐 게 없으면 묻지 않고 나간다(저장한 글에 이미 있으므로 자동 보관도 지운다)
+  if (PLUS && isSaved()) return void dropAuto().then(leave);
+  askLeave.value = true;
+};
 // 2026-10-29 크로스체크 「고쳐」: 완성도를 누르면 알림 대신 항목별 점수 시트(누르는 곳은 44px 이상)
 const progressOpen = ref(false);
 const progressWhy = () => (progressOpen.value = true);
@@ -472,6 +478,21 @@ const resume = shallowRef<DraftRec | null>(null);
 let autoOff = false;
 let autoTimer = 0;
 const current = (): Draft => ({ region: region.value, photos: photos.value, video: video.value, docs: docs.value });
+// 2026-11-04 실기 의견 「임시저장하고 나가면 또 저장하고 나가기가 떠서, 안 했나 싶어 한 번 더 저장 → 중복으로 쌓일 위험」:
+// 마지막으로 임시저장한 작업의 지문(savedSig)과 그 글 id(savedId)를 기억한다.
+// - 바뀐 게 없으면 나갈 때 묻지 않고, 임시저장을 다시 눌러도 새로 저장하지 않는다
+// - 고친 뒤 다시 저장하면 새 글을 추가하지 않고 그 글을 덮어쓴다
+let savedId: string | null = null;
+let savedSig: string | null = null;
+/** 작업 지문: 긴 글자(사진 주소 등)는 길이 · 앞뒤 조각만 써서 가볍게 */
+const sigOf = (d: Draft) =>
+  JSON.stringify(d, (_k, v: unknown) => (typeof v === "string" && v.length > 200 ? `${v.length}:${v.slice(0, 48)}…${v.slice(-48)}` : v));
+/** 저장한 그 글이 목록에 아직 있고(지웠거나 5건 넘어 밀려나지 않았고) 그 뒤로 바뀐 게 없을 때만 「저장됨」 */
+const isSaved = () => savedSig !== null && Boolean(savedId) && draftList.value.some((m) => m.id === savedId) && savedSig === sigOf(current());
+const forgetSaved = () => {
+  savedId = null;
+  savedSig = null;
+};
 async function refreshDrafts() {
   try {
     draftList.value = await listDrafts();
@@ -548,11 +569,28 @@ const saveDraft = async (): Promise<boolean> => {
     notify("사진·영상을 올리는 중이에요. 잠시 뒤 다시 눌러 주세요");
     return false;
   }
+  // 바뀐 게 없으면 다시 저장하지 않는다(같은 글이 두 번 쌓이지 않게)
+  if (isSaved()) {
+    notify("이미 임시저장했어요 · 바뀐 내용이 없어요");
+    return true;
+  }
   try {
-    const gone = await addDraft(uid(), d);
+    // 이번 작업을 이미 저장한 적이 있으면(그 글이 아직 목록에 있으면) 그 글을 덮어쓴다
+    const again = Boolean(savedId && draftList.value.some((m) => m.id === savedId));
+    const id = again && savedId ? savedId : uid();
+    const sig = sigOf(d);
+    const gone = await addDraft(id, d);
+    savedId = id;
+    savedSig = sig;
     await refreshDrafts();
     // 5건이 넘으면 가장 오래된 글이 지워진다 → 조용히 지우지 않고 알린다(2026-10-31 컨설팅 전체 대조)
-    notify(gone.length ? `임시저장했어요 · 5건이 넘어 가장 오래된 글(${draftWhen(gone[0].savedAt)})은 지웠어요` : "임시저장했어요 · 「저장한 글」에서 다시 열 수 있어요");
+    notify(
+      gone.length
+        ? `임시저장했어요 · 5건이 넘어 가장 오래된 글(${draftWhen(gone[0].savedAt)})은 지웠어요`
+        : again
+          ? "임시저장한 글을 지금 내용으로 바꿨어요"
+          : "임시저장했어요 · 「저장한 글」에서 다시 열 수 있어요",
+    );
     return true;
   } catch (e) {
     console.warn("[임시저장]", e);
@@ -574,12 +612,15 @@ const openDraft = async (id: string) => {
     // 2026-10-31 50배 크로스체크: 올리는 중에 열면 하던 작업을 담지 못하고 덮어썼다 → 다 올라간 뒤에 열게 한다
     if (photos.value.some((p) => p.uploading) || video.value?.uploading) return void notify("사진·영상을 올리는 중이에요. 잠시 뒤 다시 열어 주세요");
     const cur = current();
-    const keep = !isEmptyDraft(cur);
+    // 이미 임시저장한 그대로면 저장한 글에 있으므로 또 담지 않는다
+    const keep = !isEmptyDraft(cur) && !isSaved();
     // 연 글은 지금 작업이 되므로 목록에서 먼저 뺀다(다시 임시저장하면 다시 담긴다).
     // 먼저 빼야 5건이 차 있을 때 하던 작업을 담으며 손대지 않은 오래된 글이 지워지지 않는다.
     await deleteDraft(id);
     if (keep) await addDraft(uid(), cur);
     applyDraft(fromRecord(rec));
+    // 연 글은 목록에서 빠져 「아직 저장 안 한 작업」이 된다
+    forgetSaved();
     draftsOpen.value = false;
     notify(keep ? "하던 작업은 저장한 글에 담고, 고른 글을 열었어요" : "저장한 글을 열었어요");
   } catch (e) {
@@ -594,6 +635,7 @@ const removeDraft = async (id: string) => {
   draftBusy.value = true;
   try {
     await deleteDraft(id);
+    if (id === savedId) forgetSaved();
     notify("저장한 글을 지웠어요");
   } finally {
     draftBusy.value = false;
