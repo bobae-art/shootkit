@@ -5,7 +5,7 @@
 // ?lens=info: 이 폰에서 찾은 후면 카메라 수를 아래에 보여 준다(실기 확인용)
 import { query } from "../../lib/site";
 import type { LensOption } from "../../composables/useCamera";
-defineProps<{ options: LensOption[] }>();
+defineProps<{ options: LensOption[]; debug?: string[] }>();
 const emit = defineEmits<{ select: [id: string | null] }>();
 const INFO = query().get("lens") === "info";
 </script>
@@ -24,6 +24,6 @@ const INFO = query().get("lens") === "info";
         {{ o.label }}
       </button>
     </div>
-    <small v-if="INFO" class="shoot-lens__info">후면 카메라 {{ options.length }}개</small>
+    <small v-if="INFO" class="shoot-lens__info">후면 카메라 {{ options.length }}개<template v-for="l in debug ?? []" :key="l"><br />{{ l }}</template></small>
   </div>
 </template>

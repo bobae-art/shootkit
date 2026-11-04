@@ -561,7 +561,7 @@ const isWait = computed(() => PLUS && phase.value === "recording" && elapsed.val
         <LiveVideo v-if="camStream" :stream="camStream" />
         <NoCam v-else :denied="camError === 'denied'" />
         <!-- 2026-11-04 렌즈 바꾸기: 후면 카메라가 둘 이상일 때만, 찍는 중(카운트다운 · 녹화 · 합치기)에는 숨김 -->
-        <LensButton v-if="camStream && cam.lenses.value.length && (phase === 'idle' || phase === 'paused')" :options="cam.lensOptions.value" @select="cam.selectLens" />
+        <LensButton v-if="camStream && cam.lenses.value.length && (phase === 'idle' || phase === 'paused')" :options="cam.lensOptions.value" :debug="cam.lensDebug.value" @select="cam.selectLens" />
         <span class="shoot-pill">{{ pillText }}</span>
         <div class="shoot-vframe">
           <Corners />
