@@ -2882,6 +2882,10 @@
   stroke-linecap: round;
   filter: drop-shadow(0 0 2px rgba(0, 0, 0, 0.55));
 }
+/* 2026-11-04 새 윤곽선: 몸통 선은 열린 선이라 채우지 않는다(바퀴만 옅게 채움) */
+.shoot-guide__shape .is-line {
+  fill: none;
+}
 .shoot-guide__shape .is-ground {
   fill: none;
   stroke-dasharray: 6 6;
