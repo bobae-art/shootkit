@@ -5,6 +5,11 @@
 import type { Photo, Video } from "./core";
 
 export const MAX_DRAFTS = 5;
+/** 보관 기한(2026-11-04 실기 의견 「무한정 쌓아 둘 수 없으니 30일 정도」): 마지막으로 저장된 날로부터. 자동 보관은 작업할 때마다 갱신된다 */
+export const KEEP_DAYS = 30;
+const DAY = 24 * 60 * 60 * 1000;
+/** 지워지기까지 남은 날(올림, 0 이하 = 오늘 지워짐) */
+export const daysLeft = (savedAt: number, now = Date.now()) => Math.ceil((savedAt + KEEP_DAYS * DAY - now) / DAY);
 export const AUTO_ID = "auto";
 /** 2026-11-04 「잘못 눌러도 처음부터 다시 하지 않게」: 「저장 안 함」으로 닫은 작업을 한 건 보관하는 칸(다음에 닫는 작업으로 바뀜) */
 export const CLOSED_ID = "closed";
@@ -134,6 +139,13 @@ export async function listDrafts(): Promise<DraftMeta[]> {
 export async function getClosedMeta(): Promise<DraftMeta | null> {
   const r = await getDraft(CLOSED_ID);
   return r ? meta(r) : null;
+}
+/** 보관 기한(KEEP_DAYS)이 지난 것을 모두 지운다(저장한 글 · 최근에 닫은 작업 · 자동 보관). 지운 수를 돌려준다 */
+export async function purgeOld(now = Date.now()): Promise<number> {
+  const all = await run("readonly", (s) => s.getAll() as IDBRequest<DraftRec[]>);
+  const old = all.filter((r) => !r.savedAt || r.savedAt + KEEP_DAYS * DAY < now);
+  await Promise.all(old.map((r) => deleteDraft(r.id)));
+  return old.length;
 }
 /** 저장한 글에 한 건 추가하고 MAX_DRAFTS건을 넘으면 오래된 것부터 지운다 */
 export async function addDraft(id: string, d: Draft): Promise<DraftMeta[]> {
