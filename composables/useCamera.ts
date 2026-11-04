@@ -87,8 +87,9 @@ const mainOf = (backs: MediaDeviceInfo[]) => {
 /** 아이폰은 이름에 렌즈 종류가 있어 그대로 알려 준다. 안드로이드는 이름이 「camera2 2, facing back」뿐이라 번호로 */
 // 2026-11-04: 아이폰 Ultra Wide는 「초광각」(기본 렌즈가 광각)
 const lensName = (label: string, n: number) => (/ultra\s*wide/i.test(label) ? "초광각" : /tele/i.test(label) ? "망원" : `렌즈 ${n}`);
-/** 나열 순서: 초광각 → 기본 → (번호 렌즈) → 망원 */
-const rank = (label: string) => (label === "초광각" ? 0 : label === "기본" ? 1 : label === "망원" ? 3 : 2);
+/** 나열 순서: 초광각 → (번호 렌즈) → 기본 → 망원.
+ * 2026-11-04 실기(S23 울트라): 번호 렌즈(렌즈 2)는 초광각이었다. 안드로이드 크롬은 망원을 따로 공개하지 않아(줌으로 감) 번호 렌즈는 기본 왼쪽에 둔다 */
+const rank = (label: string) => (label === "초광각" ? 0 : label === "기본" ? 1 : label === "망원" ? 3 : 0.5);
 
 export function useCamera(
   active: () => boolean,
@@ -113,6 +114,8 @@ export function useCamera(
   // 2026-11-04 줌 버튼: 크롬(갤럭시 S23 울트라 실기)은 망원 렌즈를 따로 공개하지 않지만 메인 카메라 줌 1~8을 알려 준다
   const zoomSteps = ref<number[]>([]);
   const zoom = ref(1);
+  /** 다른 렌즈에서 줌 버튼을 누르면: 기본 렌즈로 바꾼 뒤 이 배율을 건다 */
+  let pendingZoom = 1;
   let devList: MediaDeviceInfo[] = [];
   let current: MediaStream | null = null;
   let stop: (() => void) | null = null;
@@ -205,14 +208,20 @@ export function useCamera(
         const track = s.getVideoTracks()[0];
         const caps = (track?.getCapabilities?.() ?? {}) as { torch?: boolean };
         torchSupported.value = Boolean(caps.torch);
-        // 줌: 새 카메라가 열릴 때마다 1배에서 시작
-        const zc = (track?.getCapabilities?.() ?? {}) as { zoom?: { min: number; max: number } };
+        // 줌: 기본 렌즈 기준(2026-11-04 실기 S23 울트라: 기본 1·2배 = 메인 확대, 3배부터 실제 3배 망원으로 바뀜. 초광각 확대는 의미 없음).
+        // 기본 렌즈가 열릴 때만 줌 범위를 읽고 1배에서 시작(다른 렌즈에서 누른 배율이 있으면 그것). 다른 렌즈에서는 줌을 걸지 않는다
         zoom.value = 1;
-        zoomSteps.value =
-          zc.zoom && zc.zoom.max > 1
-            ? [...(zc.zoom.min < 0.95 ? [Math.round(zc.zoom.min * 10) / 10] : []), 1, 2, 3, 5].filter((z) => z >= zc.zoom!.min - 1e-6 && z <= zc.zoom!.max + 1e-6)
-            : [];
-        if (zoomSteps.value.length < 2) zoomSteps.value = [];
+        if (!chosen) {
+          const zc = (track?.getCapabilities?.() ?? {}) as { zoom?: { min: number; max: number } };
+          zoomSteps.value =
+            zc.zoom && zc.zoom.max > 1
+              ? [...(zc.zoom.min < 0.95 ? [Math.round(zc.zoom.min * 10) / 10] : []), 1, 2, 3, 5].filter((z) => z >= zc.zoom!.min - 1e-6 && z <= zc.zoom!.max + 1e-6)
+              : [];
+          if (zoomSteps.value.length < 2) zoomSteps.value = [];
+          const want = pendingZoom;
+          pendingZoom = 1;
+          if (want !== 1 && zoomSteps.value.includes(want)) setZoom(want);
+        }
         void loadLenses(s).then(() => describe(s));
       })
       .catch((e: unknown) => {
@@ -240,7 +249,14 @@ export function useCamera(
     void track.applyConstraints({ advanced: [{ torch: on } as MediaTrackConstraintSet] }).catch(() => undefined);
   };
 
-  const setZoom = (z: number) => {
+  function setZoom(z: number) {
+    // 다른 렌즈(초광각 등)를 쓰는 중이면 기본 렌즈로 바꾼 뒤 건다
+    if (lensId.value) {
+      pendingZoom = z;
+      lensId.value = null;
+      save();
+      return;
+    }
     const track = current?.getVideoTracks()[0];
     if (!track || z === zoom.value) return;
     const prev = zoom.value;
