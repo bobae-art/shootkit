@@ -1,13 +1,13 @@
 // 보배드림 촬영 쇼츠 키트 — 넉스트(Nuxt 3) 판.
 // 리액트 시안(?register=shootkit)과 같은 화면 · 같은 동작을 Vue 컴포넌트로 옮겼다. 실제 등록 · 업로드 요청은 보내지 않는다.
 // 카메라 · 녹화 · 캔버스를 쓰는 화면이라 서버 렌더링 없이(ssr: false) 브라우저에서만 그린다.
-// 배포 주소: https://bobaekimboae.github.io/bobaedream/nuxt-shootkit/ (아이콘 · 예시 사진은 기존 시안 사이트 /bobaedream/ 의 파일을 그대로 쓴다)
+// 배포 주소: https://bobae-art.github.io/shootkit/ (main에 올리면 .github/workflows/deploy.yml 이 빌드해 gh-pages 로 배포. 아이콘 · 예시 사진은 이 저장소 public/)
 export default defineNuxtConfig({
   compatibilityDate: "2026-08-01",
   ssr: false,
   devtools: { enabled: false },
   app: {
-    baseURL: process.env.NUXT_APP_BASE_URL || "/bobaedream/nuxt-shootkit/",
+    baseURL: process.env.NUXT_APP_BASE_URL || "/shootkit/",
     head: {
       htmlAttrs: { lang: "ko" },
       // 2026-10-29 컨설팅: 탭 제목에 기술 이름(넉스트)을 쓰지 않는다
@@ -29,7 +29,7 @@ export default defineNuxtConfig({
       // 홈 화면에 앱으로 설치(아이콘은 /shoot/ 촬영 앱 아이콘을 같이 쓴다)
       link: [
         { rel: "manifest", href: "manifest.webmanifest" },
-        { rel: "apple-touch-icon", href: "../shoot/apple-touch-icon.png?v=1" },
+        { rel: "apple-touch-icon", href: "shoot/apple-touch-icon.png?v=1" },
       ],
     },
   },
