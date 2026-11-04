@@ -6218,16 +6218,27 @@ body:has(.shoot-layer) .shoot-install {
   align-items: flex-end;
   gap: 4px;
 }
+.shoot-lens__row {
+  display: flex;
+  gap: 4px;
+  padding: 3px;
+  border-radius: 24px;
+  background: rgba(0, 0, 0, 0.45);
+}
 .shoot-lens__btn {
   min-width: 44px;
-  height: 44px;
-  padding: 0 12px;
-  border-radius: 22px;
-  background: rgba(0, 0, 0, 0.55);
-  border: 1px solid rgba(255, 255, 255, 0.5);
-  color: #fff;
+  height: 40px;
+  padding: 0 11px;
+  border-radius: 20px;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.85);
   font-size: 13px;
   font-weight: 600;
+}
+/* 지금 렌즈: 흰 바탕 검은 글씨 */
+.shoot-lens__btn.is-on {
+  background: #fff;
+  color: #111;
 }
 .shoot-lens__info {
   max-width: 220px;
