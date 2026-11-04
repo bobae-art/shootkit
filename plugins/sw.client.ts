@@ -4,5 +4,5 @@ import { defineNuxtPlugin } from "#app";
 export default defineNuxtPlugin(() => {
   if (!("serviceWorker" in navigator)) return;
   const base = new URL(".", document.baseURI);
-  navigator.serviceWorker.register(new URL("../sw.js", base), { scope: base.pathname, updateViaCache: "none" }).catch(() => undefined);
+  navigator.serviceWorker.register(new URL("sw.js", base), { scope: base.pathname, updateViaCache: "none" }).catch(() => undefined);
 });
