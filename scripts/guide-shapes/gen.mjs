@@ -2,24 +2,9 @@
 // 차 한 대의 단순 3D 모형을 만들고, 촬영 각도마다 카메라를 돌려 「보이는 선」만 뽑아 SVG로 낸다.
 // → 모든 각도가 같은 차(같은 비율 · 같은 크기)로 보인다. 세단과 SUV의 중간 비율(크로스오버형), 특정 차종의 특징선은 넣지 않는다.
 // 좌표: x = 앞(0) → 뒤(L), y = 차의 오른쪽(+) / 왼쪽(−), z = 위. 단위 m.
-// 사용: node scripts/guide-shapes/gen.mjs > shapes.json → 결과를 components/shoot/GuideShape.vue 의 같은 kind 칸에 붙인다.
-// 비교 화면: node scripts/guide-shapes/preview.mjs shapes.json components/shoot/GuideShape.vue preview.html
-const L = 4.6;
-const HW = 0.92; // 차폭 절반
-
-// 단면(앞→뒤): zb 아래 · zl 허리선(어깨) · zt 위(보닛 · 지붕 · 트렁크) · wb 아래 폭 절반 · wt 위 폭 절반
-// 2026-11-04 2차: 세단과 SUV 사이(지붕 1.60 m · 바닥 높이 0.26 m · 짧은 트렁크 + 비스듬한 뒷유리)
-const ST = [
-  { x: 0.0, zb: 0.32, zl: 0.74, zt: 0.82, wb: 0.84, wt: 0.74 },
-  { x: 0.14, zb: 0.27, zl: 0.82, zt: 0.90, wb: 0.90, wt: 0.80 },
-  { x: 1.00, zb: 0.26, zl: 0.95, zt: 1.03, wb: HW, wt: 0.82 },
-  { x: 1.78, zb: 0.26, zl: 0.99, zt: 1.60, wb: HW, wt: 0.68 },
-  { x: 3.42, zb: 0.26, zl: 1.01, zt: 1.58, wb: HW, wt: 0.68 },
-  { x: 4.22, zb: 0.28, zl: 1.01, zt: 1.17, wb: 0.91, wt: 0.78 },
-  { x: 4.50, zb: 0.33, zl: 0.99, zt: 1.11, wb: 0.88, wt: 0.76 },
-  { x: L, zb: 0.44, zl: 0.95, zt: 1.05, wb: 0.84, wt: 0.72 },
-];
-const WHEEL = { r: 0.38, rim: 0.24, xs: [0.86, 3.62] };
+// 차 수치는 model.mjs(촬영 규칙 예시 사진 렌더 render-photos.html과 같이 씀).
+// 사용: node gen.mjs > shapes.json
+import { L, HW, ST, WHEEL, SIDE_WINDOWS, WINDSHIELD, BACKLIGHT } from "./model.mjs";
 
 const v = (x, y, z) => [x, y, z];
 const sub = (a, b) => [a[0] - b[0], a[1] - b[1], a[2] - b[2]];
@@ -34,34 +19,89 @@ const lerp = (a, b, t) => a + (b - a) * t;
 const ring = (s) => [v(s.x, -s.wb, s.zb), v(s.x, s.wb, s.zb), v(s.x, s.wb, s.zl), v(s.x, s.wt, s.zt), v(s.x, -s.wt, s.zt), v(s.x, -s.wb, s.zl)];
 const rings = ST.map(ring);
 const N = 6;
-// 면: 이웃 단면 사이 사각형 + 앞 · 뒤 마개. 바깥을 향하도록 법선을 맞춘다.
 const center = [L / 2, 0, 0.7];
-const faces = [];
-const mkFace = (pts, tag) => {
-  let n = norm(cross(sub(pts[1], pts[0]), sub(pts[2], pts[0])));
-  const c = mul(pts.reduce((a, p) => add(a, p), [0, 0, 0]), 1 / pts.length);
-  if (dot(n, sub(c, center)) < 0) {
-    pts = pts.slice().reverse();
-    n = mul(n, -1);
-  }
-  faces.push({ pts, n, c, tag });
+// 경첩(축 = y, 점 (hx, hz))을 중심으로 각도 a만큼 돌린다(+ = 앞쪽 끝이 들림)
+const hinge = (p, hx, hz, a) => {
+  const dx = p[0] - hx, dz = p[2] - hz, c = Math.cos(a), s = Math.sin(a);
+  return v(hx + dx * c - dz * s, p[1], hz + dx * s + dz * c);
 };
-for (let i = 0; i < rings.length - 1; i++)
-  for (let k = 0; k < N; k++) mkFace([rings[i][k], rings[i][(k + 1) % N], rings[i + 1][(k + 1) % N], rings[i + 1][k]], `s${i}k${k}`);
-mkFace(rings[0], "front");
-mkFace(rings[rings.length - 1], "rear");
-
-// 모서리(두 면이 맞닿는 선) 모으기
-const key = (p) => p.map((n) => n.toFixed(4)).join(",");
-const edges = new Map();
-faces.forEach((f, fi) => {
-  for (let i = 0; i < f.pts.length; i++) {
-    const a = f.pts[i], b = f.pts[(i + 1) % f.pts.length];
-    const k = [key(a), key(b)].sort().join("|");
-    if (!edges.has(k)) edges.set(k, { a, b, faces: [] });
-    edges.get(k).faces.push(fi);
+// 박스(실내 · 엔진룸 부품)
+const box = (x0, x1, y0, y1, z0, z1) => {
+  const P = (x, y, z) => v(x, y, z);
+  return [
+    [P(x0, y0, z1), P(x1, y0, z1), P(x1, y1, z1), P(x0, y1, z1)],
+    [P(x0, y0, z0), P(x0, y1, z0), P(x1, y1, z0), P(x1, y0, z0)],
+    [P(x0, y0, z0), P(x1, y0, z0), P(x1, y0, z1), P(x0, y0, z1)],
+    [P(x0, y1, z0), P(x0, y1, z1), P(x1, y1, z1), P(x1, y1, z0)],
+    [P(x0, y0, z0), P(x0, y0, z1), P(x0, y1, z1), P(x0, y1, z0)],
+    [P(x1, y0, z0), P(x1, y1, z0), P(x1, y1, z1), P(x1, y0, z1)],
+  ];
+};
+// 모형 만들기. mode: "normal" · "hood"(보닛 열림) · "trunk"(트렁크 열림)
+// 2026-11-04 3차: 엔진룸 · 트렁크 가이드도 같은 차에서 뽑는다(정면에서 보닛을 연 모습 · 후면에서 트렁크를 연 모습)
+const HOOD_HINGE = [1.0, 1.03], TRUNK_HINGE = [4.22, 1.17], TRUNK_SILL = 0.66;
+function buildModel(mode = "normal") {
+  const faces = [];
+  // 면은 바깥을 향하게. inward = 안쪽(실내 · 엔진룸 바닥처럼 차 중심 쪽을 향하는 면)이면 기준점을 뒤집는다
+  const mkFace = (pts, tag, ref = center, twoSided = false) => {
+    let n = norm(cross(sub(pts[1], pts[0]), sub(pts[2], pts[0])));
+    const c = mul(pts.reduce((a, p) => add(a, p), [0, 0, 0]), 1 / pts.length);
+    if (dot(n, sub(c, ref)) < 0) {
+      pts = pts.slice().reverse();
+      n = mul(n, -1);
+    }
+    faces.push({ pts, n, c, tag });
+    if (twoSided) faces.push({ pts: pts.slice().reverse(), n: mul(n, -1), c, tag: tag + "-back" });
+  };
+  const hood = [], lid = [];
+  for (let i = 0; i < rings.length - 1; i++)
+    for (let k = 0; k < N; k++) {
+      const q = [rings[i][k], rings[i][(k + 1) % N], rings[i + 1][(k + 1) % N], rings[i + 1][k]];
+      if (mode === "hood" && k === 3 && i <= 1) { hood.push(q); continue; }
+      if (mode === "trunk" && k === 3 && i >= 5) { lid.push(q); continue; }
+      mkFace(q, `s${i}k${k}`);
+    }
+  mkFace(rings[0], "front");
+  if (mode !== "trunk") mkFace(rings[rings.length - 1], "rear");
+  if (mode === "hood") {
+    // 보닛 판: 앞유리 밑 경첩으로 들어 올림(약 72°). 앞뒤 둘 다 보이는 얇은 판
+    for (const q of hood) mkFace(q.map((p) => hinge(p, HOOD_HINGE[0], HOOD_HINGE[1], (-84 * Math.PI) / 180)), "hood", v(0.5, 0, 0), true);
+    // 엔진룸: 바닥 · 엔진 덮개 · 배터리 · 냉각수 통 · 앞 라디에이터 받침
+        mkFace([v(0.12, -0.80, 0.52), v(0.98, -0.80, 0.52), v(0.98, 0.80, 0.52), v(0.12, 0.80, 0.52)], "bay", v(0.55, 0, -5));
+    for (const [tag, b] of [
+      ["engine", box(0.34, 0.86, -0.40, 0.40, 0.52, 0.84)],
+      ["battery", box(0.66, 0.92, 0.50, 0.76, 0.52, 0.76)],
+      ["tank", box(0.24, 0.42, -0.74, -0.52, 0.52, 0.80)],
+      ["rad", box(0.10, 0.20, -0.70, 0.70, 0.62, 0.80)],
+    ]) {
+      const bc = mul(b.flat().reduce((a, p) => add(a, p), [0, 0, 0]), 1 / 24);
+      for (const q of b) mkFace(q, tag, bc);
+    }
   }
-});
+  if (mode === "trunk") {
+    const s = ST[ST.length - 1];
+    // 뒤 범퍼(트렁크 문 아래)만 남기고, 트렁크 문(위 판 + 뒷면 윗부분)은 경첩으로 들어 올림
+    mkFace([v(L, -s.wb, s.zb), v(L, s.wb, s.zb), v(L, s.wb, TRUNK_SILL), v(L, -s.wb, TRUNK_SILL)], "rear-low");
+    const back = [v(L, -s.wb, TRUNK_SILL), v(L, s.wb, TRUNK_SILL), v(L, s.wb, s.zl), v(L, s.wt, s.zt), v(L, -s.wt, s.zt), v(L, -s.wb, s.zl)];
+    const up = (p) => hinge(p, TRUNK_HINGE[0], TRUNK_HINGE[1], (68 * Math.PI) / 180);
+    for (const q of [...lid, back]) mkFace(q.map(up), "lid", v(4.0, 0, 3.0), true);
+    // 트렁크 안: 바닥 · 뒷좌석 등받이 · 옆 벽
+        mkFace([v(3.72, -0.80, 0.58), v(4.56, -0.80, 0.58), v(4.56, 0.80, 0.58), v(3.72, 0.80, 0.58)], "floor", v(4.1, 0, -5));
+    mkFace([v(3.72, -0.80, 0.58), v(3.72, 0.80, 0.58), v(3.72, 0.78, 1.12), v(3.72, -0.78, 1.12)], "seatback", v(0, 0, 0.8));
+  }
+  // 모서리(두 면이 맞닿는 선) 모으기
+  const key = (p) => p.map((n) => n.toFixed(4)).join(",");
+  const edges = new Map();
+  faces.forEach((f, fi) => {
+    for (let i = 0; i < f.pts.length; i++) {
+      const a = f.pts[i], b = f.pts[(i + 1) % f.pts.length];
+      const k = [key(a), key(b)].sort().join("|");
+      if (!edges.has(k)) edges.set(k, { a, b, faces: [] });
+      edges.get(k).faces.push(fi);
+    }
+  });
+  return { faces, edges };
+}
 
 // 단면 보간: x 위치의 단면 값
 const at = (x) => {
@@ -86,8 +126,7 @@ function details(side) {
   const S = (pts) => pts.map(([x, z]) => onSide(x, z, side));
   const out = [];
   // 옆 유리(앞문 · 뒷문 · 쿼터 유리) — 허리선 바로 위
-  out.push(S([[1.10, 1.00], [1.80, 1.54], [2.58, 1.54], [2.58, 1.02], [1.10, 1.00]]));
-  out.push(S([[2.66, 1.02], [2.66, 1.54], [3.40, 1.53], [3.92, 1.24], [3.98, 1.04], [2.66, 1.02]]));
+  for (const w of SIDE_WINDOWS) out.push(S([...w, w[0]]));
   // 문 선 · 손잡이
   out.push(S([[1.14, 0.98], [1.20, 0.36]]));
   out.push(S([[2.62, 1.01], [2.62, 0.32]]));
@@ -122,10 +161,11 @@ const rearDetails = () => [
 ];
 
 // 카메라
-function camera(dir) {
-  const target = v(L / 2, 0, 0.62);
+function camera(dir, opt = {}) {
+  const target = opt.target ?? v(L / 2, 0, 0.62);
   const d = norm(v(dir[0], dir[1], 0));
-  const eye = add(target, v(d[0] * 9, d[1] * 9, 0.75)); // 9 m 떨어져 사람 눈높이(약 1.4 m)
+  const dist = opt.dist ?? 9, up = opt.up ?? 0.75;
+  const eye = add(target, v(d[0] * dist, d[1] * dist, up)); // 기본: 9 m 떨어져 사람 눈높이(약 1.4 m)
   const f = norm(sub(target, eye));
   const r = norm(cross(f, [0, 0, 1]));
   const u = cross(r, f);
@@ -140,8 +180,9 @@ function camera(dir) {
   };
 }
 
-function render(dir) {
-  const cam = camera(dir);
+function render(dir, mode = "normal", opt = {}) {
+  const { faces, edges } = buildModel(mode);
+  const cam = camera(dir, opt);
   const vis = faces.map((f) => dot(f.n, sub(cam.eye, f.c)) > 1e-6);
   const tris = [];
   faces.forEach((f, i) => {
@@ -149,7 +190,7 @@ function render(dir) {
     for (let k = 1; k < f.pts.length - 1; k++) tris.push({ face: i, p: [f.pts[0], f.pts[k], f.pts[k + 1]].map(cam.proj) });
   });
   // 바퀴(가까운 쪽)도 가리개로 쓴다
-  const sideVis = (side) => dot([0, side, 0], sub(cam.eye, v(L / 2, side * HW, 0.5))) > 0;
+  const sideVis = (side) => dot([0, side, 0], sub(cam.eye, v(L / 2, side * HW, 0.5))) > 0 && Math.abs(norm(sub(cam.eye, center))[1]) > 0.15;
   const wheelPolys = [];
   for (const side of [-1, 1]) if (sideVis(side)) for (const wx of WHEEL.xs) wheelPolys.push(circle(wx, WHEEL.r, WHEEL.r, side, 32).map(cam.proj));
   const inTri = (pt, t) => {
@@ -220,6 +261,16 @@ function render(dir) {
   const fi = faces.findIndex((f) => f.tag === "front"), ri = faces.findIndex((f) => f.tag === "rear");
   if (vis[fi]) for (const d of frontDetails()) pushVisible(d, [fi, ...faces.map((f, i) => (f.c[0] < 0.2 ? i : -1)).filter((i) => i >= 0)], false);
   if (vis[ri]) for (const d of rearDetails()) pushVisible(d, [ri, ...faces.map((f, i) => (f.c[0] > L - 0.2 ? i : -1)).filter((i) => i >= 0)], false);
+  // 앞유리 · 뒷유리 안쪽 선(기둥이 보이게). 2026-11-04 3차 「후면 뒷창을 좀 더 좁게」: 뒷유리는 양옆 · 위아래를 더 안으로
+  const onTop = (x, yf) => { const t = at(x); return v(x, yf * t.wt, t.zt + 0.004); };
+  const glass = (x0, x1, inset, own) => {
+    const fiG = faces.findIndex((f) => f.tag === own);
+    if (fiG < 0 || !vis[fiG]) return;
+    const edge = (x) => 1 - inset / at(x).wt;
+    pushVisible([onTop(x0, -edge(x0)), onTop(x0, edge(x0)), onTop(x1, edge(x1)), onTop(x1, -edge(x1)), onTop(x0, -edge(x0))], [fiG], false);
+  };
+  glass(WINDSHIELD.x0, WINDSHIELD.x1, WINDSHIELD.inset, "s2k3");
+  glass(BACKLIGHT.x0, BACKLIGHT.x1, BACKLIGHT.inset, "s4k3");
   // 거울(앞문 위 앞쪽 끝)
   for (const side of [-1, 1]) {
     const base = onSide(1.16, 1.02, side);
@@ -250,7 +301,19 @@ function render(dir) {
     const side = sideVis(1) ? 1 : -1;
     ground = [cam.proj(v(-0.6, side * HW, 0)), cam.proj(v(L + 0.6, side * HW, 0))];
   }
-  return { lines, wheels, tyreFR, ground };
+  // 화면 맞춤 범위(opt.fit = 3D 상자 [최소, 최대]). 없으면 그린 선 전체
+  const fit = opt.fit ? [0, 1].flatMap((i) => [0, 1].flatMap((j) => [0, 1].map((k) => cam.proj(v(opt.fit[i][0], opt.fit[j][1], opt.fit[k][2]))))) : null;
+  // 엔진룸 부품 위 작은 원(오일 캡 · 쇼크 업소버 윗부분 · 냉각수 캡)
+  if (mode === "hood") {
+    const ring3 = (cx, cy, cz, r) => Array.from({ length: 25 }, (_, i) => v(cx + r * Math.cos((i / 24) * 2 * Math.PI), cy + r * Math.sin((i / 24) * 2 * Math.PI), cz));
+    const tag = (t) => faces.map((ff, i) => (ff.tag === t ? i : -1)).filter((i) => i >= 0);
+    pushVisible(ring3(0.62, 0.15, 0.845, 0.05), tag("engine"), false);
+    pushVisible(ring3(0.33, -0.63, 0.805, 0.04), tag("tank"), false);
+    for (const y of [-0.66, 0.66]) pushVisible(ring3(0.9, y, 0.53, 0.07), tag("bay"), false);
+    pushVisible([v(0.40, -0.30, 0.845), v(0.80, -0.30, 0.845)], tag("engine"), false);
+    pushVisible([v(0.40, 0.30, 0.845), v(0.80, 0.30, 0.845)], tag("engine"), false);
+  }
+  return { lines, wheels, tyreFR, ground, fit };
 }
 
 const VIEWS = {
@@ -262,11 +325,14 @@ const VIEWS = {
 };
 const out = {};
 for (const [k, d] of Object.entries(VIEWS)) out[k] = render(d);
+// 엔진룸: 정면에서 보닛을 열고 조금 위에서 · 트렁크: 후면에서 트렁크를 열고 조금 위에서
+out.engine = render([-1, 0], "hood", { dist: 3.6, up: 1.25, target: v(0.6, 0, 0.7), fit: [v(0, -0.98, 0), v(1.0, 0.98, 1.12)] });
+out.trunk = render([1, 0], "trunk", { dist: 4.0, up: 1.2, target: v(4.1, 0, 0.8) });
 const svg = {};
 for (const [k, r] of Object.entries(out)) {
   // 차(선 · 바퀴)가 viewBox 안 290×136 칸을 채우게. 바닥 선은 차 폭만큼만 보이게 잘라 쓴다
   let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
-  for (const pl of [...r.lines, ...r.wheels]) for (const [x, y] of pl) {
+  for (const pl of r.fit ? [r.fit] : [...r.lines, ...r.wheels]) for (const [x, y] of pl) {
     minX = Math.min(minX, x); maxX = Math.max(maxX, x); minY = Math.min(minY, y); maxY = Math.max(maxY, y);
   }
   const sc = Math.min(290 / (maxX - minX), 136 / (maxY - minY));

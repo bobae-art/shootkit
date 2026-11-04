@@ -1,0 +1,228 @@
+<!doctype html>
+<meta charset="utf-8" />
+<title>촬영 규칙 예시 사진 렌더</title>
+<!--
+  촬영 규칙 화면의 외관 예시 사진 7장을 만든다(2026-11-04 필드테스트 3차).
+  - 가이드 윤곽선과 같은 차(model.mjs) · 회색 도장 · 실존 차종 디자인 아님 · 로고 없음 · 번호판은 빈 흰 판
+  - 각 이름은 public/assets/shoot-templates/rule-<이름>.webp 와 같다
+  쓰는 법: 로컬 서버로 이 파일을 열면 ?save=1 일 때 /save/<파일> 로 올려 저장한다(scripts/guide-shapes/README 참고)
+-->
+<style>
+  body { margin: 0; padding: 12px; background: #fff; font: 13px -apple-system, sans-serif; }
+  #g { display: grid; grid-template-columns: repeat(4, 240px); gap: 8px; }
+  figure { margin: 0; } img { width: 240px; height: 180px; display: block; border-radius: 6px; }
+  figcaption { color: #555; padding: 2px 0 6px; }
+</style>
+<div id="st">렌더 중…</div>
+<div id="g"></div>
+<script type="importmap">
+  { "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+  } }
+</script>
+<script type="module">
+import * as THREE from "three";
+import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
+import { L, HW, ST, WHEEL, SIDE_WINDOWS, WINDSHIELD, BACKLIGHT } from "./model.mjs";
+
+const W = 480, H = 360;
+// 모형 좌표(x 뒤 · y 오른쪽 · z 위) → three(X, Y 위, Z)
+const T = (x, y, z) => new THREE.Vector3(x - L / 2, z, -y);
+
+// ── 단면 값(단조 3차 보간: 보닛 → 앞유리 → 지붕이 부드럽게) ──
+const keys = ["zb", "zl", "zt", "wb", "wt"];
+const xs = ST.map((s) => s.x);
+const pchip = (ys) => {
+  const n = xs.length, h = [], d = [], m = new Array(n);
+  for (let i = 0; i < n - 1; i++) { h[i] = xs[i + 1] - xs[i]; d[i] = (ys[i + 1] - ys[i]) / h[i]; }
+  m[0] = d[0]; m[n - 1] = d[n - 2];
+  for (let i = 1; i < n - 1; i++) m[i] = d[i - 1] * d[i] <= 0 ? 0 : (3 * (h[i - 1] + h[i])) / ((2 * h[i] + h[i - 1]) / d[i - 1] + (h[i] + 2 * h[i - 1]) / d[i]);
+  return (x) => {
+    let i = 0; while (i < n - 2 && x > xs[i + 1]) i++;
+    const t = Math.min(1, Math.max(0, (x - xs[i]) / h[i])), t2 = t * t, t3 = t2 * t;
+    return (2 * t3 - 3 * t2 + 1) * ys[i] + (t3 - 2 * t2 + t) * h[i] * m[i] + (-2 * t3 + 3 * t2) * ys[i + 1] + (t3 - t2) * h[i] * m[i + 1];
+  };
+};
+const F = Object.fromEntries(keys.map((k) => [k, pchip(ST.map((s) => s[k]))]));
+const sec = (x) => Object.fromEntries(keys.map((k) => [k, F[k](Math.min(L, Math.max(0, x)))]));
+
+// ── 단면 둘레(오른쪽 절반: 바닥 가운데 → 지붕 가운데), 모서리는 둥글게. 점 개수는 늘 같다 ──
+const fillet = (P, Pp, Pn, r, k) => {
+  const u1 = Pp.clone().sub(P), u2 = Pn.clone().sub(P), l1 = u1.length(), l2 = u2.length();
+  u1.normalize(); u2.normalize();
+  const th = Math.acos(Math.max(-1, Math.min(1, u1.dot(u2))));
+  const d = Math.min(r / Math.tan(th / 2), 0.45 * Math.min(l1, l2));
+  const T1 = P.clone().add(u1.multiplyScalar(d)), T2 = P.clone().add(u2.multiplyScalar(d));
+  return Array.from({ length: k }, (_, i) => { const t = i / (k - 1); return new THREE.Vector2().addScaledVector(T1, (1 - t) ** 2).addScaledVector(P, 2 * t * (1 - t)).addScaledVector(T2, t * t); });
+};
+const seg = (a, b, n) => Array.from({ length: n }, (_, i) => a.clone().lerp(b, (i + 1) / (n + 1)));
+function half(s) {
+  const V = (y, z) => new THREE.Vector2(y, z);
+  const A = V(0, s.zb), B = V(s.wb, s.zb), C = V(s.wb + 0.01, s.zl), D = V(s.wt, s.zt), E = V(0, s.zt + 0.02);
+  const fb = fillet(B, A, C, 0.07, 6), fc = fillet(C, B, D, 0.05, 5), fd = fillet(D, C, E, 0.12, 7);
+  return [A, ...seg(A, fb[0], 7), ...fb, ...seg(fb[5], fc[0], 10), ...fc, ...seg(fc[4], fd[0], 10), ...fd, ...seg(fd[6], E, 9), E];
+}
+function ring(x, scale = 1, dx = 0) {
+  const s = sec(x), h = half(s), zc = (s.zb + s.zt) / 2;
+  const right = h.map((p) => [p.x * scale, zc + (p.y - zc) * scale]);
+  const left = h.slice(1, -1).reverse().map(([y, z]) => [-y, z]).map((p) => p);
+  const leftPts = h.slice(1, -1).reverse().map((p) => [-p.x * scale, zc + (p.y - zc) * scale]);
+  return [...right, ...leftPts].map(([y, z]) => [x + dx, y, z]);
+}
+
+// ── 몸통 ──
+const stations = [];
+for (let k = 8; k >= 1; k--) { const t = k / 8; stations.push(ring(0, Math.cos((t * Math.PI) / 2), -0.08 * Math.sin((t * Math.PI) / 2))); }
+for (let x = 0; x <= L + 1e-6; x += 0.012) stations.push(ring(Math.min(x, L)));
+for (let k = 1; k <= 8; k++) { const t = k / 8; stations.push(ring(L, Math.cos((t * Math.PI) / 2), 0.07 * Math.sin((t * Math.PI) / 2))); }
+const NR = stations[0].length;
+const pos = [], idx = [];
+for (const st of stations) for (const [x, y, z] of st) { const v = T(x, y, z); pos.push(v.x, v.y, v.z); }
+for (let i = 0; i < stations.length - 1; i++)
+  for (let j = 0; j < NR; j++) {
+    const a = i * NR + j, b = i * NR + ((j + 1) % NR), c = (i + 1) * NR + ((j + 1) % NR), d = (i + 1) * NR + j;
+    idx.push(a, d, b, b, d, c);
+  }
+const body = new THREE.BufferGeometry();
+body.setAttribute("position", new THREE.Float32BufferAttribute(pos, 3));
+body.setIndex(idx);
+body.computeVertexNormals();
+// 바깥 향하게(법선이 안쪽이면 삼각형 방향 뒤집기)
+{
+  const n = body.getAttribute("normal"), p = body.getAttribute("position");
+  let s = 0; for (let i = 0; i < p.count; i += 50) s += n.getX(i) * p.getX(i) + n.getY(i) * (p.getY(i) - 0.7) + n.getZ(i) * p.getZ(i);
+  if (s < 0) { for (let i = 0; i < idx.length; i += 3) [idx[i + 1], idx[i + 2]] = [idx[i + 2], idx[i + 1]]; body.setIndex(idx); body.computeVertexNormals(); }
+}
+
+// ── 색(정점별): 회색 도장 · 유리 · 램프 · 번호판 · 아래 몸통 ──
+const C = {
+  paint: new THREE.Color("#8d9298"), glass: new THREE.Color("#1c2126"), trim: new THREE.Color("#2a2d31"), well: new THREE.Color("#141516"),
+  head: new THREE.Color("#e4ebef"), tail: new THREE.Color("#a3222b"), plate: new THREE.Color("#f2f2f2"), seam: new THREE.Color("#5e6267"), handle: new THREE.Color("#6c7076"),
+};
+const inPoly = (x, z, poly) => { let c = false; for (let i = 0, j = poly.length - 1; i < poly.length; j = i++) { const [xi, zi] = poly[i], [xj, zj] = poly[j]; if (zi > z !== zj > z && x < ((xj - xi) * (z - zi)) / (zj - zi) + xi) c = !c; } return c; };
+{
+  const p = body.getAttribute("position"), n = body.getAttribute("normal"), col = [];
+  for (let i = 0; i < p.count; i++) {
+    const x = p.getX(i) + L / 2, z = p.getY(i), y = -p.getZ(i);
+    const nx = n.getX(i), nz = n.getY(i), ny = -n.getZ(i), ay = Math.abs(y), s = sec(x);
+    let c = C.paint;
+    const side = Math.abs(ny) > 0.45, up = nz > 0.35, fwd = nx < -0.45, back = nx > 0.45;
+    if (side && SIDE_WINDOWS.some((w) => inPoly(x, z, w))) c = C.glass;
+    else if (up && x > WINDSHIELD.x0 && x < WINDSHIELD.x1 && ay < s.wt - WINDSHIELD.inset) c = C.glass;
+    else if (up && x > BACKLIGHT.x0 && x < BACKLIGHT.x1 && ay < s.wt - BACKLIGHT.inset) c = C.glass;
+    else if (z < s.zb + 0.07) c = C.trim;
+    else if (side && WHEEL.xs.some((wx) => Math.hypot(x - wx, z - WHEEL.r) < 0.47)) c = C.well;
+    else if (x < 0.5 && z > 0.62 && z < 0.76 && ay > 0.42 && (fwd || (side && x < 0.42 && z > 0.66))) c = C.head;
+    else if (fwd && x < 0.1 && ay < 0.4 && z > 0.48 && z < 0.68) c = C.trim;
+    else if (fwd && x < 0.1 && ay < 0.25 && z > 0.37 && z < 0.47) c = C.plate;
+    else if (fwd && x < 0.1 && z < 0.45 && ay > 0.48 && ay < 0.74) c = C.trim;
+    else if (x > 4.18 && z > 0.82 && z < 0.95 && ay > 0.4 && (back || side)) c = C.tail;
+    else if (back && ay < 0.3 && z > 0.6 && z < 0.74) c = C.plate;
+    else if (back && z < 0.52) c = C.trim;
+    else if (side && z > 0.34 && z < s.zl - 0.02 && [1.17, 2.62, 3.40].some((sx) => Math.abs(x - sx) < 0.007)) c = C.seam;
+    else if (side && z > 0.865 && z < 0.905 && ((x > 2.2 && x < 2.38) || (x > 3.02 && x < 3.18))) c = C.handle;
+    col.push(c.r, c.g, c.b);
+  }
+  body.setAttribute("color", new THREE.Float32BufferAttribute(col, 3));
+}
+
+// ── 장면 ──
+const renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
+renderer.setSize(W, H); renderer.setPixelRatio(1);
+renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.05;
+renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+const scene = new THREE.Scene();
+const BG = new THREE.Color("#e7e9ec");
+scene.background = BG;
+scene.fog = new THREE.Fog(BG, 16, 34);
+const pmrem = new THREE.PMREMGenerator(renderer);
+scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+
+const paint = new THREE.MeshPhysicalMaterial({ vertexColors: true, metalness: 0.45, roughness: 0.3, clearcoat: 1, clearcoatRoughness: 0.08 });
+const car = new THREE.Group();
+const bodyMesh = new THREE.Mesh(body, paint); bodyMesh.castShadow = true; car.add(bodyMesh);
+
+// 바퀴: 타이어 + 5스포크 휠(일반형)
+const tyreMat = new THREE.MeshStandardMaterial({ color: "#161718", roughness: 0.85 });
+const rimMat = new THREE.MeshStandardMaterial({ color: "#a4a8ad", metalness: 0.85, roughness: 0.3 });
+const hubMat = new THREE.MeshStandardMaterial({ color: "#2b2d30", metalness: 0.5, roughness: 0.6 });
+const R = WHEEL.r, WW = 0.23;
+const tyreProfile = [[0.245, -WW / 2], [0.33, -WW / 2], [0.365, -WW / 2 + 0.012], [R, -0.06], [R, 0.06], [0.365, WW / 2 - 0.012], [0.33, WW / 2], [0.245, WW / 2]].map(([r, a]) => new THREE.Vector2(r, a));
+function wheel(side) {
+  const g = new THREE.Group();
+  const tyre = new THREE.Mesh(new THREE.LatheGeometry(tyreProfile, 64), tyreMat); tyre.castShadow = true; g.add(tyre);
+  const back = new THREE.Mesh(new THREE.CylinderGeometry(0.245, 0.245, 0.02, 48), hubMat); back.position.y = -0.03 * side; g.add(back);
+  const lip = new THREE.Mesh(new THREE.TorusGeometry(0.235, 0.012, 10, 64), rimMat); lip.rotation.x = Math.PI / 2; lip.position.y = 0.075 * side; g.add(lip);
+  const hub = new THREE.Mesh(new THREE.CylinderGeometry(0.055, 0.06, 0.03, 32), rimMat); hub.position.y = 0.07 * side; g.add(hub);
+  for (let k = 0; k < 5; k++) {
+    const sp = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.025, 0.2), rimMat);
+    const a = (k / 5) * Math.PI * 2;
+    sp.position.set(Math.sin(a) * 0.13, 0.065 * side, Math.cos(a) * 0.13); sp.rotation.y = a; g.add(sp);
+  }
+  // 바퀴 축(three Y)을 차 옆 방향(three Z)으로
+  g.rotation.x = Math.PI / 2;
+  return g;
+}
+for (const wx of WHEEL.xs) for (const side of [-1, 1]) {
+  const w = wheel(side === 1 ? -1 : 1); // three Z = −y
+  w.position.copy(T(wx, side * (HW + 0.012 - WW / 2), R));
+  car.add(w);
+}
+// 사이드미러
+for (const side of [-1, 1]) {
+  const m = new THREE.Mesh(new THREE.SphereGeometry(1, 24, 16), paint.clone());
+  m.material.vertexColors = false; m.material.color = C.paint.clone();
+  m.scale.set(0.09, 0.06, 0.1); m.position.copy(T(1.27, side * (HW + 0.08), 1.07)); m.castShadow = true; car.add(m);
+  const arm = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.03, 0.1), m.material); arm.position.copy(T(1.24, side * (HW + 0.01), 1.03)); car.add(arm);
+}
+scene.add(car);
+
+// 바닥 · 빛
+const ground = new THREE.Mesh(new THREE.PlaneGeometry(80, 80), new THREE.MeshStandardMaterial({ color: "#dfe1e4", roughness: 1 }));
+ground.rotation.x = -Math.PI / 2; ground.receiveShadow = true; scene.add(ground);
+{ // 바닥 접촉 그림자(차 밑이 뜨지 않게)
+  const cv = document.createElement("canvas"); cv.width = cv.height = 256; const x = cv.getContext("2d");
+  const gr = x.createRadialGradient(128, 128, 10, 128, 128, 128); gr.addColorStop(0, "rgba(0,0,0,0.55)"); gr.addColorStop(1, "rgba(0,0,0,0)");
+  x.fillStyle = gr; x.fillRect(0, 0, 256, 256);
+  const sh = new THREE.Mesh(new THREE.PlaneGeometry(L + 0.9, 2.5), new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(cv), transparent: true, depthWrite: false }));
+  sh.rotation.x = -Math.PI / 2; sh.position.y = 0.002; scene.add(sh);
+}
+scene.add(new THREE.HemisphereLight("#ffffff", "#9a9da2", 0.9));
+const sun = new THREE.DirectionalLight("#ffffff", 1.6);
+sun.position.set(-3, 9, 4); sun.castShadow = true; sun.shadow.mapSize.set(2048, 2048);
+Object.assign(sun.shadow.camera, { left: -6, right: 6, top: 6, bottom: -6, near: 1, far: 30 }); sun.shadow.radius = 6; sun.shadow.bias = -0.0005;
+scene.add(sun);
+
+// ── 카메라: 가이드와 같은 방향. 차가 사진 가운데 84%(표시할 때 92:82로 잘리는 폭) 안에 들어오게 ──
+const cam = new THREE.PerspectiveCamera(22, W / H, 0.1, 100);
+const box = [];
+for (const x of [-0.08, L + 0.07]) for (const y of [-HW - 0.02, HW + 0.02]) for (const z of [0, 1.62]) box.push(T(x, y, z));
+function aim(dir) {
+  const d = new THREE.Vector2(dir[0], dir[1]).normalize();
+  let dist = 12, ty = 0.7;
+  for (let it = 0; it < 30; it++) {
+    cam.position.copy(T(L / 2 + d.x * dist, d.y * dist, 1.45)); cam.lookAt(T(L / 2, 0, ty)); cam.updateMatrixWorld();
+    let mx = 0, y0 = 1, y1 = -1;
+    for (const p of box) { const q = p.clone().project(cam); mx = Math.max(mx, Math.abs(q.x)); y0 = Math.min(y0, q.y); y1 = Math.max(y1, q.y); }
+    const need = Math.max(mx / 0.8, (y1 - y0) / 2 / 0.7);
+    dist *= Math.pow(need, 0.7); ty += ((y0 + y1) / 2) * 0.5;
+  }
+}
+const VIEWS = { frontLeft: [-1, -1], front: [-1, 0], frontRight: [-1, 1], sideRight: [0, 1], rearRight: [1, 1], rear: [1, 0], side: [0, -1] };
+const LABEL = { frontLeft: "좌측 전면 45°", front: "정면", frontRight: "우측 전면 45°", sideRight: "우측면", rearRight: "우측 후면 45°", rear: "후면", side: "좌측면" };
+const save = new URLSearchParams(location.search).has("save");
+const out = document.getElementById("g");
+for (const [name, dir] of Object.entries(VIEWS)) {
+  aim(dir);
+  const side = new THREE.Vector3().subVectors(cam.position, T(L / 2, 0, 0.7)).setY(0).normalize();
+  sun.position.set(side.x * 5 - side.z * 2, 9, side.z * 5 + side.x * 2);
+  renderer.render(scene, cam);
+  const url = renderer.domElement.toDataURL("image/webp", 0.86);
+  (window.__fit ??= {})[name] = Math.round(cam.position.distanceTo(T(L / 2, 0, 0.7)) * 10) / 10;
+  out.insertAdjacentHTML("beforeend", `<figure><img src="${url}"><figcaption>${LABEL[name]} · rule-${name}</figcaption></figure>`);
+  if (save) await fetch(`/save/rule-${name}.webp`, { method: "POST", body: url });
+}
+document.getElementById("st").textContent = save ? "저장 완료" : "미리보기(저장하려면 ?save=1)";
+window.__done = true;
+</script>

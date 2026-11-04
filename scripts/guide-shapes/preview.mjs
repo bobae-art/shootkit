@@ -12,6 +12,8 @@ const rows = [
   ["우측 후면 45°", "q34", true, "rq34", false],
   ["후면", "rear", false, "rear", false],
   ["좌측면", "side", false, "side", false],
+  ["엔진룸", "engine", false, "engine", false],
+  ["트렁크", "trunk", false, "trunk", false],
 ];
 const svg = (inner, flip) => `<svg viewBox="0 0 320 180" ${flip ? 'style="transform:scaleX(-1)"' : ""}>${inner}</svg>`;
 const html = `<!doctype html><meta charset="utf-8"><title>가이드 윤곽선 비교</title>
