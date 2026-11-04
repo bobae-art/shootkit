@@ -80,6 +80,10 @@
 .shoot-flash.is-on {
   color: var(--shoot-accent);
 }
+/* 2026-11-04: 지금 카메라가 플래시를 지원하지 않음 */
+.shoot-flash.is-unsupported {
+  opacity: 0.35;
+}
 .shoot-view {
   position: relative;
   flex: 1;
