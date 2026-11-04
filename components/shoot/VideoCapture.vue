@@ -110,6 +110,11 @@ let tick = 0;
 let segStart = 0;
 let segBase = 0;
 let mergeTimer = 0;
+// 2026-11-04: 플래시를 지원하지 않는 카메라(렌즈)면 켜지 않고 알려 준다
+const onFlash = () => {
+  if (camStream.value && !torchSupported.value) return void notify("지금 카메라는 플래시를 켤 수 없어요" + (cam.lenses.value.length ? " · 1×(기본)에서 다시 눌러 주세요" : ""));
+  flash.value = !flash.value;
+};
 const fileRef = ref<HTMLInputElement | null>(null);
 const viewRef = ref<HTMLDivElement | null>(null);
 let liveThumbs: string[] = initial?.thumbs.slice() ?? [];
@@ -553,7 +558,7 @@ const isWait = computed(() => PLUS && phase.value === "recording" && elapsed.val
     <header class="shoot-top">
       <button type="button" class="shoot-icon-btn" aria-label="닫기" @click="onCloseClick"><Mask :src="rd('close-outline')" /></button>
       <h2>차량 영상</h2>
-      <FlashToggle v-if="mode === 'cam'" :on="flash" @toggle="flash = !flash" />
+      <FlashToggle v-if="mode === 'cam'" :on="flash" :supported="!camStream || torchSupported" @toggle="onFlash" />
       <span v-else class="shoot-icon-btn" />
     </header>
     <template v-if="mode === 'cam'">

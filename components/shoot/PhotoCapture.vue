@@ -69,6 +69,11 @@ watch(
   },
   { immediate: true },
 );
+// 2026-11-04: 플래시를 지원하지 않는 카메라(렌즈)면 켜지 않고 알려 준다
+const onFlash = () => {
+  if (stream.value && !torchSupported.value) return void notify("지금 카메라는 플래시를 켤 수 없어요" + (lenses.value.length ? " · 1×(기본)에서 다시 눌러 주세요" : ""));
+  flash.value = !flash.value;
+};
 const videoRef = ref<HTMLDivElement | null>(null);
 // 2026-10-25 컨설팅 6건: 번호판 가리기는 켜짐이 기본(58 원본 재현은 꺼짐)
 // 번호판 가리기(2026-10-29 후속 ④ 결정): 키트 기본 꺼짐, 대표 칸(첫 칸)은 늘 노출(plateLocked)
@@ -334,7 +339,7 @@ const slotShot = (i: number) => (shotPicked(slotShots.value[i]) ? slotShots.valu
         <!-- 촬영팀만: 지금 칸의 가로·세로 전환(딜러는 칸마다 정해진 방향) -->
         <button v-if="canFlipOrient && curOrient !== 'any'" type="button" class="shoot-guide-toggle shoot-orient-toggle" :aria-label="`사진 방향 바꾸기 · 지금 ${isLandscape ? '가로' : '세로'}`" @click="flipOrient">{{ isLandscape ? "가로" : "세로" }}</button>
         <button v-if="GUIDE_ON" type="button" :class="`shoot-guide-toggle ${guide ? 'is-on' : ''}`" :aria-pressed="guide" @click="guide = !guide">윤곽선</button>
-        <FlashToggle :on="flash" @toggle="flash = !flash" />
+        <FlashToggle :on="flash" :supported="!stream || torchSupported" @toggle="onFlash" />
       </span>
       <span v-else class="shoot-icon-btn" />
     </header>

@@ -12,7 +12,7 @@ import { END_CARD, canMakeHq, canMakeMp4, mp4VideoCodec, cutAt, damageLine, draw
 import { useLayerEsc } from "../../composables/useLayerEsc";
 import SnsPublish from "./SnsPublish.vue";
 import { SHOOT } from "../../lib/items";
-import { saveFilesToDevice, saveToDevice, mp4Name } from "../../lib/save-mp4";
+import { saveFilesToDevice, saveToDevice, savedWhere, mp4Name } from "../../lib/save-mp4";
 import { PHOTO_CUT_MAX, analyzeClip, buildSound, isPhotoClip, maxShortsLength, planCuts, planPhotoCuts, type ClipInfo, type Highlight, type PlannedCut } from "../../lib/shorts";
 import type { MadeShortform, ShortsInput } from "../../lib/shortform-types";
 import { rd, sitePath } from "../../lib/site";
@@ -381,7 +381,7 @@ const saveMade = async () => {
   const m = made.value;
   if (!m) return;
   const r = await saveToDevice(m.blob, mp4Name("shorts"));
-  if (r === "downloaded") say("쇼츠 mp4를 저장했어요");
+  if (r === "downloaded") say(`쇼츠 mp4를 저장했어요${savedWhere()}`);
   else if (r === "shared") say("공유창에서 「동영상 저장」을 누르면 사진첩에 들어가요");
 };
 

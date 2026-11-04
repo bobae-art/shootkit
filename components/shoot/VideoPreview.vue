@@ -28,7 +28,7 @@ import TourPlayer, { type TourChapter } from "./TourPlayer.vue";
 import { TOUR, isTourList } from "../../lib/items";
 import { useLayerEsc } from "../../composables/useLayerEsc";
 import { BASE_STAGES, PLUS, def, mmss, type Note, type Notes, type Take } from "../../lib/core";
-import { makeMp4, mp4Codec, mp4Name, saveToDevice } from "../../lib/save-mp4";
+import { isIOS, makeMp4, mp4Codec, mp4Name, savedWhere, saveToDevice } from "../../lib/save-mp4";
 import type { VideoStage } from "../../lib/stages";
 import { rd } from "../../lib/site";
 
@@ -154,13 +154,14 @@ const ready = ref<Ready | null>(null);
 const canShareFile = (blob: Blob, name: string) => {
   const touch = window.matchMedia?.("(pointer: coarse)").matches;
   const nav = navigator as Navigator & { canShare?: (d: ShareData) => boolean };
-  return Boolean(touch && nav.canShare?.({ files: [new File([blob], name, { type: "video/mp4" })] }));
+  // 공유창은 아이폰만(안드로이드는 바로 다운로드 · 2026-11-04)
+  return Boolean(touch && isIOS() && nav.canShare?.({ files: [new File([blob], name, { type: "video/mp4" })] }));
 };
 const deliver = async (x: Ready) => {
   ready.value = null;
   const r = await saveToDevice(x.blob, x.name);
   if (x.odd && r !== "cancelled") say("저장했어요 · 이 폰은 VP9 방식이라 아이폰·인스타그램에서 안 열릴 수 있어요");
-  else if (r === "downloaded") say(`${x.label} mp4를 저장했어요`);
+  else if (r === "downloaded") say(`${x.label} mp4를 저장했어요${savedWhere()}`);
   else if (r === "shared") say("공유창에서 「동영상 저장」을 누르면 사진첩에 들어가요");
 };
 const partLabel = (i: number) => {
