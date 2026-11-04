@@ -1,6 +1,6 @@
 // 후면 카메라 스트림(리액트 useCamera와 같은 동작). active가 false가 되면 바로 끈다.
 // 2026-11-04 렌즈 바꾸기: 기본은 지금까지와 똑같이 폰이 고른 후면 카메라(facingMode: environment).
-// 사용자가 「렌즈」 버튼을 누를 때만 다른 후면 카메라(광각 · 망원 등)를 deviceId로 연다.
+// 사용자가 렌즈 버튼을 누를 때만 다른 후면 카메라(초광각 · 망원 등)를 deviceId로 연다. 다음에 열 때는 다시 기본.
 // 열지 못하면(폰 교체 · 권한 초기화로 id가 바뀜 등) 조용히 기본 카메라로 돌아간다. 렌즈가 하나뿐인 폰은 버튼이 나오지 않는다.
 // 2026-11-04 실기(갤럭시 S23 울트라 · 크롬): facingMode만 주면 크롬이 메인 대신 화질 낮은 초광각을 열었다.
 // 메인 카메라를 알 수 있으면(안드로이드 카메라 번호가 가장 작은 것 · 아이폰 「Back Camera」 · 그 밖엔 최대 해상도가 가장 큰 것) 그 카메라를 「기본」으로 고정해 연다.
@@ -103,12 +103,13 @@ export function useCamera(
   const torchSupported = ref(false);
   const nonce = ref(0);
   const saved = readSaved(lensKey);
-  /** null = 기본(폰이 고른 후면 카메라) */
-  const lensId = ref<string | null>(saved.lens);
+  /** null = 기본(메인 카메라). 2026-11-04 실기 의견: 촬영 화면을 열 때마다 늘 기본 렌즈 1×로 시작한다
+   * (예전엔 고른 렌즈를 기억했더니 초광각으로 열려 헷갈렸다). 기억하는 것은 「어느 카메라가 메인인지」뿐 */
+  const lensId = ref<string | null>(null);
   let baseId: string | null = saved.base;
   /** true = 기본을 이름으로 찾은 메인 카메라로 고정해서 연다 */
   let basePinned = Boolean(saved.pin && saved.base);
-  const save = () => writeSaved(lensKey, { lens: lensId.value, base: baseId, pin: basePinned });
+  const save = () => writeSaved(lensKey, { lens: null, base: baseId, pin: basePinned });
   const lenses = ref<Lens[]>([]);
   const lensDebug = ref<string[]>([]);
   // 2026-11-04 줌 버튼: 크롬(갤럭시 S23 울트라 실기)은 망원 렌즈를 따로 공개하지 않지만 메인 카메라 줌 1~8을 알려 준다
