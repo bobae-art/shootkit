@@ -19,6 +19,7 @@ import Corners from "./Corners.vue";
 import ModeTabs from "./ModeTabs.vue";
 import LiveVideo from "./LiveVideo.vue";
 import FlashToggle from "./FlashToggle.vue";
+import LensButton from "./LensButton.vue";
 import NoCam from "./NoCam.vue";
 import CamPermission from "./CamPermission.vue";
 import StageTemplate from "./StageTemplate.vue";
@@ -41,6 +42,8 @@ const mode = ref<"cam" | "album">("cam");
 const cam = useCamera(
   () => mode.value === "cam",
   () => true,
+  undefined,
+  "bbm-shoot-lens-video",
 );
 const camStream = cam.stream;
 const camError = cam.error;
@@ -557,6 +560,8 @@ const isWait = computed(() => PLUS && phase.value === "recording" && elapsed.val
       <div ref="viewRef" class="shoot-view" @pointerdown="markDamage">
         <LiveVideo v-if="camStream" :stream="camStream" />
         <NoCam v-else :denied="camError === 'denied'" />
+        <!-- 2026-11-04 렌즈 바꾸기: 후면 카메라가 둘 이상일 때만, 찍는 중(카운트다운 · 녹화 · 합치기)에는 숨김 -->
+        <LensButton v-if="camStream && cam.lenses.value.length && (phase === 'idle' || phase === 'paused')" :label="cam.lensLabel.value" :count="cam.lensCount.value" :names="cam.lenses.value.map((l) => l.label)" @next="cam.nextLens" />
         <span class="shoot-pill">{{ pillText }}</span>
         <div class="shoot-vframe">
           <Corners />
