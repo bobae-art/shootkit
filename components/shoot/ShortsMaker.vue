@@ -26,12 +26,31 @@ const EMPTY_INFO: Info = { title: "", price: "", name: "", company: "", phone: "
 type Loaded = { clip: ClipInfo; video: HTMLVideoElement; blob: Blob };
 type LoadedPhoto = { image: HTMLImageElement; label: string; slot: string };
 
-function loadInfo(): Info {
+// 2026-11-04 필드테스트 「지난번 값을 기억해 다른 차에 엉뚱한 정보가 들어갈 우려」:
+// 딜러 정보(이름 · 상사 · 연락처)만 이 폰에 계속 기억하고, 차 정보(차량 이름 · 가격)는 같은 촬영본에서만 이어 쓴다.
+// 다른 차(새 촬영본)로 쇼츠를 만들면 차량 이름 · 가격은 빈 칸에서 시작한다.
+const CAR_KEY = "bbm-shoot-shorts-car";
+const DEALER_KEYS = ["name", "company", "phone"] as const;
+type CarMemo = { take: string; title: string; price: string };
+
+function loadInfo(take: string): Info {
+  const out: Info = { ...EMPTY_INFO };
   try {
-    return { ...EMPTY_INFO, ...JSON.parse(window.localStorage.getItem(INFO_KEY) ?? "{}") };
+    const d = JSON.parse(window.localStorage.getItem(INFO_KEY) ?? "{}") as Partial<Info>;
+    for (const k of DEALER_KEYS) if (typeof d[k] === "string") out[k] = d[k];
   } catch {
-    return { ...EMPTY_INFO };
+    /* 기억한 값 없이 시작 */
   }
+  try {
+    const c = JSON.parse(window.sessionStorage.getItem(CAR_KEY) ?? "null") as CarMemo | null;
+    if (c && c.take === take) {
+      out.title = c.title ?? "";
+      out.price = c.price ?? "";
+    }
+  } catch {
+    /* 기억한 값 없이 시작 */
+  }
+  return out;
 }
 const mmss = (s: number) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, "0")}`;
 
@@ -57,7 +76,14 @@ const hlList = shallowRef<Highlight[]>(props.input.hl.slice());
 const noteLine = (c: PlannedCut) => (props.input.notes?.[c.clip.key]?.trim() ? props.input.notes[c.clip.key]!.trim().slice(0, 20) : cleanLabel(c.line));
 const codec = ref<string | null>(null);
 const template = ref<ShortformTemplate>("reels");
-const info = ref<Info>(loadInfo());
+/** 이 촬영본을 가리키는 짧은 값(영상 조각 · 사진 주소를 줄인 것). 다른 차를 찍으면 달라진다. 사진 주소가 길 수 있어 그대로 담지 않는다 */
+const takeKey = (() => {
+  const all = [...props.input.segs.filter(Boolean), ...(props.input.photos ?? []).map((p) => p.src)].join("|");
+  let h = 5381;
+  for (let i = 0; i < all.length; i++) h = ((h << 5) + h + all.charCodeAt(i)) | 0;
+  return `${all.length}-${(h >>> 0).toString(36)}`;
+})();
+const info = ref<Info>(loadInfo(takeKey));
 const hook = ref("");
 const lines = ref<Record<string, string>>({});
 const keepSound = ref(true);
@@ -92,7 +118,8 @@ watch(
   info,
   (v) => {
     try {
-      window.localStorage.setItem(INFO_KEY, JSON.stringify(v));
+      window.localStorage.setItem(INFO_KEY, JSON.stringify({ name: v.name, company: v.company, phone: v.phone }));
+      window.sessionStorage.setItem(CAR_KEY, JSON.stringify({ take: takeKey, title: v.title, price: v.price } satisfies CarMemo));
     } catch {
       /* 이번 화면에서만 */
     }
