@@ -6,6 +6,8 @@ import type { Photo, Video } from "./core";
 
 export const MAX_DRAFTS = 5;
 export const AUTO_ID = "auto";
+/** 2026-11-04 「잘못 눌러도 처음부터 다시 하지 않게」: 「저장 안 함」으로 닫은 작업을 한 건 보관하는 칸(다음에 닫는 작업으로 바뀜) */
+export const CLOSED_ID = "closed";
 const DB_NAME = "bbm-shootkit";
 const STORE = "drafts";
 
@@ -126,7 +128,12 @@ export async function deleteDraft(id: string) {
 /** 저장한 글(자동 보관 제외), 최근 것부터 */
 export async function listDrafts(): Promise<DraftMeta[]> {
   const all = await run("readonly", (s) => s.getAll() as IDBRequest<DraftRec[]>);
-  return all.filter((r) => r.id !== AUTO_ID).sort((a, b) => b.savedAt - a.savedAt).map(meta);
+  return all.filter((r) => r.id !== AUTO_ID && r.id !== CLOSED_ID).sort((a, b) => b.savedAt - a.savedAt).map(meta);
+}
+/** 최근에 닫은 작업(없으면 null) */
+export async function getClosedMeta(): Promise<DraftMeta | null> {
+  const r = await getDraft(CLOSED_ID);
+  return r ? meta(r) : null;
 }
 /** 저장한 글에 한 건 추가하고 MAX_DRAFTS건을 넘으면 오래된 것부터 지운다 */
 export async function addDraft(id: string, d: Draft): Promise<DraftMeta[]> {
