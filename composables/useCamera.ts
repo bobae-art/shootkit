@@ -3,7 +3,7 @@
 // 사용자가 「렌즈」 버튼을 누를 때만 다른 후면 카메라(광각 · 망원 등)를 deviceId로 연다.
 // 열지 못하면(폰 교체 · 권한 초기화로 id가 바뀜 등) 조용히 기본 카메라로 돌아간다. 렌즈가 하나뿐인 폰은 버튼이 나오지 않는다.
 // 2026-11-04 실기(갤럭시 S23 울트라 · 크롬): facingMode만 주면 크롬이 메인 대신 화질 낮은 초광각을 열었다.
-// 카메라 이름으로 메인 카메라를 알 수 있으면(안드로이드 「camera2 0」 = 가장 작은 번호 · 아이폰 「Back Camera」) 그 카메라를 「기본」으로 고정해 연다.
+// 메인 카메라를 알 수 있으면(안드로이드 카메라 번호가 가장 작은 것 · 아이폰 「Back Camera」 · 그 밖엔 최대 해상도가 가장 큰 것) 그 카메라를 「기본」으로 고정해 연다.
 // 이름으로 알 수 없는 폰은 예전처럼 폰이 고른 카메라가 기본이다.
 import { computed, onBeforeUnmount, ref, shallowRef, watch, type ComputedRef, type Ref } from "vue";
 import { FAKE_ONLY } from "../lib/core";
@@ -58,11 +58,26 @@ const writeSaved = (key: string | undefined, v: Saved) => {
 /** 카메라 이름으로 앞 카메라 · 아이폰의 「여러 렌즈 묶음」(자동 전환용 가상 카메라)을 거른다 */
 const isFront = (label: string) => /front|user|전면|셀카/i.test(label);
 const isVirtualIos = (label: string) => /dual|triple/i.test(label);
-/** 이름으로 메인 후면 카메라 찾기: 안드로이드는 camera2 번호가 가장 작은 것, 아이폰은 「Back Camera」 */
+/** 메인 후면 카메라 찾기
+ * 1) 안드로이드: 이름의 카메라 번호가 가장 작은 것(「camera2 0, facing back」 · 「camera 0, facing back」 두 형식 모두. 0번 = 메인이 관례)
+ *    2026-11-04 실기(갤럭시 S23 울트라 · 크롬): 이름이 「camera 0」 · 「camera 2」(띄어 씀)였다. 0번 = 메인(최대 4080×3060), 2번 = 초광각(4000×3000)
+ * 2) 아이폰: 「Back Camera」
+ * 3) 이름으로 모르면: 크롬이 알려 주는 최대 해상도가 가장 큰 것(메인 센서가 보통 가장 큼). 그것도 모르면 null(폰이 고른 카메라) */
+const camNo = (label: string) => Number(/camera2?\s+(\d+)/i.exec(label)?.[1] ?? NaN);
+const maxPixels = (d: MediaDeviceInfo) => {
+  const c = (d as MediaDeviceInfo & { getCapabilities?: () => { width?: { max?: number }; height?: { max?: number } } }).getCapabilities?.();
+  return (c?.width?.max ?? 0) * (c?.height?.max ?? 0);
+};
 const mainOf = (backs: MediaDeviceInfo[]) => {
-  const nums = backs.map((d) => Number(/camera2\s+(\d+)/i.exec(d.label)?.[1] ?? NaN));
-  if (backs.length && nums.every((n) => !Number.isNaN(n))) return backs[nums.indexOf(Math.min(...nums))];
-  return backs.find((d) => /^back camera$/i.test(d.label.trim())) ?? null;
+  if (!backs.length) return null;
+  const nums = backs.map((d) => camNo(d.label));
+  if (nums.every((n) => !Number.isNaN(n))) return backs[nums.indexOf(Math.min(...nums))];
+  const ios = backs.find((d) => /^back camera$/i.test(d.label.trim()));
+  if (ios) return ios;
+  if (backs.length < 2) return null;
+  const px = backs.map(maxPixels);
+  const best = Math.max(...px);
+  return best > 0 && px.filter((p) => p === best).length === 1 ? backs[px.indexOf(best)] : null;
 };
 /** 아이폰은 이름에 렌즈 종류가 있어 그대로 알려 준다. 안드로이드는 이름이 「camera2 2, facing back」뿐이라 번호로 */
 // 2026-11-04: 아이폰 Ultra Wide는 「초광각」(기본 렌즈가 광각)
