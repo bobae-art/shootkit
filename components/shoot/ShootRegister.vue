@@ -26,7 +26,7 @@ import { bakeSticker, normalizeFile } from "../../lib/image-ops";
 import { QC_TAG, QC_TEXT, checkPhoto, firstIssue } from "../../lib/quality";
 import { primeSound } from "../../lib/sound";
 import { dialogStack } from "../../lib/dialog-stack";
-import { AUTO_ID, addDraft, deleteDraft, draftWhen, fromRecord, getDraft, isEmptyDraft, isQuota, listDrafts, putDraft, toRecord, EMPTY_DOCS, type DocFile, type Docs, type Draft, type DraftMeta, type DraftRec } from "../../lib/drafts";
+import { AUTO_ID, CLOSED_ID, getClosedMeta, addDraft, deleteDraft, draftWhen, fromRecord, getDraft, isEmptyDraft, isQuota, listDrafts, putDraft, toRecord, EMPTY_DOCS, type DocFile, type Docs, type Draft, type DraftMeta, type DraftRec } from "../../lib/drafts";
 import { icon, query, rd } from "../../lib/site";
 import type { VideoStage } from "../../lib/stages";
 import { BASE_STAGES, ENFORCE, ENF_TEXT, MAX_PHOTOS, OTHER, PLATE_KINDS, PLUS, def, mmss, noteCount, PREFS, platePlace, plateLocked, releaseVideo, reqLabel, roleNow, setPrefs, sortBySlot, stageGroup, uid, type Notes, type Photo, type Take, type Video } from "../../lib/core";
@@ -223,16 +223,20 @@ onMounted(() => {
     window.history.pushState({ ...(window.history.state ?? {}), bbmShoot: 1 }, "", window.location.href);
     guarded = true;
     (window as PopWin).__bbmShootPop = onPop;
-    // 임시저장: 저장한 글 수를 세고, 지난번에 찍던 내용(자동 보관)이 있으면 이어서 할지 묻는다
+    // 임시저장: 저장한 글 수를 세고, 지난번에 찍던 내용(자동 보관)이 있으면 묻지 않고 바로 이어서 한다
+    // (2026-11-04 실기 의견: 딜러는 전화가 언제 올지 모르는데 「이어서 할까요?」에서 「새로 시작」을 잘못 누르면 처음부터 다시 해야 했다)
     void refreshDrafts();
     autoOff = true;
     void getDraft(AUTO_ID)
       .then((rec) => {
         // 2026-10-31 50배 크로스체크: 소재지 · 서류만 있어도 되살린다(전에는 무시하고 덮어써 사라졌다)
-        if (rec && (rec.photos.length || rec.video || rec.region || rec.docs?.inspection)) resume.value = rec;
-        else autoOff = false;
+        if (rec && (rec.photos.length || rec.video || rec.region || rec.docs?.inspection)) {
+          applyDraft(fromRecord(rec));
+          later(() => notify("중단됐던 작업을 불러왔어요"), 0);
+        }
       })
-      .catch(() => (autoOff = false));
+      .catch(() => undefined)
+      .finally(() => (autoOff = false));
     document.addEventListener("visibilitychange", onHide);
     window.addEventListener("pagehide", onHide);
   }
@@ -471,19 +475,39 @@ const progressRows = computed(() => {
 });
 // ── 임시저장(2026-10-29 「수정하고 병합해라」): 이 폰 브라우저(IndexedDB)에 실제로 보관하고 「저장한 글」에서 다시 연다 ──
 const draftList = shallowRef<DraftMeta[]>([]);
+/** 「저장 안 함」으로 닫은 작업(저장한 글 맨 위에 한 건) */
+const closedMeta = shallowRef<DraftMeta | null>(null);
 const draftsOpen = ref(false);
 const draftBusy = ref(false);
-/** 지난번 자동 보관 — 「이어서 할까요?」 */
-const resume = shallowRef<DraftRec | null>(null);
 let autoOff = false;
 let autoTimer = 0;
 const current = (): Draft => ({ region: region.value, photos: photos.value, video: video.value, docs: docs.value });
+/** 사진 촬영 화면에서 「완료」 전에 찍은 사진(자동 보관에만 넣는다) */
+const pendingShots = shallowRef<Photo[]>([]);
+/** 자동 보관할 내용 = 지금 작업 + 촬영 중인 사진 */
+const autoDraft = (): Draft => (pendingShots.value.length ? { ...current(), photos: sortBySlot([...photos.value, ...pendingShots.value]) } : current());
 // 2026-11-04 실기 의견 「임시저장하고 나가면 또 저장하고 나가기가 떠서, 안 했나 싶어 한 번 더 저장 → 중복으로 쌓일 위험」:
 // 마지막으로 임시저장한 작업의 지문(savedSig)과 그 글 id(savedId)를 기억한다.
 // - 바뀐 게 없으면 나갈 때 묻지 않고, 임시저장을 다시 눌러도 새로 저장하지 않는다
 // - 고친 뒤 다시 저장하면 새 글을 추가하지 않고 그 글을 덮어쓴다
+// 페이지가 새로 열려도(전화 등으로 중단) 같은 탭이면 이어지게 sessionStorage에도 둔다
+const SAVED_KEY = "bbm-shoot-saved-draft";
 let savedId: string | null = null;
 let savedSig: string | null = null;
+try {
+  const v = JSON.parse(window.sessionStorage.getItem(SAVED_KEY) ?? "null") as { id: string; sig: string } | null;
+  if (v) ({ id: savedId, sig: savedSig } = v);
+} catch {
+  /* 없음 */
+}
+const keepSaved = () => {
+  try {
+    if (savedId && savedSig) window.sessionStorage.setItem(SAVED_KEY, JSON.stringify({ id: savedId, sig: savedSig }));
+    else window.sessionStorage.removeItem(SAVED_KEY);
+  } catch {
+    /* 이번 화면에서만 */
+  }
+};
 /** 작업 지문: 긴 글자(사진 주소 등)는 길이 · 앞뒤 조각만 써서 가볍게 */
 const sigOf = (d: Draft) =>
   JSON.stringify(d, (_k, v: unknown) => (typeof v === "string" && v.length > 200 ? `${v.length}:${v.slice(0, 48)}…${v.slice(-48)}` : v));
@@ -492,11 +516,13 @@ const isSaved = () => savedSig !== null && Boolean(savedId) && draftList.value.s
 const forgetSaved = () => {
   savedId = null;
   savedSig = null;
+  keepSaved();
 };
 async function refreshDrafts() {
   try {
     draftList.value = await listDrafts();
     drafts.value = draftList.value.length;
+    closedMeta.value = await getClosedMeta().catch(() => null);
   } catch {
     draftList.value = [];
   }
@@ -507,7 +533,7 @@ let autoGen = 0;
 async function writeAuto() {
   if (!PLUS || autoOff) return;
   const gen = ++autoGen;
-  const d = current();
+  const d = autoDraft();
   try {
     if (isEmptyDraft(d)) await deleteDraft(AUTO_ID);
     else {
@@ -523,7 +549,7 @@ const scheduleAuto = () => {
   window.clearTimeout(autoTimer);
   if (PLUS && !autoOff) autoTimer = window.setTimeout(() => void writeAuto(), 1200);
 };
-watch([photos, video, region, docs], scheduleAuto);
+watch([photos, video, region, docs, pendingShots], scheduleAuto);
 // 다른 앱으로 가거나 화면이 꺼질 때는 기다리지 않고 바로 보관한다(아이폰은 나가기 경고가 없다)
 function onHide() {
   if (document.visibilityState === "hidden" || !document.visibilityState) {
@@ -539,20 +565,6 @@ const applyDraft = (d: Draft) => {
   docs.value = d.docs ?? EMPTY_DOCS;
   tried.value = false;
   setScreen({ name: "main" });
-};
-const resumeSummary = (r: DraftRec) =>
-  [r.photos.length ? `사진 ${r.photos.length}장` : "", r.video ? "영상" : "", r.region ? `소재지 ${r.region.sido}${r.region.gu ? ` ${r.region.gu}` : ""}` : "", r.docs?.inspection ? "점검기록부" : ""].filter(Boolean).join(" · ");
-const resumeOk = () => {
-  const rec = resume.value;
-  resume.value = null;
-  if (rec) applyDraft(fromRecord(rec));
-  autoOff = false;
-  notify("지난번 작업을 이어서 해요");
-};
-const resumeNo = () => {
-  resume.value = null;
-  void deleteDraft(AUTO_ID).catch(() => undefined);
-  autoOff = false;
 };
 const saveDraft = async (): Promise<boolean> => {
   if (!PLUS) {
@@ -582,6 +594,7 @@ const saveDraft = async (): Promise<boolean> => {
     const gone = await addDraft(id, d);
     savedId = id;
     savedSig = sig;
+    keepSaved();
     await refreshDrafts();
     // 5건이 넘으면 가장 오래된 글이 지워진다 → 조용히 지우지 않고 알린다(2026-10-31 컨설팅 전체 대조)
     notify(
@@ -813,7 +826,16 @@ const discardOk = () => {
 };
 const leaveNoSave = async () => {
   askLeave.value = false;
-  if (PLUS) await dropAuto();
+  // 2026-11-04: 잘못 눌러도 사라지지 않게 지우지 않고 「저장한 글 › 최근에 닫은 작업」에 한 건 보관한다(다음에 닫는 작업으로 바뀜)
+  if (PLUS) {
+    try {
+      const d = current();
+      if (!isEmptyDraft(d)) await putDraft(await toRecord(CLOSED_ID, d));
+    } catch (e) {
+      console.warn("[최근에 닫은 작업]", e);
+    }
+    await dropAuto();
+  }
   leave();
 };
 const leaveSave = async () => {
@@ -1008,7 +1030,15 @@ const leaveSave = async () => {
           }
         "
       />
-      <PhotoCapture v-if="screen.name === 'capture'" :existing="photos" :start-mode="screen.mode" @notify="notify" @close="setScreen({ name: 'main' })" @done="addPhotos" />
+      <PhotoCapture
+        v-if="screen.name === 'capture'"
+        :existing="photos"
+        :start-mode="screen.mode"
+        @notify="notify"
+        @pending="(p) => (pendingShots = p)"
+        @close="(pendingShots = []), setScreen({ name: 'main' })"
+        @done="(p) => ((pendingShots = []), addPhotos(p))"
+      />
       <PhotoSort
         v-if="screen.name === 'sort'"
         :photos="photos"
@@ -1095,17 +1125,7 @@ const leaveSave = async () => {
       <RulesPage v-if="screen.name === 'rules'" @back="setScreen({ name: 'main' })" @add="setScreen({ name: 'capture', mode: 'cam' })" />
 
       <ProgressSheet v-if="progressOpen" :rows="progressRows" :total="progress" @close="progressOpen = false" />
-      <DraftSheet v-if="draftsOpen" :items="draftList" :busy="draftBusy" @close="draftsOpen = false" @open="openDraft" @remove="removeDraft" />
-      <Confirm
-        v-if="resume"
-:text="`지난번에 쓰던 내용이 있어요(${resumeSummary(resume)}). 이어서 할까요?`"
-        cancel-text="새로 시작"
-        ok-text="이어서 하기"
-        has-dim
-        @dim="() => undefined"
-        @cancel="resumeNo"
-        @ok="resumeOk"
-      />
+      <DraftSheet v-if="draftsOpen" :items="draftList" :closed="closedMeta" :busy="draftBusy" @close="draftsOpen = false" @open="openDraft" @remove="removeDraft" />
       <Confirm
         v-if="doneAsk"
         :text="`등록했어요(시안 화면이라 실제로 등록하지는 않아요). 올린 ${video && !video.uploading ? (readyPhotos ? '사진·영상' : '영상') : `사진 ${readyPhotos}장`}으로 쇼츠도 바로 만들까요? 고르지 않아도 알아서 만들어요.`"

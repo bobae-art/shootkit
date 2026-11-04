@@ -10,7 +10,8 @@ import { useDialogFocus } from "../../composables/useDialogFocus";
 import { MAX_DRAFTS, draftWhen, type DraftMeta } from "../../lib/drafts";
 import { rd } from "../../lib/site";
 
-defineProps<{ items: DraftMeta[]; busy?: boolean }>();
+// closed: 「저장 안 함」으로 닫은 작업(2026-11-04, 잘못 눌렀을 때 되살리기). 열기 · 지우기는 저장한 글과 같다
+defineProps<{ items: DraftMeta[]; closed?: DraftMeta | null; busy?: boolean }>();
 const emit = defineEmits<{ close: []; open: [id: string]; remove: [id: string] }>();
 const box = ref<HTMLElement | null>(null);
 useDialogFocus(box, () => emit("close"));
@@ -24,6 +25,23 @@ const place = (m: DraftMeta) => (m.region ? `${m.region.sido}${m.region.gu ? ` $
         <h2 id="shoot-drafts-t">저장한 글</h2>
         <button type="button" class="shoot-icon-btn" aria-label="닫기" @click="emit('close')"><Mask :src="rd('close-outline')" /></button>
       </header>
+      <template v-if="closed">
+        <h3 class="shoot-drafts-sub">최근에 닫은 작업 <small>저장하지 않고 나간 작업을 한 건 보관해요</small></h3>
+        <ul class="shoot-drafts-list">
+          <li>
+            <button type="button" class="shoot-drafts-open" :disabled="busy" @click="emit('open', closed.id)">
+              <img v-if="closed.thumb" :src="closed.thumb" alt="" />
+              <i v-else class="is-blank" />
+              <span>
+                <b>사진 {{ closed.photoCount }}장{{ closed.hasVideo ? " · 영상" : "" }}</b>
+                <small>{{ place(closed) }} · {{ draftWhen(closed.savedAt) }}</small>
+              </span>
+            </button>
+            <button type="button" class="shoot-drafts-del" aria-label="최근에 닫은 작업 지우기" :disabled="busy" @click="emit('remove', closed.id)"><Mask :src="rd('delete-outline')" /></button>
+          </li>
+        </ul>
+        <h3 class="shoot-drafts-sub">저장한 글</h3>
+      </template>
       <p v-if="!items.length" class="shoot-drafts-empty">저장한 글이 없어요. 아래 「임시저장」을 누르면 이 폰에 담아 둬요.</p>
       <ul v-else class="shoot-drafts-list">
         <li v-for="m in items" :key="m.id">

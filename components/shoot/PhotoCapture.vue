@@ -35,7 +35,8 @@ import { GUIDE_ON, askTilt, type CamSession } from "../../lib/photo-capture";
 import { QC_TAG, QC_TEXT, QC_TIP, checkPhoto, firstIssue, type QcIssue } from "../../lib/quality";
 
 const props = defineProps<{ existing: Photo[]; startMode: "cam" | "album" }>();
-const emit = defineEmits<{ close: []; done: [added: Photo[]]; notify: [t: string] }>();
+// pending: 「완료」 전에 고른(찍은) 사진 — 2026-11-04 자동 보관용(전화 등으로 중단돼도 남게)
+const emit = defineEmits<{ close: []; done: [added: Photo[]]; notify: [t: string]; pending: [picked: Photo[]] }>();
 const notify = (t: string) => emit("notify", t);
 
 const mode = ref<"cam" | "album">(props.startMode);
@@ -300,13 +301,13 @@ const importFiles = async (files: FileList | null) => {
   if (PLUS) for (const p of photos) void checkPhoto(p.src).then((qc) => alive && setQc(p.id, qc));
 };
 
-const done = () => {
+const pickedPhotos = () => {
   const byId = new Map(albumItems.value.map((p) => [p.id, p]));
-  emit(
-    "done",
-    session.value.picked.map((id) => byId.get(id)).filter((p): p is Photo => Boolean(p)),
-  );
+  return session.value.picked.map((id) => byId.get(id)).filter((p): p is Photo => Boolean(p));
 };
+const done = () => emit("done", pickedPhotos());
+// 찍거나 고를 때마다 부모가 자동 보관에 넣을 수 있게 알린다
+watch(session, () => emit("pending", pickedPhotos()), { deep: true });
 
 const onClickClose = () => (PLUS && session.value.picked.length ? (askClose.value = true) : emit("close"));
 // 2026-10-29 컨설팅: 휴대폰 뒤로가기 · Esc도 X와 같게(찍은 사진이 있으면 먼저 묻는다). 뒤로가기는 등록 화면이 Esc로 바꿔 보낸다.
