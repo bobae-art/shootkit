@@ -659,8 +659,7 @@
           "rule": "rearRight",
           "level": "required",
           "guide": {
-            "kind": "q34",
-            "flip": true,
+            "kind": "rq34",
             "hint": "차 뒷모서리를 윤곽 모서리에 맞춰 주세요"
           },
           "auto": [
