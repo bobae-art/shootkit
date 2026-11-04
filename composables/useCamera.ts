@@ -33,6 +33,11 @@ export type CameraState = {
   selectLens: (id: string | null) => void;
   /** ?lens=info 진단 줄(카메라마다 이름 · 최대 해상도, 지금 열린 카메라 · 줌 범위) */
   lensDebug: Ref<string[]>;
+  /** 줌 버튼 값(지금 카메라가 줌을 지원할 때만, 예: [1, 2, 3, 5]). 비면 줌 버튼을 숨긴다 */
+  zoomSteps: Ref<number[]>;
+  /** 지금 줌 배율 */
+  zoom: Ref<number>;
+  setZoom: (z: number) => void;
   /** 이 폰에서 찾은 후면 카메라 수(기본 포함, ?lens=info 진단용) */
   lensCount: ComputedRef<number>;
 };
@@ -105,6 +110,9 @@ export function useCamera(
   const save = () => writeSaved(lensKey, { lens: lensId.value, base: baseId, pin: basePinned });
   const lenses = ref<Lens[]>([]);
   const lensDebug = ref<string[]>([]);
+  // 2026-11-04 줌 버튼: 크롬(갤럭시 S23 울트라 실기)은 망원 렌즈를 따로 공개하지 않지만 메인 카메라 줌 1~8을 알려 준다
+  const zoomSteps = ref<number[]>([]);
+  const zoom = ref(1);
   let devList: MediaDeviceInfo[] = [];
   let current: MediaStream | null = null;
   let stop: (() => void) | null = null;
@@ -149,7 +157,7 @@ export function useCamera(
         return c?.width?.max ? `${c.width.max}×${c.height?.max ?? "?"}` : "?";
       };
       lensDebug.value = [
-        `지금: ${name(st.deviceId)} · ${st.width ?? "?"}×${st.height ?? "?"} · 줌 ${tc.zoom ? `${tc.zoom.min}~${tc.zoom.max}` : "없음"}`,
+        `지금: ${name(st.deviceId)} · ${st.width ?? "?"}×${st.height ?? "?"} · 줌 ${tc.zoom ? `${tc.zoom.min}~${tc.zoom.max} (지금 ${(st as { zoom?: number }).zoom ?? zoom.value}배)` : "없음"}`,
         ...devList.filter((d) => !isFront(d.label)).map((d) => `${d.label} · 최대 ${maxRes(d)}${d.deviceId === baseId ? " [기본]" : ""}`),
       ];
     } catch {
@@ -197,6 +205,14 @@ export function useCamera(
         const track = s.getVideoTracks()[0];
         const caps = (track?.getCapabilities?.() ?? {}) as { torch?: boolean };
         torchSupported.value = Boolean(caps.torch);
+        // 줌: 새 카메라가 열릴 때마다 1배에서 시작
+        const zc = (track?.getCapabilities?.() ?? {}) as { zoom?: { min: number; max: number } };
+        zoom.value = 1;
+        zoomSteps.value =
+          zc.zoom && zc.zoom.max > 1
+            ? [...(zc.zoom.min < 0.95 ? [Math.round(zc.zoom.min * 10) / 10] : []), 1, 2, 3, 5].filter((z) => z >= zc.zoom!.min - 1e-6 && z <= zc.zoom!.max + 1e-6)
+            : [];
+        if (zoomSteps.value.length < 2) zoomSteps.value = [];
         void loadLenses(s).then(() => describe(s));
       })
       .catch((e: unknown) => {
@@ -224,6 +240,21 @@ export function useCamera(
     void track.applyConstraints({ advanced: [{ torch: on } as MediaTrackConstraintSet] }).catch(() => undefined);
   };
 
+  const setZoom = (z: number) => {
+    const track = current?.getVideoTracks()[0];
+    if (!track || z === zoom.value) return;
+    const prev = zoom.value;
+    zoom.value = z;
+    void track.applyConstraints({ advanced: [{ zoom: z } as MediaTrackConstraintSet] }).then(
+      () => current && describe(current),
+      () => {
+        // 줌을 못 거는 폰(권한 · 브라우저 제한)은 줌 버튼을 숨기고 그대로 쓴다
+        zoom.value = prev;
+        zoomSteps.value = [];
+      },
+    );
+  };
+
   const nextLens = () => {
     if (!lenses.value.length) return;
     const i = lenses.value.findIndex((l) => l.id === lensId.value);
@@ -244,5 +275,5 @@ export function useCamera(
   };
   const lensCount = computed(() => lenses.value.length + 1);
 
-  return { stream, error, torchSupported, setTorch, retry: () => (nonce.value += 1), lenses, lensLabel, nextLens, lensCount, lensOptions, selectLens, lensDebug };
+  return { stream, error, torchSupported, setTorch, retry: () => (nonce.value += 1), lenses, lensLabel, nextLens, lensCount, lensOptions, selectLens, lensDebug, zoomSteps, zoom, setZoom };
 }
