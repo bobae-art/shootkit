@@ -1,9 +1,9 @@
-// 등록하기 → 실제 업로드(2026-10-31 「실제 동작 가능하게」 · 「임시 무료 서버」).
-// 큰 파일은 서버를 거치지 않는다: 폰 → Vercel Blob 직접(@vercel/blob/client), 서버(shootkit-api, Laravel 12)는
-// 촬영 기록 · 업로드 허가표 · 등록 확인만 맡는다. 서버 주소가 없으면 예전처럼 「시안 화면」 안내만 한다.
+// 등록하기 → 실제 업로드(2026-10-31 「실제 동작 가능하게」).
+// 2026-11-06: 테스트 백엔드 서버(노션 「테스트 백엔드 서버정보」)에 연결. 사진·영상은 폰 → 서버로 바로 올리고(PUT, 파일 그대로),
+// 서버(shootkit-api, PHP)는 파일 저장 · 촬영 기록(숏폼 DB) · 등록 확인을 맡는다. 서버 주소가 비면 예전처럼 「시안 화면」 안내만 한다.
 
-/** 임시 무료 서버 주소. 비어 있으면 업로드를 끈다(배포 후 채움). */
-export const DEFAULT_API = "";
+/** 테스트 서버 주소(121.78.125.73 · https는 sslip.io 이름으로 인증서를 받았다). 비우면 업로드를 끈다. */
+export const DEFAULT_API = "https://121-78-125-73.sslip.io";
 
 /** 시험용: ?api=http://127.0.0.1:7799 (내 컴퓨터 주소만 허락 — 다른 곳으로 사진이 새지 않게) */
 export function apiBase(): string {
@@ -46,6 +46,32 @@ async function api<T>(path: string, body?: unknown): Promise<T> {
 /** 파일 이름: shoots/{id}/photo/01-s3.jpg (번호 = 등록 화면 순서, 이름표는 meta.items) */
 const pathOf = (id: string, it: UpItem, type: string) => `shoots/${id}/${it.kind}/${String(it.n).padStart(2, "0")}-${it.key}.${EXT[type] ?? (it.kind === "photo" ? "jpg" : "mp4")}`;
 
+/**
+ * 파일 하나를 서버에 그대로 올린다: PUT /api/shoots/{id}/files/{kind}/{번호-이름.확장자}.
+ * 진행률을 보려고 fetch 대신 XMLHttpRequest를 쓴다(fetch는 올리는 진행률을 알려 주지 않는다).
+ */
+function putFile(pathname: string, blob: Blob, type: string, onLoaded: (loaded: number) => void): Promise<{ pathname: string }> {
+  const url = apiBase() + "/api/" + pathname.replace(/^shoots\/([^/]+)\//, "shoots/$1/files/");
+  return new Promise((resolve, reject) => {
+    const x = new XMLHttpRequest();
+    x.open("PUT", url);
+    x.setRequestHeader("content-type", type);
+    x.timeout = 10 * 60 * 1000;
+    x.upload.onprogress = (e) => onLoaded(e.loaded);
+    x.onload = () => {
+      let j: { pathname?: string; error?: string; code?: string } = {};
+      try {
+        j = JSON.parse(x.responseText);
+      } catch {}
+      if (x.status >= 200 && x.status < 300 && j.pathname) resolve({ pathname: j.pathname });
+      else reject(new UploadError(j.error || "파일을 올리지 못했어요.", j.code || String(x.status)));
+    };
+    x.onerror = () => reject(new UploadError("인터넷 연결을 확인해 주세요.", "offline"));
+    x.ontimeout = () => reject(new UploadError("올리는 데 너무 오래 걸려요. 다시 시도해 주세요.", "timeout"));
+    x.send(blob);
+  });
+}
+
 async function blobOf(src: string): Promise<Blob> {
   const r = await fetch(src);
   if (!r.ok) throw new UploadError("찍은 파일을 읽지 못했어요.", "read");
@@ -62,8 +88,6 @@ export async function uploadShoot(
   state: UpState,
   onProgress: (p: UpProgress) => void,
 ): Promise<UpResult> {
-  const { upload } = await import("@vercel/blob/client");
-  const base = apiBase();
   if (!state.id) {
     const c = await api<{ id: string }>("/api/shoots", {
       ...meta,
@@ -96,15 +120,9 @@ export async function uploadShoot(
           const type = blob.type || (it.kind === "photo" ? "image/jpeg" : "video/mp4");
           bytes.set(k, { loaded: 0, total: blob.size });
           tick(it.label);
-          const r = await upload(pathOf(id, it, type), blob, {
-            access: "public",
-            handleUploadUrl: `${base}/api/blob/upload`,
-            contentType: type,
-            multipart: blob.size > 8 * 1024 * 1024,
-            onUploadProgress: (e) => {
-              bytes.set(k, { loaded: e.loaded, total: e.total || blob.size });
-              tick(it!.label);
-            },
+          const r = await putFile(pathOf(id, it, type), blob, type, (loaded) => {
+            bytes.set(k, { loaded, total: blob.size });
+            tick(it!.label);
           });
           state.done[k] = r.pathname;
           bytes.delete(k);
