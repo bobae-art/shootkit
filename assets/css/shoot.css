@@ -5391,9 +5391,14 @@ body:has(.shoot-layer) .shoot-install {
   }
 }
 
-/* 올린 내용 보기(?shoot=) */
+/* 올린 내용 보기(?shoot=)
+   2026-11-06 S23: 아래 사진이 안 보임 → body가 overflow:hidden(촬영 화면용)이라 이 화면은 스스로 스크롤한다 */
 .shoot-seen {
-  min-height: 100dvh;
+  box-sizing: border-box;
+  height: 100%;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
   max-width: 720px;
   margin: 0 auto;
   padding: 0 16px 40px;
